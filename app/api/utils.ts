@@ -6,7 +6,7 @@ export function responseSuccess(response: AxiosResponse<any, any>) {
     status: response?.status,
     statusText: response?.statusText,
     message: response?.data?.message,
-    data: response?.data?.data?.output,
+    data: response?.data?.data,
     code: response?.data?.code
   }, { status: response?.status });
 }

@@ -1,14 +1,13 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  username: z
+  email: z
     .string()
-    .min(1, "Username is required")
-    .min(3, "Username must be at least 3 characters"),
-  password: z
-    .string()
-    .min(1, "Password is required")
-    .min(8, "Password must be at least 8 characters"),
+    .min(1, "Email là bắt buộc")
+    .email("Email không hợp lệ")
+    .trim(),
+  password: z.string().min(1, "Mật khẩu là bắt buộc")
+    .trim(),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;

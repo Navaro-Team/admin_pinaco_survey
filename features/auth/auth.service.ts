@@ -1,14 +1,15 @@
-import { HttpService } from "../http/HttpService";
+import { clientService } from "../http/ClientService";
 import { parseCommonHttpResult } from "../http/parseCommonResult";
+import { LoginFormData } from "./auth.schema";
 
 class AuthService {
-  async login(data: { email: string, password: string }) {
-    const response = await HttpService.doPostRequest('/auth/login', data);
+  async login(data: { username: string, password: string }) {
+    const response = await clientService.post('/auth/login', data);
     return parseCommonHttpResult(response);
   }
 
   async logout() {
-    const response = await HttpService.doPostRequest('/auth/logout', "", true);
+    const response = await clientService.post('/auth/logout');
     return parseCommonHttpResult(response);
   }
 }

@@ -32,6 +32,7 @@ import { clearRequestState, logout } from "@/features/auth/auth.slice"
 import { useEffect } from "react"
 import { useToastContext } from "@/context/ToastContext"
 import Link from "next/link"
+import { clearUser, setIsLogged } from "@/features/app/app.slice"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
@@ -47,6 +48,8 @@ export function NavUser() {
 
   const handleLogout = async () => {
     dispatch(logout());
+    dispatch(clearUser());
+    dispatch(setIsLogged(false));
   }
 
   useEffect(() => {

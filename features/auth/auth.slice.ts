@@ -12,7 +12,6 @@ const initialState: AuthState = {
 };
 
 export const login: any = commonCreateAsyncThunk({ type: 'login', action: authService.login });
-
 export const logout: any = commonCreateAsyncThunk({ type: 'logout', action: authService.logout });
 
 const authSlice = createSlice({
@@ -23,7 +22,15 @@ const authSlice = createSlice({
       state.requestState = { status: 'idle', type: '' };
     }
   },
-  extraReducers: (builder) => { }
+  extraReducers: (builder) => {
+    builder
+      .addCase(login.fulfilled, (state) => {
+        state.requestState = { status: 'completed', type: 'login' };
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.requestState = { status: 'completed', type: 'logout' };
+      });
+  }
 });
 
 export const {
