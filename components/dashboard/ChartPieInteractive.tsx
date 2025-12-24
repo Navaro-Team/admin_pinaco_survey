@@ -1,7 +1,6 @@
 "use client"
 import * as React from "react"
-import { Label, Legend, Pie, PieChart, Sector } from "recharts"
-import { PieSectorDataItem } from "recharts/types/polar/Pie"
+import { Label, Legend, Pie, PieChart } from "recharts"
 import {
   ChartConfig,
   ChartContainer,
@@ -9,50 +8,35 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-export const description = "An interactive pie chart"
-const desktopData = [
-  { month: "january", desktop: 186, fill: "var(--color-january)" },
-  { month: "february", desktop: 305, fill: "var(--color-february)" },
-  { month: "march", desktop: 237, fill: "var(--color-march)" },
-  { month: "april", desktop: 173, fill: "var(--color-april)" },
-  { month: "may", desktop: 209, fill: "var(--color-may)" },
+
+const brandData = [
+  { brand: "pinaco", value: 305, fill: "#20409a" },
+  { brand: "gs", value: 186, fill: "#10b981" },
+  { brand: "enimac", value: 173, fill: "#f59e0b" },
+  { brand: "globe", value: 120, fill: "#6b7280" },
+  { brand: "others", value: 100, fill: "#8b5cf6" },
 ]
+
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  pinaco: {
+    label: "Pinaco",
+    color: "#20409a",
   },
-  desktop: {
-    label: "Desktop",
+  gs: {
+    label: "GS",
+    color: "#10b981",
   },
-  mobile: {
-    label: "Mobile",
+  enimac: {
+    label: "Enimac",
+    color: "#f59e0b",
   },
-  january: {
-    label: "January",
-    color: "var(--chart-1)",
+  globe: {
+    label: "Globe",
+    color: "#6b7280",
   },
-  february: {
-    label: "February",
-    color: "var(--chart-2)",
-  },
-  march: {
-    label: "March",
-    color: "var(--chart-3)",
-  },
-  april: {
-    label: "April",
-    color: "var(--chart-4)",
-  },
-  may: {
-    label: "May",
-    color: "var(--chart-5)",
+  others: {
+    label: "Other",
+    color: "#8b5cf6",
   },
 } satisfies ChartConfig
 
@@ -79,9 +63,9 @@ export function ChartPieInteractive() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={desktopData}
-              dataKey="desktop"
-              nameKey="month"
+              data={brandData}
+              dataKey="value"
+              nameKey="brand"
               innerRadius={60}
               strokeWidth={5}>
               <Label
@@ -99,14 +83,14 @@ export function ChartPieInteractive() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {desktopData[0].desktop.toLocaleString()}
+                          {brandData[0].value.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Pinaco
                         </tspan>
                       </text>
                     )
@@ -114,7 +98,11 @@ export function ChartPieInteractive() {
                 }}
               />
             </Pie>
-            <Legend verticalAlign="bottom" height={36} />
+            <Legend 
+              verticalAlign="bottom" 
+              height={36}
+              formatter={(value: string) => chartConfig[value as keyof typeof chartConfig]?.label || value}
+            />
           </PieChart>
         </ChartContainer>
       </div>

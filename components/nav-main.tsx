@@ -47,10 +47,10 @@ export function NavMain({
               <SidebarMenuButton
                 tooltip={item.title}
                 isActive={isActive}
-                className={`text-sm font-medium p-2! ${isActive ? "bg-blue-100! text-main!" : ""}`}
+                className={`text-sm font-normal p-2! ${isActive ? "bg-blue-100! text-main!" : ""}`}
               >
                 <Link className="w-full flex items-center gap-2" href={item.url}>
-                  {item.icon && <item.icon className="h-[24px] w-[24px]" />}
+                  {item.icon && <item.icon className="h-5 w-5" />}
                   {(item.items && item.items.length) || open ? <span>{item.title}</span> : <></>}
                 </Link>
               </SidebarMenuButton>
