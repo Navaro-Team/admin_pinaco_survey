@@ -9,7 +9,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { clearRequestState } from "@/features/auth/auth.slice";
+import { clearAuthState } from "@/features/auth/auth.slice";
 import { useToastContext } from "@/context/ToastContext";
 
 export function ResetPasswordForm({
@@ -76,7 +76,7 @@ export function ResetPasswordForm({
           break;
         case 'failed':
           error(authRequestState.error || 'Error. Please try again.');
-          dispatch(clearRequestState())
+          dispatch(clearAuthState())
           break;
       }
     }

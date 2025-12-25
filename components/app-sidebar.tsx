@@ -2,14 +2,8 @@
 
 import * as React from "react"
 import {
-  BookOpen,
-  Settings2,
   LayoutDashboard,
-  ShoppingCart,
-  Rocket,
   Users,
-  ExternalLink,
-  HeadphonesIcon,
   FileText,
   Calendar,
   List

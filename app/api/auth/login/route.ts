@@ -24,13 +24,13 @@ export async function POST(request: NextRequest) {
       const refreshToken = responseData?.data?.refreshToken;
 
       if (accessToken) {
-        (await cookies()).set('accessToken', accessToken, {
+        (await cookies()).set('access_token', accessToken, {
           path: '/',
           httpOnly: true,
         });
       }
       if (refreshToken) {
-        (await cookies()).set('refreshToken', refreshToken, {
+        (await cookies()).set('refresh_token', refreshToken, {
           path: '/',
           httpOnly: true,
         });

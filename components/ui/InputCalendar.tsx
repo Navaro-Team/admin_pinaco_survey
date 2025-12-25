@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -26,6 +27,11 @@ export function InputCalendar({
 }: InputCalendarProps) {
   const [open, setOpen] = useState(false);
   const [internalDate, setInternalDate] = useState<Date | null>(value ?? null);
+
+  // Sync internal date with value prop
+  React.useEffect(() => {
+    setInternalDate(value ?? null);
+  }, [value]);
 
   const displayValue = useMemo(() => {
     if (!internalDate) return "";

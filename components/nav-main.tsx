@@ -1,21 +1,13 @@
 "use client"
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
+import { type LucideIcon } from "lucide-react"
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar'
 import Link from "next/link"
@@ -47,10 +39,9 @@ export function NavMain({
               <SidebarMenuButton
                 tooltip={item.title}
                 isActive={isActive}
-                className={`text-sm font-normal p-2! ${isActive ? "bg-blue-100! text-main!" : ""}`}
-              >
+                className={`p-2! ${isActive ? "bg-blue-100! text-main!" : ""}`} >
                 <Link className="w-full flex items-center gap-2" href={item.url}>
-                  {item.icon && <item.icon className="h-5 w-5" />}
+                  {item.icon && <item.icon className="h-4 w-4" />}
                   {(item.items && item.items.length) || open ? <span>{item.title}</span> : <></>}
                 </Link>
               </SidebarMenuButton>

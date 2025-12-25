@@ -6,14 +6,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { Status, StatusBadge } from "../ui/status-badge";
 import { Table as TableUI, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../ui/table";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../ui/pagination";
+import { TablePagination } from "../ui/table-pagination";
 import Link from "next/link";
 
 export function Table() {
@@ -82,47 +75,9 @@ export function Table() {
     },
   ]
 
-  const totalPages = Math.ceil(surveys.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentSurveys = surveys.slice(startIndex, endIndex);
-  const startItem = startIndex + 1;
-  const endItem = Math.min(endIndex, surveys.length);
-
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    const maxVisiblePages = 5;
-
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-
-      if (currentPage <= 3) {
-        for (let i = 2; i <= 4; i++) {
-          pages.push(i);
-        }
-        pages.push("...");
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push("...");
-        for (let i = totalPages - 3; i <= totalPages; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push("...");
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push("...");
-        pages.push(totalPages);
-      }
-    }
-
-    return pages;
-  };
 
   return (
     <Card>
@@ -165,44 +120,12 @@ export function Table() {
             ))}
           </TableBody>
         </TableUI>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t">
-          <div className="text-sm text-muted-foreground w-full sm:w-auto">
-            Hiển thị {startItem} đến {endItem} trong tổng số {surveys.length} mục
-          </div>
-          <Pagination className="w-full sm:w-auto">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-              {getPageNumbers().map((page, index) => (
-                <PaginationItem key={index}>
-                  {page === "..." ? (
-                    <span className="flex h-9 w-9 items-center justify-center text-muted-foreground">
-                      ...
-                    </span>
-                  ) : (
-                    <PaginationLink
-                      onClick={() => setCurrentPage(page as number)}
-                      isActive={currentPage === page}
-                      className="cursor-pointer"
-                    >
-                      {page}
-                    </PaginationLink>
-                  )}
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        <TablePagination
+          currentPage={currentPage}
+          totalItems={surveys.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+        />
       </CardContent>
     </Card>
   )

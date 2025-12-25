@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { clearRequestState } from "@/features/auth/auth.slice";
+import { clearAuthState } from "@/features/auth/auth.slice";
 import Link from "next/link";
 
 export function RegisterForm() {
@@ -110,12 +110,12 @@ export function RegisterForm() {
       switch (requestState?.status) {
         case 'completed':
           success("Register", "Please login to continue");
-          dispatch(clearRequestState());
+          dispatch(clearAuthState());
           router.push('/login');
           break;
         case 'failed':
           error("Register", requestState.error || 'Please try again');
-          dispatch(clearRequestState());
+          dispatch(clearAuthState());
           break;
       }
     }

@@ -27,6 +27,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     } else if (pathWaiting.includes(pathname)) {
       router.push("/dashboard");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLogged, pathname, query, router]);
 
   return isLogged ? <SidebarProvider

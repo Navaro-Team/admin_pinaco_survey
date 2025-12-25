@@ -1,4 +1,4 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
+import { IconTrendingUp } from "@tabler/icons-react"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { BadgeCheck, CheckCircle2Icon, CheckIcon, PercentCircle, PlusCircleIcon, ReceiptTextIcon } from "lucide-react"
+import { BadgeCheck, CheckCircle2Icon, PercentCircle, ReceiptTextIcon } from "lucide-react"
 
 export function SectionCards() {
   return (

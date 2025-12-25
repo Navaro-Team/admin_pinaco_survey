@@ -21,6 +21,6 @@ export function responseFailed(error: any, defaultMessage: string) {
   return NextResponse.json({
     message: error.message || defaultMessage,
     code: error.status || 500,
-    statusText: error.statusText || 'Internal Server Error',
+    // statusText: error.statusText || 'Internal Server Error',
   }, { status: error.status || 500 });
 }

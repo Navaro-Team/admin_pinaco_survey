@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { clearRequestState } from "@/features/auth/auth.slice";
+import { clearAuthState } from "@/features/auth/auth.slice";
 import { useToastContext } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 
@@ -62,7 +62,7 @@ export function ForgotForm({
           break;
         case 'failed':
           error(authRequestState.error || 'Có lỗi xảy ra. Vui lòng thử lại.');
-          dispatch(clearRequestState())
+          dispatch(clearAuthState())
           break;
       }
     }
@@ -89,7 +89,7 @@ export function ForgotForm({
             type="submit"
             className="w-full cursor-pointer"
             onClick={() => {
-              dispatch(clearRequestState())
+              dispatch(clearAuthState())
               router.push('/login')
             }} >
             Return to login
