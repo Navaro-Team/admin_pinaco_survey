@@ -7,7 +7,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const accessToken = (await cookies()).get('accessToken')?.value;
+  const accessToken = (await cookies()).get('access_token')?.value;
   try {
     if (!accessToken) throw new Error('No access token');
     const { id } = await params;
@@ -24,7 +24,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const accessToken = (await cookies()).get('accessToken')?.value;
+  const accessToken = (await cookies()).get('access_token')?.value;
   try {
     if (!accessToken) throw new Error('No access token');
     const { id } = await params;

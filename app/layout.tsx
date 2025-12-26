@@ -7,6 +7,7 @@ import { ToastProvider } from '@/context/ToastContext';
 import { ToastContainer } from '@/components/ui/toast-container';
 import { DialogProvider } from '@/context/DialogContext';
 import { DialogContainer } from '@/components/ui/dialog-container';
+import { NavigationProgress } from "@/components/navigation-progress";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
         <Providers>
           <ToastProvider>
             <DialogProvider>
+              <NavigationProgress />
               <AuthGuard>
                 {children}
               </AuthGuard>

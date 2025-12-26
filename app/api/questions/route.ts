@@ -4,7 +4,7 @@ import { serverService } from "@/features/http/ServerService";
 import { responseFailed, responseSuccess } from "../utils";
 
 export async function GET(request: NextRequest) {
-  const accessToken = (await cookies()).get('accessToken')?.value;
+  const accessToken = (await cookies()).get('access_token')?.value;
   const params = request.nextUrl.searchParams;
   try {
     if (!accessToken) throw new Error('No access token');
