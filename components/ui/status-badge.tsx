@@ -7,6 +7,7 @@ export enum Status {
   COMPLETED = "COMPLETED",
   IN_PROGRESS = "IN_PROGRESS",
   OVERDUE = "OVERDUE",
+  RESURVEY_REQUIRED = "RESURVEY_REQUIRED",
   PENDING = "PENDING",
 }
 
@@ -20,6 +21,7 @@ const statusConfig: Record<Status, { label: string; variant: "default" | "second
   [Status.IN_PROGRESS]: { label: "Sắp diễn ra", variant: "secondary", color: "bg-yellow-500 text-white" },
   [Status.PENDING]: { label: "Đã gửi yêu cầu hỗ trợ", variant: "outline", color: "bg-blue-500 text-white" },
   [Status.OVERDUE]: { label: "Quá hạn khảo sát", variant: "destructive", color: "bg-red-500 text-white" },
+  [Status.RESURVEY_REQUIRED]: { label: "Yêu cầu hỗ trợ", variant: "outline", color: "bg-blue-500 text-white" },
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {

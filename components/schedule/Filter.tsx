@@ -4,10 +4,10 @@ import { Input } from "../ui/input";
 import { InputCalendar } from "../ui/InputCalendar";
 import { Label } from "../ui/label";
 import { Combobox } from "../ui/combobox";
-import { changeArea, changeDeadline, changeRegion, changeStatus, changeStore } from "@/features/schedule/schedule.slice";
+import { changeArea, changeDeadline, changeRegion, changeStatus, changeStore, clearFilter, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
 import { Status } from "../ui/status-badge";
 import { Button } from "../ui/button";
-import { Search } from "lucide-react";
+import { RefreshCcw, X } from "lucide-react";
 
 export function Filter() {
   const dispatch = useAppDispatch();
@@ -18,14 +18,24 @@ export function Filter() {
   const status = useAppSelector((state) => state.schedule.filter.status);
   const deadline = useAppSelector((state) => state.schedule.filter.deadline);
 
+  const handleClearFilter = () => {
+    dispatch(clearFilter());
+  }
+
+  const handleRefresh = () => {
+    handleClearFilter();
+    dispatch(resetPagination());
+    dispatch(getTasks({ page: 1, limit: 20 }));
+  }
+
   return (
     <Card>
       <CardContent>
         <div className="flex flex-col md:flex-row gap-4 md:items-end w-full">
           <div className="flex-1 min-w-0 flex flex-col gap-2">
-            <Label>Mã / Tên điểm bán</Label>
+            <Label>Tên cửa hàng</Label>
             <Input
-              placeholder="Nhập mã điểm bán hoặc tên điểm bán"
+              placeholder="Nhập tên cửa hàng"
               value={store}
               onChange={(e) => dispatch(changeStore(e.target.value))} />
           </div>
@@ -58,6 +68,7 @@ export function Filter() {
             <InputCalendar
               placeholder="Chọn hạn khảo sát"
               inputFormat="dd/MM/yyyy"
+
               value={deadline}
               onChange={(value) => dispatch(changeDeadline(value))}
             />
@@ -69,14 +80,19 @@ export function Filter() {
               options={[
                 { value: Status.COMPLETED, label: "Đã hoàn thành" },
                 { value: Status.IN_PROGRESS, label: "Sắp diễn ra" },
-                { value: Status.OVERDUE, label: "Quá hạn khảo sát" }]}
+                { value: Status.OVERDUE, label: "Quá hạn khảo sát" },
+                { value: Status.RESURVEY_REQUIRED, label: "Yêu cầu hỗ trợ" }
+              ]}
               value={status}
               placeholder="Chọn trạng thái"
               onChange={(value) => dispatch(changeStatus(value))} />
           </div>
-          <Button variant="outline" className="w-full md:w-24 h-10 md:self-end">
-            <Search className="size-4" />
-            Lọc
+          <Button variant="outline" className="w-full md:w-24 h-10 md:self-end" onClick={handleClearFilter}>
+            <X className="size-4" />
+            Xoá lọc
+          </Button>
+          <Button variant="outline" className="w-10 h-10 md:self-end" onClick={handleRefresh}>
+            <RefreshCcw className="size-4" />
           </Button>
         </div>
       </CardContent>

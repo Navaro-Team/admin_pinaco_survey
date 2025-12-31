@@ -75,6 +75,7 @@ export function InputCalendar({
             setOpen(false);
           }}
           captionLayout="dropdown"
+          toYear={new Date().getFullYear() + 5}
         />
       </PopoverContent>
     </Popover>

@@ -5,8 +5,13 @@ import { StoreIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { useEffect } from "react";
+import { getStores } from "@/features/store/store.slice";
 
 export function StoreInfo() {
+  const task = useAppSelector((state) => state.schedule.task);
+
   return (
     <Card className="flex flex-col gap-4!">
       <CardHeader className="h-8">
