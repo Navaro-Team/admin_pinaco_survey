@@ -1,76 +1,161 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InputCalendar } from "@/components/ui/InputCalendar";
 import { Combobox } from "@/components/ui/combobox";
-import { StaffFormData, staffSchema } from "@/features/staffs/staffs.schema";
+import { StaffFormData, staffFormSchema } from "@/features/staffs/staffs.schema";
 import { Spinner } from "@/components/ui/spinner";
 import { ArrowLeft } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { getUserById, createUser, updateUser, clearStaffsState } from "@/features/staffs/staffs.slice";
+import { useDialog } from "@/hooks/use-dialog";
 
-interface StaffFormProps {
-  id?: string;
-}
-
-export function StaffForm({ id }: StaffFormProps) {
+export function StaffForm() {
   const router = useRouter();
-  const isEdit = !!id;
+  const dispatch = useAppDispatch();
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const { showSuccess, showFailed, showInfo, showLoading } = useDialog();
+
+  const action = useAppSelector((state) => state.staffs.action);
+  const requestState = useAppSelector((state) => state.staffs.requestState);
+  const selectedStaff = useAppSelector((state) => state.staffs.selectedStaff);
+
+  const isEdit = action === "UPD";
 
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    trigger,
   } = useForm<StaffFormData>({
-    resolver: zodResolver(staffSchema),
+    resolver: zodResolver(staffFormSchema),
+    mode: "onBlur", // Validate on blur
     defaultValues: {
-      fullName: "",
+      name: "",
       phone: "",
       email: "",
-      dateOfBirth: null,
+      dateOfBirth: undefined,
       address: "",
-      gender: "",
-      role: "",
+      gender: null,
+      password: "",
+      roles: [],
+      status: "active",
     },
   });
 
-  // Load data nếu là edit mode
   useEffect(() => {
-    if (isEdit && id) {
-      // TODO: Fetch data từ API
-      // const fetchData = async () => {
-      //   const data = await getStaff(id);
-      //   reset({
-      //     ...data,
-      //     dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
-      //   });
-      // };
-      // fetchData();
+    if (isEdit) {
+      const fetchData = async () => {
+        try {
+          setIsLoadingData(true);
+          await dispatch(getUserById(selectedStaff?.id || ""));
+        } catch (err) {
+          showFailed({
+            title: "Lỗi khi lấy dữ liệu nhân sự",
+            description: (err as any)?.message || "Có lỗi xảy ra. Vui lòng thử lại.",
+            onConfirm() {
+              router.push("/staffs");
+              dispatch(clearStaffsState());
+              setIsLoadingData(false);
+            },
+            onCancel() {
+              router.push("/staffs");
+              dispatch(clearStaffsState());
+              setIsLoadingData(false);
+            },
+          });
+        } finally {
+          setIsLoadingData(false);
+        }
+      };
+      fetchData();
     }
-  }, [id, isEdit, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [action, dispatch]);
+
+  useEffect(() => {
+    if (selectedStaff && isEdit) {
+      reset({
+        name: selectedStaff.name || "",
+        phone: selectedStaff.phone || "",
+        email: selectedStaff.email || "",
+        dateOfBirth: selectedStaff.dateOfBirth
+          ? new Date(selectedStaff.dateOfBirth)
+          : undefined,
+        address: selectedStaff.address || "",
+        gender: selectedStaff.gender || null,
+        password: "",
+        roles: selectedStaff.roles || [],
+        status: (selectedStaff.status as "active" | "inactive" | "suspended" | "banned" | "deleted" | "locked" | "requires_re_authentication") || "active",
+      });
+    } else if (!isEdit) {
+      reset({
+        name: "",
+        phone: "",
+        email: "",
+        dateOfBirth: undefined,
+        address: "",
+        gender: null,
+        password: "",
+        roles: [],
+        status: "active",
+      });
+    }
+  }, [selectedStaff, isEdit, reset]);
 
   const onSubmit = async (data: StaffFormData) => {
-    try {
-      // TODO: Call API để tạo hoặc cập nhật
-      // if (isEdit) {
-      //   await updateStaff(id, data);
-      // } else {
-      //   await createStaff(data);
-      // }
-      console.log("Form data:", data);
-
-      // Redirect về trang danh sách
-      router.push("/staffs");
-    } catch (error) {
-      console.error("Error:", error);
+    // Trigger validation for all fields before submit
+    const isValid = await trigger();
+    if (!isValid) {
+      // Form has validation errors, React Hook Form will prevent submit
+      return;
     }
+
+    let authMethod: 'email' | 'phone' | undefined;
+    if (data.email && data.email.trim() !== '') {
+      authMethod = 'email';
+    } else if (data.phone && data.phone.trim() !== '') {
+      authMethod = 'phone';
+    }
+
+    const submitData: any = {
+      name: data.name ? data.name.trim() : undefined,
+      email: data.email && data.email.trim() !== '' ? data.email.trim() : undefined,
+      phone: data.phone && data.phone.trim() !== '' ? data.phone.trim() : undefined,
+      dateOfBirth: data.dateOfBirth ? data.dateOfBirth.toISOString() : undefined,
+      address: data.address && data.address.trim() !== '' ? data.address.trim() : undefined,
+      gender: data.gender || undefined,
+      roles: data.roles && data.roles.length > 0 ? data.roles : undefined,
+      status: data.status || undefined,
+    };
+
+    if (authMethod) {
+      submitData.authMethod = authMethod;
+    }
+
+    if (data.password && data.password.trim() !== "") {
+      submitData.password = data.password;
+    }
+
+    showInfo({
+      title: "Xác nhận",
+      description: isEdit ? "Bạn có chắc chắn muốn cập nhật nhân sự này không?" : "Bạn có chắc chắn muốn tạo nhân sự mới không?",
+      onConfirm() {
+        if (isEdit) {
+          dispatch(updateUser({ id: selectedStaff?.id || "", data: submitData }));
+        } else {
+          dispatch(createUser(submitData));
+        }
+      },
+    });
   };
 
   const genderOptions = [
@@ -82,8 +167,61 @@ export function StaffForm({ id }: StaffFormProps) {
   const roleOptions = [
     { value: "admin", label: "Quản trị viên" },
     { value: "manager", label: "Quản lý" },
-    { value: "staff", label: "Nhân viên" },
+    { value: "officer", label: "Nhân viên" },
+    { value: "sales", label: "Nhân viên bán hàng" },
   ];
+
+  const statusOptions = [
+    { value: "active", label: "Hoạt động" },
+    { value: "inactive", label: "Không hoạt động" },
+    { value: "suspended", label: "Bị đình chỉ" },
+    { value: "banned", label: "Bị cấm" },
+    { value: "locked", label: "Bị khóa" },
+  ];
+
+  useEffect(() => {
+    if (!requestState.type) return;
+    if (['createUser', 'updateUser', 'deleteUser'].includes(requestState.type)) {
+      switch (requestState.status) {
+        case 'completed':
+          showSuccess({
+            title: "Thành công",
+            description: isEdit ? "Nhân sự đã được cập nhật thành công." : "Nhân sự đã được tạo thành công.",
+            onConfirm() {
+              router.push("/staffs");
+              dispatch(clearStaffsState());
+              setIsLoadingData(false);
+            },
+          });
+          break;
+        case 'failed':
+          showFailed({
+            title: "Lỗi khi " + (isEdit ? "cập nhật" : "tạo") + " nhân sự",
+            description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
+            onConfirm() {
+              router.push("/staffs");
+              dispatch(clearStaffsState());
+              setIsLoadingData(false);
+            },
+          });
+          break;
+        case 'loading':
+          showLoading({
+            title: "Đang xử lý",
+            description: "Vui lòng chờ trong giây lát...",
+          });
+          break;
+      }
+    }
+  }, [requestState, dispatch])
+
+  if (isLoadingData) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Spinner className="size-6" />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -95,10 +233,10 @@ export function StaffForm({ id }: StaffFormProps) {
               <Label className="text-sm text-gray-500">Họ và tên</Label>
               <Controller
                 control={control}
-                name="fullName"
+                name="name"
                 render={({ field }) => (
                   <Input
-                    className={`bg-gray-100 text-black opacity-100 ${errors.fullName ? "border-destructive" : ""}`}
+                    className={`bg-gray-100 text-black opacity-100 ${errors.name ? "border-destructive" : ""}`}
                     value={field.value || ""}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
@@ -106,12 +244,8 @@ export function StaffForm({ id }: StaffFormProps) {
                   />
                 )}
               />
-              {errors.fullName && (
-                <FieldError errors={[errors.fullName]} />
-              )}
             </div>
 
-            {/* Số điện thoại */}
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-gray-500">Số điện thoại</Label>
               <Controller
@@ -123,13 +257,10 @@ export function StaffForm({ id }: StaffFormProps) {
                     value={field.value || ""}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
-                    placeholder="Nhập số điện thoại"
+                    placeholder="Nhập số điện thoại (0xxxxxxxxx)"
                   />
                 )}
               />
-              {errors.phone && (
-                <FieldError errors={[errors.phone]} />
-              )}
             </div>
 
             {/* Email */}
@@ -149,9 +280,6 @@ export function StaffForm({ id }: StaffFormProps) {
                   />
                 )}
               />
-              {errors.email && (
-                <FieldError errors={[errors.email]} />
-              )}
             </div>
 
             {/* Ngày sinh */}
@@ -169,9 +297,6 @@ export function StaffForm({ id }: StaffFormProps) {
                   />
                 )}
               />
-              {errors.dateOfBirth && (
-                <FieldError errors={[errors.dateOfBirth]} />
-              )}
             </div>
 
             {/* Địa chỉ */}
@@ -190,9 +315,6 @@ export function StaffForm({ id }: StaffFormProps) {
                   />
                 )}
               />
-              {errors.address && (
-                <FieldError errors={[errors.address]} />
-              )}
             </div>
 
             {/* Giới tính */}
@@ -211,9 +333,28 @@ export function StaffForm({ id }: StaffFormProps) {
                   />
                 )}
               />
-              {errors.gender && (
-                <FieldError errors={[errors.gender]} />
-              )}
+            </div>
+
+            {/* Mật khẩu */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">
+                Mật khẩu {!isEdit && <span className="text-red-500">*</span>}
+                {isEdit && <span className="text-xs text-gray-400">(Để trống nếu không đổi)</span>}
+              </Label>
+              <Controller
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <Input
+                    type="password"
+                    className={`bg-gray-100 text-black opacity-100 ${errors.password ? "border-destructive" : ""}`}
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder={isEdit ? "Nhập mật khẩu mới (tối thiểu 6 ký tự)" : "Nhập mật khẩu (tối thiểu 6 ký tự)"}
+                  />
+                )}
+              />
             </div>
 
             {/* Vai trò */}
@@ -221,21 +362,43 @@ export function StaffForm({ id }: StaffFormProps) {
               <Label className="text-sm text-gray-500">Vai trò</Label>
               <Controller
                 control={control}
-                name="role"
+                name="roles"
+                render={({ field }) => {
+                  const selectedRole = Array.isArray(field.value) && field.value.length > 0
+                    ? field.value[0]
+                    : "";
+                  return (
+                    <Combobox
+                      options={roleOptions}
+                      value={selectedRole}
+                      placeholder="Chọn vai trò"
+                      onChange={(value) => {
+                        field.onChange(value ? [value] : []);
+                      }}
+                      className="w-full"
+                    />
+                  );
+                }}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">Trạng thái</Label>
+              <Controller
+                control={control}
+                name="status"
                 render={({ field }) => (
                   <Combobox
-                    options={roleOptions}
-                    value={field.value || ""}
-                    placeholder="Chọn vai trò"
+                    options={statusOptions}
+                    value={field.value || "active"}
+                    placeholder="Chọn trạng thái"
                     onChange={field.onChange}
                     className="w-full"
                   />
                 )}
               />
-              {errors.role && (
-                <FieldError errors={[errors.role]} />
-              )}
             </div>
+
           </div>
         </CardContent>
       </Card>

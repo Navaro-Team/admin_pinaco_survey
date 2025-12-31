@@ -4,7 +4,7 @@ import { useDialogContext } from '@/context/DialogContext'
 export type { DialogType, DialogConfig } from '@/context/DialogContext'
 
 export const useDialog = () => {
-  const { open, close, showSuccess, showFailed, showWarning, showInfo, state } = useDialogContext()
+  const { open, close, showSuccess, showFailed, showWarning, showInfo, showLoading, state } = useDialogContext()
 
   return {
     showDialog: open,
@@ -12,7 +12,7 @@ export const useDialog = () => {
     showFailed,
     showWarning,
     showInfo,
-    hideDialog: close,
-    isOpen: state.isOpen,
+    showLoading,
+    hideDialog: close
   }
 } 

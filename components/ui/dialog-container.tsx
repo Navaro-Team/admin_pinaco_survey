@@ -3,8 +3,6 @@
 import React from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -13,15 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useDialogContext } from '@/context/DialogContext';
 import { cn } from '@/lib/utils';
-import type { DialogType } from '@/context/DialogContext';
-
-const TYPE_TITLE: Record<DialogType, string> = {
-  success: 'Success',
-  failed: 'Failed',
-  warning: 'Warning',
-  info: 'Information',
-  custom: '',
-};
+import { Button } from '@/components/ui/button';
 
 export const DialogContainer: React.FC = () => {
   const { state, close, visuals } = useDialogContext();
@@ -41,48 +31,62 @@ export const DialogContainer: React.FC = () => {
     close();
   };
 
-  const isCustom = state.type === 'custom';
+  const showButtons = state.type !== 'loading';
+  const showBothButtons = ['success', 'info'].includes(state.type);
+  const showCloseOnly = ['warning', 'failed'].includes(state.type);
 
   return (
     <AlertDialog open={state.isOpen} onOpenChange={close}>
-      <AlertDialogContent>
-        {/* Header: only for non-custom types */}
-        {!isCustom && (
-          <AlertDialogHeader>
-            <div className="flex items-center gap-3">
-              <Icon className={cn('h-6 w-6', visual.iconColor)} />
-              <span className={cn('text-base font-semibold', visual.iconColor)}>
-                {TYPE_TITLE[state.type]}
-              </span>
-            </div>
-          </AlertDialogHeader>
+      <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogHeader>
+          <div className="flex flex-col items-center gap-2">
+            {state.type === 'loading' ? (
+              <Icon className={cn('h-12 w-12', visual.iconColor)} />
+            ) : (
+              <Icon className={cn('h-12 w-12', visual.iconColor)} />
+            )}
+            {state.title && (
+              <AlertDialogTitle className="text-center text-lg font-semibold">{state.title}</AlertDialogTitle>
+            )}
+          </div>
+        </AlertDialogHeader>
+
+        {state.description && (
+          <AlertDialogDescription className="text-center text-sm text-gray-700">
+            {state.description}
+          </AlertDialogDescription>
         )}
 
-        {/* Body: user-provided title + description */}
-        <div className="space-y-2">
-          {state.title && (
-            <AlertDialogTitle className="text-center">{state.title}</AlertDialogTitle>
-          )}
-          {state.description && (
-            <AlertDialogDescription className="text-center">
-              {state.description}
-            </AlertDialogDescription>
-          )}
-        </div>
-
-        {/* Actions: if custom actions provided, render them instead of default footer */}
-        {state.actions ? (
-          <div className="mt-4 flex items-center justify-center gap-2">
-            {state.actions}
-          </div>
-        ) : (
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancel}>
-              {state.cancelText}
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm}>
-              {state.confirmText}
-            </AlertDialogAction>
+        {/* Actions */}
+        {showButtons && (
+          <AlertDialogFooter className="sm:justify-end gap-2">
+            {showCloseOnly && (
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                className="w-full sm:w-auto"
+              >
+                {state.cancelText || 'Đóng'}
+              </Button>
+            )}
+            {showBothButtons && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleCancel}
+                  className="w-full sm:w-auto"
+                >
+                  {state.cancelText || 'Đóng'}
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={handleConfirm}
+                  className="w-full sm:w-auto bg-main text-white hover:bg-main/90"
+                >
+                  {state.confirmText || 'Xác nhận'}
+                </Button>
+              </>
+            )}
           </AlertDialogFooter>
         )}
       </AlertDialogContent>

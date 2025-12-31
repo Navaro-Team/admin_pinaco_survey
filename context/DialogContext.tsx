@@ -2,8 +2,9 @@
 
 import React, { createContext, useCallback, useContext, useMemo, useState, ReactNode } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 
-export type DialogType = 'success' | 'failed' | 'warning' | 'info' | 'custom';
+export type DialogType = 'success' | 'failed' | 'warning' | 'info' | 'loading';
 
 export interface DialogConfig {
   title: string;
@@ -35,6 +36,7 @@ interface DialogContextType {
   showFailed: (config: DialogConfig) => void;
   showWarning: (config: DialogConfig) => void;
   showInfo: (config: DialogConfig) => void;
+  showLoading: (config: DialogConfig) => void;
   visuals: Record<DialogType, DialogVisualConfig>;
 }
 
@@ -71,11 +73,11 @@ const visuals: Record<DialogType, DialogVisualConfig> = {
     bgColor: 'bg-blue-50',
     borderColor: 'border-blue-200',
   },
-  custom: {
-    icon: Info,
-    iconColor: 'text-muted-foreground',
-    bgColor: '',
-    borderColor: '',
+  loading: {
+    icon: Spinner,
+    iconColor: 'text-gray-600',
+    bgColor: 'bg-gray-50',
+    borderColor: 'border-gray-200',
   },
 };
 
@@ -95,8 +97,8 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
       type,
       title: config.title,
       description: config.description,
-      confirmText: config.confirmText || 'OK',
-      cancelText: config.cancelText || 'Cancel',
+      confirmText: config.confirmText || 'Xác nhận',
+      cancelText: config.cancelText || 'Đóng',
       onConfirm: config.onConfirm,
       onCancel: config.onCancel,
       actions: config.actions,
@@ -111,6 +113,7 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
   const showFailed = useCallback((config: DialogConfig) => open('failed', config), [open]);
   const showWarning = useCallback((config: DialogConfig) => open('warning', config), [open]);
   const showInfo = useCallback((config: DialogConfig) => open('info', config), [open]);
+  const showLoading = useCallback((config: DialogConfig) => open('loading', config), [open]);
 
   const value = useMemo<DialogContextType>(() => ({
     state,
@@ -120,8 +123,9 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
     showFailed,
     showWarning,
     showInfo,
+    showLoading,
     visuals,
-  }), [state, open, close, showSuccess, showFailed, showWarning, showInfo]);
+  }), [state, open, close, showSuccess, showFailed, showWarning, showInfo, showLoading]);
 
   return <DialogContext.Provider value={value}>{children}</DialogContext.Provider>;
 };

@@ -1,17 +1,28 @@
+"use client"
+
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { Card, CardContent } from "../ui/card";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Combobox } from "../ui/combobox";
-import { changeSearch, changeRole, changeStatus } from "@/features/staffs/staffs.slice";
+import { changeSearch, changeRole, changeStatus, clearFilter, getUsers } from "@/features/staffs/staffs.slice";
 import { Button } from "../ui/button";
-import { Search } from "lucide-react";
+import { RefreshCcw, X } from "lucide-react";
 
 export function Filter() {
   const dispatch = useAppDispatch();
   const search = useAppSelector((state) => state.staffs.filter.search);
   const role = useAppSelector((state) => state.staffs.filter.role);
   const status = useAppSelector((state) => state.staffs.filter.status);
+
+  const handleClearFilter = () => {
+    dispatch(clearFilter());
+  };
+
+  const handleRefresh = () => {
+    handleClearFilter();
+    dispatch(getUsers());
+  }
 
   return (
     <Card>
@@ -31,7 +42,8 @@ export function Filter() {
               options={[
                 { value: "admin", label: "Quản trị viên" },
                 { value: "manager", label: "Quản lý" },
-                { value: "staff", label: "Nhân viên" },
+                { value: "officer", label: "Nhân viên" },
+                { value: "sales", label: "Nhân viên bán hàng" },
               ]}
               value={role}
               placeholder="Chọn vai trò"
@@ -44,14 +56,26 @@ export function Filter() {
               options={[
                 { value: "active", label: "Hoạt động" },
                 { value: "inactive", label: "Không hoạt động" },
+                { value: "suspended", label: "Bị đình chỉ" },
+                { value: "banned", label: "Bị cấm" },
+                { value: "locked", label: "Bị khóa" },
               ]}
               value={status}
               placeholder="Chọn trạng thái"
               onChange={(value) => dispatch(changeStatus(value))} />
           </div>
-          <Button variant="outline" className="w-full md:w-24 h-10 md:self-end">
-            <Search className="size-4" />
-            Lọc
+          <Button
+            variant="outline"
+            className="w-full md:w-24 h-10 md:self-end"
+            onClick={handleClearFilter}>
+            <X className="size-4" />
+            Xoá lọc
+          </Button>
+          <Button
+            variant="outline"
+            className="w-10 h-10 md:self-end"
+            onClick={handleRefresh}>
+            <RefreshCcw className="size-4" />
           </Button>
         </div>
       </CardContent>

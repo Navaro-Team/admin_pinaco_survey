@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "../ui/table";
+import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "../ui/table";
 import { useState, useEffect } from "react";
 import { TablePagination } from "../ui/table-pagination";
 import { Button } from "../ui/button";
@@ -69,61 +69,71 @@ export function TableQuestion() {
   };
 
   return (
-    <Card>
+    <Card className="flex flex-col flex-1 min-h-0 pb-0!">
       <CardHeader>
         <CardTitle>Danh sách câu hỏi</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col flex-1 p-0 overflow-hidden min-h-0">
         {isLoading ? (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex items-center justify-center flex-1">
             <Spinner className="size-6" />
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-left w-10">STT</TableHead>
-                <TableHead className="text-left">Nội dung câu hỏi</TableHead>
-                <TableHead className="text-left">Loại câu hỏi</TableHead>
-                <TableHead className="text-left w-32">Hành động</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {questions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                    Không có dữ liệu
-                  </TableCell>
-                </TableRow>
-              ) : (
-                questions.map((question, index) => (
-                  <TableRow key={question._id}>
-                    <TableCell className="text-center w-10">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
-                    </TableCell>
-                    <TableCell>{question.title}</TableCell>
-                    <TableCell>{getQuestionTypeLabel(question.questionType)}</TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="outline" 
-                        size="icon"
-                        onClick={() => handleViewQuestion(question._id)}
-                      >
-                        <Eye className="size-4 text-blue-500" />
-                      </Button>
-                    </TableCell>
+          <div className="flex flex-col flex-1 overflow-hidden min-h-0">
+            <div className="border-b px-4">
+              <table className="w-full caption-bottom text-sm">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-left w-10">STT</TableHead>
+                    <TableHead className="text-left">Nội dung câu hỏi</TableHead>
+                    <TableHead className="text-left">Loại câu hỏi</TableHead>
+                    <TableHead className="text-left w-32">Hành động</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                </TableHeader>
+              </table>
+            </div>
+            <div className="flex-1 overflow-y-auto min-h-0 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <table className="w-full caption-bottom text-sm">
+                <TableBody>
+                  {questions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                        Không có dữ liệu
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    questions.map((question, index) => (
+                      <TableRow key={question._id}>
+                        <TableCell className="text-center w-10">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </TableCell>
+                        <TableCell>{question.title}</TableCell>
+                        <TableCell>{getQuestionTypeLabel(question.questionType)}</TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            onClick={() => handleViewQuestion(question._id)}
+                          >
+                            <Eye className="size-4 text-blue-500" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </table>
+            </div>
+            <div className="border-t p-0!">
+              <TablePagination
+                currentPage={currentPage}
+                totalItems={total}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          </div>
         )}
-        <TablePagination
-          currentPage={currentPage}
-          totalItems={total}
-          itemsPerPage={itemsPerPage}
-          onPageChange={handlePageChange}
-        />
       </CardContent>
       <QuestionDetailSheet
         questionId={selectedQuestionId}
