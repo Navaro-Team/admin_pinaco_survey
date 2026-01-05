@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "../ui/table";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { changePage, changeLimit, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
+import { changePage, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
 import { Spinner } from "../ui/spinner";
 import { StatusBadge } from "../ui/status-badge";
 import { formatDate, isSameDay } from "date-fns";
