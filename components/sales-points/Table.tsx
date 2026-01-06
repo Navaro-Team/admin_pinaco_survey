@@ -1,110 +1,219 @@
 "use client"
 
-import { useState } from "react";
-import { Eye, TrashIcon } from "lucide-react";
+import { useEffect } from "react";
+import { Eye, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
-import { Card, CardContent } from "../ui/card";
-import { Table as TableUI, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "../ui/table";
 import { TablePagination } from "../ui/table-pagination";
 import Link from "next/link";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { changePage, clearSalesPointsState, deleteStore, getStores, resetPagination } from "@/features/sales-points/sales-points.slice";
+import { Spinner } from "../ui/spinner";
+import { useDialog } from "@/hooks/use-dialog";
 
 export function Table() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const dispatch = useAppDispatch();
+  const { showSuccess, showFailed, showInfo, showLoading } = useDialog();
+
+  const stores = useAppSelector((state) => state.salesPoints.stores);
+  const filter = useAppSelector((state) => state.salesPoints.filter);
+  const pagination = useAppSelector((state) => state.salesPoints.pagination);
+  const requestState = useAppSelector((state) => state.salesPoints.requestState);
+
+  const isLoading = requestState.status === 'loading' && requestState.type === 'getStores' && requestState.data === true;
+  const error = requestState.status === 'failed' && requestState.type === 'getStores' ? requestState.error : null;
+
+  useEffect(() => {
+    dispatch(resetPagination());
+    dispatch(getStores({ page: pagination.page, limit: pagination.limit }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    dispatch(resetPagination());
+    dispatch(getStores({ page: pagination.page, limit: pagination.limit }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter.search, filter.area]);
+
+  const filteredStores = stores.filter((store) => {
+    if (filter.search) {
+      const searchLower = filter.search.toLowerCase();
+      const nameMatch = store.name?.toLowerCase().includes(searchLower);
+      const codeMatch = store.code?.toLowerCase().includes(searchLower);
+      if (!nameMatch && !codeMatch) {
+        return false;
+      }
+    }
+
+    if (filter.area) {
+      if (store.area !== filter.area) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  const handleDeleteStore = (id: string) => {
+    showInfo({
+      title: "Xác nhận",
+      description: "Bạn có chắc chắn muốn xóa điểm bán này không?",
+      onConfirm() {
+        dispatch(deleteStore(id));
+      },
+    });
+  }
+
+  const handleLoadMore = () => {
+    dispatch(changePage(pagination.page + 1));
+    dispatch(getStores({ page: pagination.page + 1, limit: pagination.limit }));
+  };
+
   const itemsPerPage = 10;
 
-  const salesPoints = [
-    {
-      id: 1,
-      code: "DB001",
-      name: "Cửa hàng phụ tùng 365",
-      address: "36 Đường 3/2, Phường 12, Quận 10, TP.HCM",
-      area: "Khu vực 1",
-      manager: "Nguyễn Văn A",
-    },
-    {
-      id: 2,
-      code: "DB002",
-      name: "Gara Ô tô Minh Tuấn",
-      address: "Cầu Giấy, Hà Nội",
-      area: "Khu vực 2",
-      manager: "Trần Thị B",
-    },
-    {
-      id: 3,
-      code: "DB003",
-      name: "Đại lý ô tô Hoàng An",
-      address: "123 Đường 1, Quận 1, TP.HCM",
-      area: "Khu vực 1",
-      manager: "Lê Văn C",
-    },
-    {
-      id: 4,
-      code: "DB004",
-      name: "Cửa hàng phụ tùng ABC",
-      address: "456 Đường Lê Lợi, Quận 1, TP.HCM",
-      area: "Khu vực 3",
-      manager: "Phạm Thị D",
-    },
-    {
-      id: 5,
-      code: "DB005",
-      name: "Gara Xe Máy XYZ",
-      address: "789 Đường Nguyễn Trãi, Quận 5, TP.HCM",
-      area: "Khu vực 2",
-      manager: "Hoàng Văn E",
-    },
-  ];
+  const handlePageChange = (page: number) => {
+    const neededItems = page * itemsPerPage;
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
+    if (stores.length < neededItems && pagination.hasMore) {
+      const itemsNeeded = neededItems - stores.length;
+      const batchesNeeded = Math.ceil(itemsNeeded / pagination.limit);
+
+      if (batchesNeeded > 0) {
+        dispatch(getStores({ page: 1, limit: pagination.limit }));
+      }
+    }
+
+    dispatch(changePage(page));
+  };
+  const startIndex = (pagination.page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentSalesPoints = salesPoints.slice(startIndex, endIndex);
+  const displayStores = filteredStores.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    if (!requestState.type) return;
+    if (['deleteStore'].includes(requestState.type)) {
+      switch (requestState.status) {
+        case 'completed':
+          showSuccess({
+            title: "Thành công",
+            description: "Điểm bán đã được xóa thành công.",
+            onConfirm() {
+              dispatch(resetPagination());
+              dispatch(getStores({ page: 1, limit: pagination.limit }));
+            },
+          });
+          break;
+        case 'failed':
+          showFailed({
+            title: "Lỗi khi xóa điểm bán",
+            description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
+            onConfirm() {
+              dispatch(resetPagination());
+              dispatch(getStores({ page: 1, limit: pagination.limit }));
+            },
+          });
+          break;
+        case 'loading':
+          showLoading({
+            title: "Đang xử lý",
+            description: "Vui lòng chờ trong giây lát...",
+          });
+          break;
+      }
+    }
+  }, [requestState]);
+
+  const getAddress = (store: any) => {
+    if (store.location?.address) {
+      return store.location.address;
+    }
+    if (store.province) {
+      return store.province;
+    }
+    return "-";
+  };
 
   return (
-    <Card>
-      <CardContent>
-        <TableUI>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-left w-10">STT</TableHead>
-              <TableHead className="text-left">Mã điểm bán</TableHead>
-              <TableHead className="text-left">Tên cửa hàng</TableHead>
-              <TableHead className="text-left">Địa chỉ</TableHead>
-              <TableHead className="text-left">Khu vực</TableHead>
-              <TableHead className="text-left">Quản lý</TableHead>
-              <TableHead className="text-left w-32">Hành động</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentSalesPoints.map((point, index) => (
-              <TableRow key={point.id}>
-                <TableCell className="text-center w-10">{startIndex + index + 1}</TableCell>
-                <TableCell>{point.code}</TableCell>
-                <TableCell>{point.name}</TableCell>
-                <TableCell>
-                  <span className="text-sm">{point.address}</span>
-                </TableCell>
-                <TableCell>{point.area}</TableCell>
-                <TableCell>{point.manager}</TableCell>
-                <TableCell className="flex flex-row gap-2">
-                  <Link href={`/sales-points/${point.id}`}>
-                    <Button variant="outline" size="icon">
-                      <Eye className="size-4 text-blue-500" />
-                    </Button>
-                  </Link>
-                  <Button variant="outline" size="icon">
-                    <TrashIcon className="size-4 text-red-500 hover:text-red-600" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </TableUI>
-        <TablePagination
-          currentPage={currentPage}
-          totalItems={salesPoints.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={setCurrentPage}
-        />
+    <Card className="flex flex-col flex-1 min-h-0 pb-0!">
+      <CardHeader>
+        <CardTitle>Danh sách điểm bán</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col flex-1 p-0 overflow-hidden min-h-0">
+        {isLoading ? (
+          <div className="flex items-center justify-center flex-1">
+            <Spinner className="size-6" />
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center flex-1 text-red-500">
+            {error}
+          </div>
+        ) : (
+          <div className="flex flex-col flex-1 overflow-hidden min-h-0">
+            <div className="border-b px-4">
+              <table className="w-full caption-bottom text-sm">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-center w-10">STT</TableHead>
+                    <TableHead className="text-left w-30">Mã điểm bán</TableHead>
+                    <TableHead className="text-left flex-1">Tên cửa hàng</TableHead>
+                    <TableHead className="text-left w-64">Địa chỉ</TableHead>
+                    <TableHead className="text-left w-32">Khu vực</TableHead>
+                    <TableHead className="text-left w-32">Số điện thoại</TableHead>
+                    <TableHead className="text-center w-24"></TableHead>
+                  </TableRow>
+                </TableHeader>
+              </table>
+            </div>
+            <div className="flex-1 overflow-y-auto min-h-0 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <table className="w-full caption-bottom text-sm">
+                <TableBody>
+                  {displayStores.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        Không có dữ liệu
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    displayStores.map((store, index) => (
+                      <TableRow key={store.id}>
+                        <TableCell className="text-center w-10">{startIndex + index + 1}</TableCell>
+                        <TableCell className="text-left w-30">{store.code || "-"}</TableCell>
+                        <TableCell className="text-left flex-1">{store.name || "-"}</TableCell>
+                        <TableCell className="text-left w-64">
+                          <span className="text-sm">{getAddress(store)}</span>
+                        </TableCell>
+                        <TableCell className="text-left w-32">{store.area || "-"}</TableCell>
+                        <TableCell className="text-left w-32">{store.phone || "-"}</TableCell>
+                        <TableCell className="text-center w-24">
+                          <div className="flex flex-row gap-2 justify-center">
+                            <Link href={`/sales-points/${store.id}`}>
+                              <Button variant="outline" size="icon">
+                                <Eye className="size-4 text-blue-500" />
+                              </Button>
+                            </Link>
+                            <Button variant="outline" size="icon" onClick={() => handleDeleteStore(store.id)}>
+                              <Trash2 className="size-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </table>
+            </div>
+            <TablePagination
+              currentPage={pagination.page}
+              totalItems={stores.length}
+              itemsPerPage={itemsPerPage}
+              hasMore={pagination.hasMore}
+              onLoadMore={handleLoadMore}
+              onPageChange={handlePageChange}
+              isLoading={isLoading}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   )

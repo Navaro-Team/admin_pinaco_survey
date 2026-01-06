@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     if (!accessToken) throw new Error('No access token');
     const urlParams = new URLSearchParams();
 
-    // Pagination
+    // Filtering
     if (params.get('page')) {
       urlParams.set('page', params.get('page') ?? '');
     }
