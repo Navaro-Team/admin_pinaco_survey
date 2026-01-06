@@ -1,9 +1,21 @@
 import { clientService } from "../http/ClientService";
 import { parseCommonHttpResult } from "../http/parseCommonResult";
 
+export interface GetStoresParams {
+  page?: number;
+  limit?: number;
+}
 class StoreService {
-  async getStores(params: any) {
-    const response = await clientService.get(`/stores`, params);
+  async getStores(params: GetStoresParams) {
+    const urlParams = new URLSearchParams();
+    if (params.page) {
+      urlParams.set('page', params.page.toString());
+    }
+    if (params.limit) {
+      urlParams.set('limit', params.limit.toString());
+    }
+    const queryString = urlParams.toString();
+    const response = await clientService.get(`/stores`, queryString);
     return parseCommonHttpResult(response);
   }
 
