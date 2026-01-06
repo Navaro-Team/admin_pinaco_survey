@@ -1,0 +1,71 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ "main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -------------------------
+      # 1. Checkout source
+      # -------------------------
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # -------------------------
+      # 2. Generate ENV
+      # -------------------------
+      - name: Create .env file main branch
+        if: github.ref == 'refs/heads/main'
+        run: echo "${{ secrets.ENV_MAIN }}" > .env
+      # -------------------------
+      # 3. Install + Build BEFORE deploying
+      # -------------------------
+      - name: Install dependencies
+        if: github.ref == 'refs/heads/main'
+        run: | 
+          npm install
+
+      - name: Build project (stop if fails)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          npm run build
+      # -------------------------
+      # 4. Setup SSH keys
+      # -------------------------
+      - name: Set up SSH key
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Configure SSH
+          cat >> ~/.ssh/config << 'EOF'
+          Host ${{ secrets.SERVER_HOST }}
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ConnectTimeout 60
+            ServerAliveInterval 30
+          EOF
+
+      # -------------------------
+      # 5. Deploy (PM2)
+      # -------------------------
+      - name: Deploy
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Deploy and running PM2"
+          rsync -avz --delete --exclude 'node_modules' --exclude '.git' \
+            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/home/ubuntu/admin_pinaco_survey
+
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} '
+            cd /home/ubuntu/admin_pinaco_survey &&
+            npm install &&
+            (pm2 delete pinaco-admin || true) &&
+            pm2 start "npm run start" --name pinaco-admin
+          '
