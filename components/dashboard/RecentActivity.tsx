@@ -54,7 +54,7 @@ export function RecentActivity() {
           <CardDescription>5 khảo sát mới nhất được gửi về</CardDescription>
         </div>
         <CardAction className="flex items-center gap-1">
-          <Link href="/recent-activity" className="text-sm text-main hover:text-main/80">Xem tất cả</Link>
+          <Link href="/schedule" className="text-sm text-main hover:text-main/80">Xem tất cả</Link>
         </CardAction>
       </CardHeader>
       <CardFooter className="flex-row items-center gap-1 text-sm">
