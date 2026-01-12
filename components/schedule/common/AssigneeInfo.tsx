@@ -4,8 +4,10 @@ import { Separator } from "@/components/ui/separator";
 import { formatDate } from "date-fns";
 import { LogIn, LogOut, UserIcon } from "lucide-react";
 import Image from "next/image";
+import { useAppSelector } from "@/hooks/redux";
 
 export function AssigneeInfo() {
+  const task = useAppSelector((state) => state.schedule.task);
   return (
     <Card className="flex flex-col gap-4!">
       <CardHeader>
@@ -23,8 +25,8 @@ export function AssigneeInfo() {
             height={100}
             className="rounded-full border border-dotted" />
           <div className="flex flex-col gap-2">
-            <Label className="text-lg font-medium">Nguyễn Văn A</Label>
-            <span className="text-sm text-muted-foreground">Nhân viên thị trường - Khu vực 1</span>
+            <Label className="text-lg font-medium">{task?.assignee?.name ?? "N/A"}</Label>
+            <span className="text-sm text-muted-foreground">{task?.assignee?.role ?? "N/A"}</span>
           </div>
         </div>
         <Separator />
@@ -35,15 +37,15 @@ export function AssigneeInfo() {
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Mã nhân viên</Label>
-            <span className="text-lg font-medium">NV001</span>
+            <span className="text-lg font-medium">{task?.assignee?.id ?? "N/A"}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground"><LogIn className="size-4 text-green-500" /> Check in</Label>
-            <span className="text-lg font-medium">10:00 AM</span>
+            <span className="text-lg font-medium">{formatDate(task?.createdAt ?? new Date(), 'HH:mm')}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground"><LogOut className="size-4 text-red-500" /> Check out</Label>
-            <span className="text-lg font-medium">11:00 AM</span>
+            <span className="text-lg font-medium">{formatDate(task?.completedAt ?? new Date(), 'HH:mm')}</span>
           </div>
         </div>
       </CardContent>

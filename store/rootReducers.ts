@@ -6,6 +6,9 @@ import questionsReducer from '../features/questions/questions.slice';
 import staffsReducer from '../features/staffs/staffs.slice';
 import salesPointsReducer from '../features/sales-points/sales-points.slice';
 import storeReducer from '../features/store/store.slice';
+import taskReducer from '../features/task/task.slice';
+import surveyReducer from '../features/survey/survey.slice';
+import submissionReducer from '../features/submission/submission.slice';
 
 const rootReducer = combineReducers({
   app: appReducer,
@@ -15,6 +18,9 @@ const rootReducer = combineReducers({
   staffs: staffsReducer,
   salesPoints: salesPointsReducer,
   store: storeReducer,
+  task: taskReducer,
+  survey: surveyReducer,
+  submission: submissionReducer,
 });
 
 export default rootReducer;

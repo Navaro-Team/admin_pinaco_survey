@@ -5,15 +5,18 @@ import { HeaderDetailSchedule } from "@/components/schedule/common/HeaderDetailS
 import { ResultServey } from "@/components/schedule/common/ResultServey"
 import { StoreInfo } from "@/components/schedule/common/StoreInfo"
 import { changeTask, getTaskById } from "@/features/schedule/schedule.slice"
+import { getSubmissionById } from "@/features/submission/submission.slice"
+import { getSurveyById } from "@/features/survey/survey.slice"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
-import { useSearchParams } from "next/navigation"
+import { useParams } from "next/navigation"
 import { useEffect } from "react"
 
 export default function Page() {
-  const searchParams = useSearchParams();
+  const params = useParams();
   const dispatch = useAppDispatch();
-  const id = searchParams.get('id');
+  const id = params.id as string;
   const tasks = useAppSelector((state) => state.schedule.tasks);
+  const task = useAppSelector((state) => state.schedule.task);
 
   useEffect(() => {
     if (id) {
@@ -25,6 +28,16 @@ export default function Page() {
       }
     }
   }, [id, dispatch]);
+
+  useEffect(() => {
+    if (task?.submissionId) {
+      dispatch(getSubmissionById(task.submissionId));
+    }
+
+    if (task?.survey?.id) {
+      dispatch(getSurveyById(task.survey.id));
+    }
+  }, [task, dispatch])
 
   return (
     <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">

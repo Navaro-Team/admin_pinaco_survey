@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card"
 
 export default function Page() {
   return (
-    <div className="h-[calc(100vh-var(--header-height))] overflow-hidden flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+    <div className="h-[calc(100vh-var(--header-height))] flex flex-col gap-4 py-4 md:gap-6 md:py-6">
       <SectionCards />
       <div className="px-4 lg:px-6 flex lg:flex-row flex-col gap-4">
         <Card className="@container/card gap-4! py-4! flex-4/6">

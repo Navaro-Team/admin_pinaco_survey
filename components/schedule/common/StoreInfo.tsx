@@ -5,9 +5,10 @@ import { StoreIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
+import { useAppSelector } from "@/hooks/redux";
 
 export function StoreInfo() {
-  // const task = useAppSelector((state) => state.schedule.task);
+  const task = useAppSelector((state) => state.schedule.task);
 
   return (
     <Card className="flex flex-col gap-4!">
@@ -17,7 +18,7 @@ export function StoreInfo() {
           <span>Thông tin cửa hàng</span>
         </CardTitle>
         <CardAction>
-          <Link href={`/store/1`}>
+          <Link href={`/store/${task?.store?.id}`}>
             <Button variant="ghost" className="text-main cursor-pointer">
               Xem chi tiết
             </Button>
@@ -30,19 +31,19 @@ export function StoreInfo() {
         <div className="flex flex-col gap-2">
           <div>
             <Label className="text-sm text-muted-foreground">Tên cửa hàng</Label>
-            <span className="text-lg font-medium">Cửa hàng phụ tùng 365</span>
+            <span className="text-lg font-medium">{task?.store?.name ?? "N/A"}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Địa chỉ</Label>
-            <span className="text-lg font-medium">36 Đường 3/2, Phường 12, Quận 10, TP.HCM</span>
+            <span className="text-lg font-medium">{task?.store?.location?.address ?? "N/A"}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Người liên hệ</Label>
-            <span className="text-lg font-medium">Nguyễn Thị Minh</span>
+            <span className="text-lg font-medium">{task?.store?.contactName ?? "N/A"}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Số điện thoại</Label>
-            <span className="text-lg font-medium">0912345678</span>
+            <span className="text-lg font-medium">{task?.store?.phone ?? "N/A"}</span>
           </div>
         </div>
       </CardContent>
