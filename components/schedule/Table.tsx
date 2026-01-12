@@ -20,17 +20,17 @@ export function Table() {
   const filter = useAppSelector((state) => state.schedule.filter);
   const pagination = useAppSelector((state) => state.schedule.pagination);
   const requestState = useAppSelector((state) => state.schedule.requestState);
-  const isLoading = requestState.status === 'loading' && requestState.type === 'getTasks' && requestState.data === true;
+  const isLoading = requestState.status === 'loading' && requestState.type === 'getTasks' && requestState.data !== true;
 
   useEffect(() => {
     dispatch(resetPagination());
-    dispatch(getTasks({ page: pagination.page, limit: 20 }));
+    dispatch(getTasks({ page: 1, limit: 20 }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     dispatch(resetPagination());
-    dispatch(getTasks({ page: pagination.page, limit: 20 }));
+    dispatch(getTasks({ page: 1, limit: 20 }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter.store, filter.area, filter.region, filter.deadline, filter.status]);
 

@@ -1,10 +1,22 @@
 import { z } from "zod";
 
+export const initialValues = {
+  name: "",
+  code: "",
+  address: "",
+  salesScale: 0,
+  contactName: "",
+  phone: "",
+  sellerName: "",
+  supplierCode: "",
+  supplierName: "",
+};
+
 export const salesPointSchema = z.object({
   name: z.string().min(1, "Tên điểm bán là bắt buộc"),
   code: z.string().optional(),
   address: z.string().min(1, "Địa chỉ là bắt buộc"),
-  salesScale: z.string().optional(),
+  salesScale: z.number().optional(),
   contactName: z.string().optional(),
   phone: z.string().optional(),
   sellerName: z.string().optional(),

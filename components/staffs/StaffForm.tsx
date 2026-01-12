@@ -415,13 +415,6 @@ export function StaffForm() {
         </Button>
         <div className="flex flex-row gap-4">
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push("/staffs")}
-          >
-            Hủy
-          </Button>
-          <Button
             type="submit"
             className="bg-main text-white hover:bg-main/90"
             disabled={isSubmitting}

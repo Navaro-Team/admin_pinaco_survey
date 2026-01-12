@@ -1,4 +1,4 @@
-import { parseStores, Store } from "@/model/Store.model";
+import { parseStore, parseStores, Store } from "@/model/Store.model";
 import { RequestState } from "@/store/state";
 import { commonCreateAsyncThunk } from "@/store/thunk";
 import { createSlice } from "@reduxjs/toolkit";
@@ -36,6 +36,9 @@ const initialState: SalesPointsState = {
 
 export const getStores = commonCreateAsyncThunk({ type: 'salesPoints/getStores', action: storeService.getStores });
 export const deleteStore = commonCreateAsyncThunk({ type: 'salesPoints/deleteStore', action: storeService.deleteStore });
+export const getStoreById = commonCreateAsyncThunk({ type: 'salesPoints/getStoreById', action: storeService.getStoreById });
+export const createStore = commonCreateAsyncThunk({ type: 'salesPoints/createStore', action: storeService.createStore });
+export const updateStore = commonCreateAsyncThunk({ type: 'salesPoints/updateStore', action: storeService.updateStore });
 
 export const salesPointsSlice = createSlice({
   name: 'salesPoints',
@@ -112,10 +115,49 @@ export const salesPointsSlice = createSlice({
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'deleteStore', error: payload?.message };
       })
+      .addCase(getStoreById.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.store = responseData ? parseStore(responseData) : null;
+        state.requestState = { status: 'completed', type: 'getStoreById' };
+      })
+      .addCase(getStoreById.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'getStoreById' };
+      })
+      .addCase(getStoreById.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'getStoreById', error: payload?.message };
+      })
+      .addCase(updateStore.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.store = responseData ? parseStore(responseData) : null;
+        state.requestState = { status: 'completed', type: 'updateStore' };
+      })
+      .addCase(updateStore.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'updateStore' };
+      })
+      .addCase(updateStore.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'updateStore', error: payload?.message };
+      })
+      .addCase(createStore.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.store = responseData ? parseStore(responseData) : null;
+        state.requestState = { status: 'completed', type: 'createStore' };
+      })
+      .addCase(createStore.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'createStore' };
+      })
+      .addCase(createStore.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'createStore', error: payload?.message };
+      })
   },
 })
 
-export const { changeSearch, changeArea, clearSalesPointsState, clearFilter, changePage, changeLimit, resetPagination  } = salesPointsSlice.actions;
+export const { changeSearch, changeArea, clearSalesPointsState, clearFilter, changePage, changeLimit, resetPagination } = salesPointsSlice.actions;
 
 export default salesPointsSlice.reducer;
 

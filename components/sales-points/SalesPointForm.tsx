@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,67 +11,121 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SalesPointFormData, salesPointSchema } from "@/features/sales-points/sales-points.schema";
+import { initialValues, SalesPointFormData, salesPointSchema } from "@/features/sales-points/sales-points.schema";
 import { Spinner } from "@/components/ui/spinner";
 import { ArrowLeft } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { useDialog } from "@/hooks/use-dialog";
+import { clearSalesPointsState, createStore, updateStore } from "@/features/sales-points/sales-points.slice";
 
 interface SalesPointFormProps {
-  id?: string;
+  isEdit: boolean;
 }
 
-export function SalesPointForm({ id }: SalesPointFormProps) {
+export function SalesPointForm({ isEdit }: SalesPointFormProps) {
   const router = useRouter();
-  const isEdit = !!id;
+  const dispatch = useAppDispatch();
+  const { showSuccess, showFailed, showInfo, showLoading } = useDialog();
+  const store = useAppSelector((state) => state.salesPoints.store);
+  const requestState = useAppSelector((state) => state.salesPoints.requestState);
+
+  const defaultValues = useMemo(() => {
+    if (store) {
+      return {
+        name: store?.name || "",
+        code: store?.code || "",
+        address: store?.location?.address || "",
+        salesScale: store?.salesScale || 0,
+        contactName: store?.location?.contactName || "",
+        phone: store?.phone || "",
+        supplierCode: "",
+        supplierName: "",
+        sellerName: "",
+      };
+    }
+
+    return initialValues;
+  }, [store, isEdit]);
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isSubmitting },
     reset,
+    formState: { errors, isSubmitting },
   } = useForm<SalesPointFormData>({
     resolver: zodResolver(salesPointSchema),
-    defaultValues: {
-      name: "",
-      code: "",
-      address: "",
-      salesScale: "",
-      contactName: "",
-      phone: "",
-      sellerName: "",
-      supplierCode: "",
-      supplierName: "",
-    },
+    defaultValues,
   });
 
-  // Load data nếu là edit mode
   useEffect(() => {
-    if (isEdit && id) {
-      // TODO: Fetch data từ API
-      // const fetchData = async () => {
-      //   const data = await getSalesPoint(id);
-      //   reset(data);
-      // };
-      // fetchData();
+    if (isEdit && store) {
+      reset(defaultValues);
+    } else if (!isEdit) {
+      reset(initialValues);
     }
-  }, [id, isEdit, reset]);
+  }, [store, isEdit, reset]);
 
   const onSubmit = async (data: SalesPointFormData) => {
     try {
-      // TODO: Call API để tạo hoặc cập nhật
-      // if (isEdit) {
-      //   await updateSalesPoint(id, data);
-      // } else {
-      //   await createSalesPoint(data);
-      // }
-      console.log("Form data:", data);
-
-      // Redirect về trang danh sách
-      router.push("/sales-points");
+      const payload = {
+        name: data.name,
+        code: data.code,
+        address: data.address,
+        salesScale: data.salesScale,
+        contactName: data.contactName,
+        phone: data.phone,
+        supplierCode: data.supplierCode,
+        supplierName: data.supplierName,
+        sellerName: data.sellerName,
+      };
+      showInfo({
+        title: "Xác nhận",
+        description: isEdit ? "Bạn có chắc chắn muốn cập nhật điểm bán này không?" : "Bạn có chắc chắn muốn tạo điểm bán mới không?",
+        onConfirm: async () => {
+          if (isEdit) {
+            await dispatch(updateStore({ id: store?.id || "", data: payload }));
+          } else {
+            await dispatch(createStore(payload));
+          }
+        },
+      });
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
+  useEffect(() => {
+    if (!requestState.type) return;
+    if (['updateStore', 'createStore'].includes(requestState.type)) {
+      switch (requestState.status) {
+        case 'completed':
+          showSuccess({
+            title: "Thành công",
+            description: isEdit ? "Điểm bán đã được cập nhật thành công." : "Điểm bán đã được tạo thành công.",
+            onConfirm() {
+              dispatch(clearSalesPointsState());
+            },
+          });
+          break;
+        case 'failed':
+          showFailed({
+            title: "Lỗi khi " + (isEdit ? "cập nhật" : "tạo") + " điểm bán",
+            description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
+            onConfirm() {
+              router.push("/sales-points");
+              dispatch(clearSalesPointsState());
+            },
+          });
+          break;
+        case 'loading':
+          showLoading({
+            title: "Đang xử lý",
+            description: "Vui lòng chờ trong giây lát...",
+          });
+          break;
+      }
+    }
+  }, [requestState, dispatch, router, isEdit, showSuccess, showFailed, showLoading]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

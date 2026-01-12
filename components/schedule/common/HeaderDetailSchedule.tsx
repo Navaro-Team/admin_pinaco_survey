@@ -7,7 +7,8 @@ import { useToastContext } from "@/context/ToastContext";
 import { getTaskById } from "@/features/schedule/schedule.slice";
 import { approveResurveyRequest, rejectResurveyRequest } from "@/features/survey/survey.slice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { CircleCheckBig, CircleX, Download, PencilIcon } from "lucide-react";
+import { ArrowLeftIcon, CircleCheckBig, CircleX, Download } from "lucide-react";
+import Link from "next/link";
 
 export function HeaderDetailSchedule() {
   const dispatch = useAppDispatch();
@@ -73,13 +74,15 @@ export function HeaderDetailSchedule() {
         </>
         }
         <Button variant="outline">
-          <PencilIcon className="size-4" />
-          Chỉnh sửa
-        </Button>
-        <Button variant="outline">
           <Download className="size-4" />
           Xuất PDF
         </Button>
+        <Link href="/schedule" className="cursor-pointer">
+          <Button variant="outline">
+            <ArrowLeftIcon className="size-4" />
+            Quay lại
+          </Button>
+        </Link>
       </div>
     </div>
   )
