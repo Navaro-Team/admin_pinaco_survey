@@ -2,12 +2,12 @@ import { RequestState } from "@/store/state";
 import { createSlice } from "@reduxjs/toolkit";
 import { commonCreateAsyncThunk } from "@/store/thunk";
 import { staffsService } from "./staffs.service";
-import { User, parseUser } from "@/model/User.model";
+import { User, parseUser, parseUsers } from "@/model/User.model";
 import { ACTION } from "@/lib/types";
 
 interface StaffsState {
   staffs: User[];
-  selectedStaff: User | null;
+  staff: User | null;
   action: ACTION;
   filter: {
     search: string;
@@ -19,7 +19,7 @@ interface StaffsState {
 
 const initialState: StaffsState = {
   staffs: [],
-  selectedStaff: null,
+  staff: null,
   action: "INS",
   filter: {
     search: "",
@@ -30,6 +30,7 @@ const initialState: StaffsState = {
 }
 
 export const getUsers = commonCreateAsyncThunk({ type: 'staffs/getUsers', action: staffsService.getUsers });
+export const searchUsers = commonCreateAsyncThunk({ type: 'staffs/searchUsers', action: staffsService.searchUsers });
 export const getUserById = commonCreateAsyncThunk({ type: 'staffs/getUserById', action: staffsService.getUserById });
 export const createUser = commonCreateAsyncThunk({ type: 'staffs/createUser', action: staffsService.createUser });
 export const updateUser = commonCreateAsyncThunk({ type: 'staffs/updateUser', action: staffsService.updateUser });
@@ -52,10 +53,13 @@ export const staffsSlice = createSlice({
     changeStatus: (state, action) => {
       state.filter.status = action.payload;
     },
+    changeStaff: (state, action) => {
+      state.staff = action.payload;
+    },
     clearStaffsState: (state) => {
-      state.requestState = { status: 'idle', type: '' };
-      state.selectedStaff = null;
+      state.staff = null;
       state.action = "INS";
+      state.requestState = { status: 'idle', type: '' };
     },
     clearFilter: (state) => {
       state.filter.search = "";
@@ -70,7 +74,7 @@ export const staffsSlice = createSlice({
         const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
         const usersArray = Array.isArray(responseData) ? responseData : [];
         state.staffs = usersArray.map(parseUser);
-        state.requestState = { status: 'completed', type: 'getUsers', data: responseData };
+        state.requestState = { status: 'completed', type: 'getUsers' };
       })
       .addCase(getUsers.pending, (state) => {
         state.requestState = { status: 'loading', type: 'getUsers' };
@@ -79,10 +83,23 @@ export const staffsSlice = createSlice({
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'getUsers', error: payload?.message };
       })
+      .addCase(searchUsers.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.staffs = parseUsers(data.data);
+        state.requestState = { status: 'completed', type: 'searchUsers' };
+      })
+      .addCase(searchUsers.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'searchUsers' };
+      })
+      .addCase(searchUsers.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'searchUsers', error: payload?.message };
+      })
       .addCase(getUserById.fulfilled, (state, action) => {
         const payload = action.payload as any;
         const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
-        state.selectedStaff = responseData ? parseUser(responseData) : null;
+        state.staff = responseData ? parseUser(responseData) : null;
         state.requestState = { status: 'completed', type: 'getUserById', data: responseData };
       })
       .addCase(getUserById.pending, (state) => {
@@ -90,7 +107,7 @@ export const staffsSlice = createSlice({
       })
       .addCase(getUserById.rejected, (state, action) => {
         const payload = action.payload as any;
-        state.selectedStaff = null;
+        state.staff = null;
         state.requestState = { status: 'failed', type: 'getUserById', error: payload?.message };
       })
       .addCase(createUser.fulfilled, (state, action) => {
@@ -112,8 +129,7 @@ export const staffsSlice = createSlice({
         const payload = action.payload as any;
         const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
         if (responseData) {
-          state.selectedStaff = parseUser(responseData);
-          // Update in staffs list if exists
+          state.staff = parseUser(responseData);
           const index = state.staffs.findIndex(s => s.id === responseData.id);
           if (index !== -1) {
             state.staffs[index] = parseUser(responseData);
@@ -131,8 +147,8 @@ export const staffsSlice = createSlice({
       .addCase(deleteUser.fulfilled, (state, action) => {
         const userId = action.meta.arg;
         state.staffs = state.staffs.filter(s => s.id !== userId);
-        if (state.selectedStaff?.id === userId) {
-          state.selectedStaff = null;
+        if (state.staff?.id === userId) {
+          state.staff = null;
         }
         state.requestState = { status: 'completed', type: 'deleteUser' };
       })
@@ -158,6 +174,6 @@ export const staffsSlice = createSlice({
   },
 })
 
-export const { changeAction, changeSearch, changeRole, changeStatus, clearStaffsState, clearFilter } = staffsSlice.actions;
+export const { changeAction, changeSearch, changeRole, changeStatus, changeStaff, clearStaffsState, clearFilter } = staffsSlice.actions;
 export default staffsSlice.reducer;
 

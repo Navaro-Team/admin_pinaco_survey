@@ -12,12 +12,11 @@ import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { createMultipleTasks } from "@/features/task/task.slice";
-import { changeCampaign, getCampaigns } from "@/features/campaigns/campaigns.slice";
-import { useEffect } from "react";
+import { changeCampaign } from "@/features/campaigns/campaigns.slice";
 import { Label } from "../ui/label";
 import { Combobox } from "../ui/combobox";
 import { Campaign } from "@/model/Campaign.model";
-import { changeSurvey, getSurveys } from "@/features/survey/survey.slice";
+import { changeSurvey } from "@/features/survey/survey.slice";
 import { Survey } from "@/model/Survey.model";
 import { useDialog } from "@/hooks/use-dialog";
 
@@ -81,11 +80,6 @@ export function ScheduleSheet({
       }
     });
   }
-
-  useEffect(() => {
-    dispatch(getCampaigns());
-    dispatch(getSurveys({}));
-  }, [dispatch]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

@@ -4,7 +4,7 @@ import { storage } from "@/lib/storage.util";
 
 export class ServerService extends BaseHttpService {
   constructor() {
-    super(process.env.NEXT_PUBLIC_API_URL || '', 30000);
+    super(process.env.NEXT_PUBLIC_API_URL || '', 90000);
   }
 
   protected setupInterceptors(): void {

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { serverService } from "@/features/http/ServerService";
-import { responseFailed, responseSuccess } from "../utils";
+import { missingRequiredFieldsResponse, responseFailed, responseSuccess } from "../utils";
 
 export async function GET(request: NextRequest) {
   const accessToken = (await cookies()).get('access_token')?.value;
@@ -40,3 +40,35 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function POST(request: NextRequest) {
+  const accessToken = (await cookies()).get('access_token')?.value;
+  const { surveyId, assignee, storeId, campaignId, dueDate } = await request.json();
+  console.log('surveyId: ', surveyId);
+  console.log('assignee: ', assignee);
+  console.log('storeId: ', storeId);
+  console.log('campaignId: ', campaignId);
+  console.log('dueDate: ', dueDate);
+  try {
+    if (!accessToken) throw new Error('No access token');
+    if (!surveyId) return missingRequiredFieldsResponse('surveyId')
+    if (!assignee) return missingRequiredFieldsResponse('assignee')
+    if (!storeId) return missingRequiredFieldsResponse('storeId')
+    if (!campaignId) return missingRequiredFieldsResponse('campaignId')
+    if (!dueDate) return missingRequiredFieldsResponse('dueDate')
+
+    const payload = {
+      surveyId: surveyId.toString(),
+      assignee: assignee,
+      storeId: storeId.toString(),
+      campaignId: campaignId.toString(),
+      dueDate: dueDate
+    }
+
+    const response = await serverService.post('/tasks', payload);
+    return responseSuccess(response);
+  } catch (error: any) {
+    const payload = error as any;
+    console.log('error: ', payload);
+    return responseFailed(payload, 'Create task failed');
+  }
+}
