@@ -37,11 +37,13 @@ export function Header() {
             description: 'Lịch trình khảo sát đã được tạo thành công',
             onCancel: () => {
               clearState();
+              dispatch(getTasks({ page: 1, limit: 20 }));
               setOpenScheduleSheet(false);
               setOpenAssignSheet(false);
             },
             onConfirm: () => {
               clearState();
+              dispatch(getTasks({ page: 1, limit: 20 }));
               setOpenScheduleSheet(false);
               setOpenAssignSheet(false);
             }
