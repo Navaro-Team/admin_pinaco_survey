@@ -4,6 +4,16 @@ import { parseCommonHttpResult } from "../http/parseCommonResult";
 export interface GetUsersParams {
   status?: string;
   phone?: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export interface SearchUsersParams {
+  q?: string;
+  page?: number;
+  limit?: number;
+  status?: string;
 }
 
 class StaffsService {
@@ -12,8 +22,27 @@ class StaffsService {
 
     if (params?.status) queryParams.status = params.status;
     if (params?.phone) queryParams.phone = params.phone;
+    if (params?.page) queryParams.page = params.page.toString();
+    if (params?.limit) queryParams.limit = params.limit.toString();
+    if (params?.search) queryParams.search = params.search;
 
     const response = await clientService.get('/users', queryParams);
+    return parseCommonHttpResult(response);
+  }
+
+  async searchUsers(params?: SearchUsersParams) {
+    const queryParams: Record<string, string> = {};
+
+    if (params?.q) {
+      queryParams.q = params.q;
+    } else {
+      if (params?.limit) queryParams.limit = params.limit.toString();
+    }
+    
+    if (params?.page) queryParams.page = params.page.toString();
+    if (params?.status) queryParams.status = params.status;
+
+    const response = await clientService.get('/users/search', queryParams);
     return parseCommonHttpResult(response);
   }
 

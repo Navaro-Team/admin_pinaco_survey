@@ -28,6 +28,11 @@ class TaskService {
     return parseCommonHttpResult(response);
   }
 
+  async createTask(payload: { surveyId: string, assignee: any, storeId: string, campaignId: string, dueDate: string }) {
+    const response = await clientService.post('/tasks', payload);
+    return parseCommonHttpResult(response);
+  }
+
   async createMultipleTasks(payload: { surveyId: string, campaignId: string, dueDate: string }) {
     const response = await clientService.post('/tasks/assign-from-mappings', payload);
     return parseCommonHttpResult(response);

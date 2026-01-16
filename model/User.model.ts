@@ -1,6 +1,7 @@
 // User interface based on UserResponse from API
 export interface User {
   id: string;
+  code: string;
   name: string;
   email?: string;
   phone?: string;
@@ -20,6 +21,7 @@ export interface User {
 export const parseUser = (user: any): User => {
   return {
     id: user.id,
+    code: user.code,
     name: user.name,
     email: user.email,
     phone: user.phone,
@@ -37,17 +39,22 @@ export const parseUser = (user: any): User => {
   };
 };
 
+export const parseUsers = (users: any): User[] => {
+  if (!Array.isArray(users)) return [];
+  return users.map(parseUser);
+};
+
 // Map roles to Vietnamese
 export const getRoleLabel = (roles: string[]): string => {
   if (!roles || roles.length === 0) return "Nhân viên";
-  
+
   const roleMap: Record<string, string> = {
     admin: "Quản trị viên",
     manager: "Quản lý",
     officer: "Nhân viên",
     sales: "Nhân viên bán hàng",
   };
-  
+
   // Get the first role or default
   const primaryRole = roles[0]?.toLowerCase() || "officer";
   return roleMap[primaryRole] || primaryRole;
@@ -64,7 +71,7 @@ export const getStatusLabel = (status: string): string => {
     locked: "Bị khóa",
     requires_re_authentication: "Yêu cầu xác thực lại",
   };
-  
+
   return statusMap[status] || status;
 };
 

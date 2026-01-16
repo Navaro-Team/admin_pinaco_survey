@@ -3,10 +3,8 @@ import { BaseHttpService } from "./BaseHttpService";
 import { cookieUtils } from "@/utils/cookie.util";
 
 export class ClientService extends BaseHttpService {
-  private _storeCache: any = null;
-
   constructor() {
-    super(process.env.NEXT_PUBLIC_BASE_URL + '/api', 30000);
+    super(process.env.NEXT_PUBLIC_BASE_URL + '/api', 90000);
   }
 
   private accessToken = () => {

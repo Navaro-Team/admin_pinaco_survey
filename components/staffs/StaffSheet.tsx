@@ -14,7 +14,7 @@ import { Button } from "../ui/button";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { getUsers, importUsers } from "@/features/staffs/staffs.slice";
+import { clearStaffsState, getUsers, importUsers } from "@/features/staffs/staffs.slice";
 
 interface ImportLog {
   id: string;
@@ -343,7 +343,15 @@ export function StaffSheet({
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}>
+            onClick={() => {
+              onOpenChange(false);
+              setLogs([]);
+              setSelectedFile(null);
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+              }
+              dispatch(clearStaffsState());
+            }}>
             Đóng
           </Button>
           <Button

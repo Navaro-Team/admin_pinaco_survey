@@ -25,7 +25,7 @@ export function StaffForm() {
 
   const action = useAppSelector((state) => state.staffs.action);
   const requestState = useAppSelector((state) => state.staffs.requestState);
-  const selectedStaff = useAppSelector((state) => state.staffs.selectedStaff);
+  const staff = useAppSelector((state) => state.staffs.staff);
 
   const isEdit = action === "UPD";
 
@@ -56,7 +56,7 @@ export function StaffForm() {
       const fetchData = async () => {
         try {
           setIsLoadingData(true);
-          await dispatch(getUserById(selectedStaff?.id || ""));
+          await dispatch(getUserById(staff?.id || ""));
         } catch (err) {
           showFailed({
             title: "Lỗi khi lấy dữ liệu nhân sự",
@@ -82,19 +82,19 @@ export function StaffForm() {
   }, [action, dispatch]);
 
   useEffect(() => {
-    if (selectedStaff && isEdit) {
+    if (staff && isEdit) {
       reset({
-        name: selectedStaff.name || "",
-        phone: selectedStaff.phone || "",
-        email: selectedStaff.email || "",
-        dateOfBirth: selectedStaff.dateOfBirth
-          ? new Date(selectedStaff.dateOfBirth)
+        name: staff.name || "",
+        phone: staff.phone || "",
+        email: staff.email || "",
+        dateOfBirth: staff.dateOfBirth
+          ? new Date(staff.dateOfBirth)
           : undefined,
-        address: selectedStaff.address || "",
-        gender: selectedStaff.gender || null,
+        address: staff.address || "",
+        gender: staff.gender || null,
         password: "",
-        roles: selectedStaff.roles || [],
-        status: (selectedStaff.status as "active" | "inactive" | "suspended" | "banned" | "deleted" | "locked" | "requires_re_authentication") || "active",
+        roles: staff.roles || [],
+        status: (staff.status as "active" | "inactive" | "suspended" | "banned" | "deleted" | "locked" | "requires_re_authentication") || "active",
       });
     } else if (!isEdit) {
       reset({
@@ -109,7 +109,7 @@ export function StaffForm() {
         status: "active",
       });
     }
-  }, [selectedStaff, isEdit, reset]);
+  }, [staff, isEdit, reset]);
 
   const onSubmit = async (data: StaffFormData) => {
     // Trigger validation for all fields before submit
@@ -150,7 +150,7 @@ export function StaffForm() {
       description: isEdit ? "Bạn có chắc chắn muốn cập nhật nhân sự này không?" : "Bạn có chắc chắn muốn tạo nhân sự mới không?",
       onConfirm() {
         if (isEdit) {
-          dispatch(updateUser({ id: selectedStaff?.id || "", data: submitData }));
+          dispatch(updateUser({ id: staff?.id || "", data: submitData }));
         } else {
           dispatch(createUser(submitData));
         }

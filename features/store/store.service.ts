@@ -5,6 +5,13 @@ export interface GetStoresParams {
   page?: number;
   limit?: number;
 }
+
+export interface SearchStoresParams {
+  q?: string;
+  page?: number;
+  limit?: number;
+}
+
 class StoreService {
   async getStores(params: GetStoresParams) {
     const urlParams = new URLSearchParams();
@@ -16,6 +23,21 @@ class StoreService {
     }
     const queryString = urlParams.toString();
     const response = await clientService.get(`/stores`, queryString);
+    return parseCommonHttpResult(response);
+  }
+
+  async searchStores(params?: SearchStoresParams) {
+    const queryParams: Record<string, string> = {};
+
+    if (params?.q) {
+      queryParams.q = params.q;
+    } else {
+      if (params?.limit) queryParams.limit = params.limit.toString();
+    }
+    
+    if (params?.page) queryParams.page = params.page.toString();
+
+    const response = await clientService.get('/stores/search', queryParams);
     return parseCommonHttpResult(response);
   }
 

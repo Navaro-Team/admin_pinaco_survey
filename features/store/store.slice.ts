@@ -20,6 +20,7 @@ const initialState: StoreState = {
 }
 
 export const getStores = commonCreateAsyncThunk({ type: 'store/getStores', action: storeService.getStores });
+export const searchStores = commonCreateAsyncThunk({ type: 'store/searchStores', action: storeService.searchStores });
 export const getStoreById = commonCreateAsyncThunk({ type: 'store/getStoreById', action: storeService.getStoreById });
 export const createStore = commonCreateAsyncThunk({ type: 'store/createStore', action: storeService.createStore });
 export const updateStore = commonCreateAsyncThunk({ type: 'store/updateStore', action: storeService.updateStore });
@@ -36,13 +37,16 @@ export const storeSlice = createSlice({
       state.store = action.payload;
     },
     clearStoreState: (state) => {
+      state.store = null;
       state.requestState = { status: 'idle', type: '' };
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(getStores.fulfilled, (state, action) => {
-        state.stores = parseStores(action.payload);
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.stores = responseData ? parseStores(responseData) : [];
         state.requestState = { status: 'completed', type: 'getStores', data: action.payload };
       })
       .addCase(getStores.pending, (state) => {
@@ -50,6 +54,19 @@ export const storeSlice = createSlice({
       })
       .addCase(getStores.rejected, (state, action) => {
         state.requestState = { status: 'failed', type: 'getStores', error: action.error.message };
+      })
+      .addCase(searchStores.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.stores = parseStores(data.data);
+        state.requestState = { status: 'completed', type: 'searchStores' };
+      })
+      .addCase(searchStores.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'searchStores' };
+      })
+      .addCase(searchStores.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'searchStores', error: payload?.message };
       })
       .addCase(getStoreById.fulfilled, (state, action) => {
         const payload = action.payload as any;

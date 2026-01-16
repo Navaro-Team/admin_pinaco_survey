@@ -14,7 +14,7 @@ import { Button } from "../ui/button";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { getStores, importStores } from "@/features/sales-points/sales-points.slice";
+import { clearSalesPointsState, getStores, importStores } from "@/features/sales-points/sales-points.slice";
 
 interface ImportLog {
   id: string;
@@ -341,7 +341,15 @@ export function SalesPointSheet({
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}>
+            onClick={() => {
+              onOpenChange(false);
+              setLogs([]);
+              setSelectedFile(null);
+              if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+              }
+              dispatch(clearSalesPointsState());
+            }}>
             Đóng
           </Button>
           <Button
