@@ -30,7 +30,7 @@ export function Table() {
 
   useEffect(() => {
     dispatch(resetPagination());
-    dispatch(getTasks({ page: 1, limit: 20 }));
+    dispatch(getTasks({ page: 1, limit: 20, status: filter.status }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter.store, filter.area, filter.region, filter.deadline, filter.status]);
 

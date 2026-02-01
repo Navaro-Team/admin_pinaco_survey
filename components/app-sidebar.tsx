@@ -39,6 +39,11 @@ const data = {
       icon: Calendar,
     },
     {
+      title: "Đang chờ duyệt",
+      url: "/pending-review",
+      icon: FileText,
+    },
+    {
       title: "Danh sách câu hỏi",
       url: "/questions",
       icon: List,

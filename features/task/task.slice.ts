@@ -18,6 +18,7 @@ const initialState: TaskState = {
 
 export const getTasks = commonCreateAsyncThunk({ type: "getTasks", action: taskService.getTasks });
 export const getTaskById = commonCreateAsyncThunk({ type: "getTaskById", action: taskService.getTaskById });
+export const getTaskBySubmissionAndSurvey = commonCreateAsyncThunk({ type: "getTaskBySubmissionAndSurvey", action: taskService.getTaskBySubmissionAndSurvey });
 export const createTask = commonCreateAsyncThunk({ type: "createTask", action: taskService.createTask });
 export const createMultipleTasks = commonCreateAsyncThunk({ type: "createMultipleTasks", action: taskService.createMultipleTasks });
 
@@ -62,6 +63,19 @@ export const taskSlice = createSlice({
       .addCase(getTaskById.rejected, (state, action) => {
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'getTaskById', error: payload?.message };
+      })
+      .addCase(getTaskBySubmissionAndSurvey.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'getTaskBySubmissionAndSurvey' };
+      })
+      .addCase(getTaskBySubmissionAndSurvey.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.task = responseData ? parseTask(responseData) : null;
+        state.requestState = { status: 'completed', type: 'getTaskBySubmissionAndSurvey' };
+      })
+      .addCase(getTaskBySubmissionAndSurvey.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'getTaskBySubmissionAndSurvey', error: payload?.message };
       })
       .addCase(createMultipleTasks.pending, (state) => {
         state.requestState = { status: 'loading', type: 'createMultipleTasks' };

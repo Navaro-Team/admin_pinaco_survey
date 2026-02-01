@@ -11,7 +11,7 @@ export interface Task {
   resurveyRequest: any,
   isResurveyRequested: boolean,
   resurveyStatus: string,
-  createdAt: Date,
+  createdAt: string,
   completedAt: Date,
   updatedAt: Date
 }

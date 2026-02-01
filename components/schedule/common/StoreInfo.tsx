@@ -5,14 +5,15 @@ import { StoreIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Label } from "@/components/ui/label";
-import { useAppSelector } from "@/hooks/redux";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Store } from "@/model/Store.model";
 
-export function StoreInfo() {
-  const task = useAppSelector((state) => state.schedule.task);
-  const scheduleState = useAppSelector((state) => state.schedule.requestState);
-  const isLoading = scheduleState.status === 'loading' && scheduleState.type === 'getTaskById';
+interface StoreInfoProps {
+  store: Store;
+  isLoading: boolean;
+}
 
+export function StoreInfo({ store, isLoading }: StoreInfoProps) {
   return (
     <Card className="flex flex-col gap-4!">
       <CardHeader className="h-8">
@@ -21,7 +22,7 @@ export function StoreInfo() {
           <span>Thông tin cửa hàng</span>
         </CardTitle>
         <CardAction>
-          <Link href={`/sales-points/${task?.store?.id}`}>
+          <Link href={`/sales-points/${store?.id}`}>
             <Button variant="ghost" className="text-main cursor-pointer">
               Xem chi tiết
             </Button>
@@ -30,23 +31,23 @@ export function StoreInfo() {
       </CardHeader>
       <Separator />
       <CardContent className="flex flex-row py-2! gap-4">
-        <Image src="/images/store.png" alt="Store" width={224} height={224} className="rounded-md border border-dotted" />
+        <Image src="/images/store.png" alt="Store" width={224} height={224} className="rounded-md border border-dotted w-56 h-56" />
         <div className="flex flex-col gap-2">
           <div>
             <Label className="text-sm text-muted-foreground">Tên cửa hàng</Label>
-            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{task?.store?.name ?? "N/A"}</span>}
+            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.name ?? "N/A"}</span>}
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Địa chỉ</Label>
-            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{task?.store?.location?.address ?? "N/A"}</span>}
+            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.location?.address ?? "N/A"}</span>}
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Người liên hệ</Label>
-            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{task?.store?.contactName ?? "N/A"}</span>}
+            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.contactPersonName ?? "N/A"}</span>}
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Số điện thoại</Label>
-            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{task?.store?.phone ?? "N/A"}</span>}
+            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.phone ?? "N/A"}</span>}
           </div>
         </div>
       </CardContent>

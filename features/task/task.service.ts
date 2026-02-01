@@ -16,8 +16,6 @@ class TaskService {
     if (params?.page) queryParams.page = params.page.toString();
     if (params?.limit) queryParams.limit = params.limit.toString();
     if (params?.status) queryParams.status = params.status;
-    if (params?.assigneeId) queryParams.assigneeId = params.assigneeId;
-    if (params?.campaignId) queryParams.campaignId = params.campaignId;
 
     const response = await clientService.get('/tasks', queryParams);
     return parseCommonHttpResult(response);
@@ -25,6 +23,14 @@ class TaskService {
 
   async getTaskById(id: string) {
     const response = await clientService.get(`/tasks/${id}`);
+    return parseCommonHttpResult(response);
+  }
+
+  async getTaskBySubmissionAndSurvey(params: { submissionId: string, surveyId: string }) {
+    const queryParams: Record<string, string> = {};
+    if (params.submissionId) queryParams.submissionId = params.submissionId;
+    if (params.surveyId) queryParams.surveyId = params.surveyId;
+    const response = await clientService.get('/tasks/by-submission-and-survey', queryParams);
     return parseCommonHttpResult(response);
   }
 
