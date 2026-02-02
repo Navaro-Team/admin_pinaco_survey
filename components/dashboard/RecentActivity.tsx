@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { useEffect } from "react";
 import { getTasks } from "@/features/task/task.slice";
 import { Task } from "@/model/Task.model";
-import { formatDate } from "date-fns";
+import { formatUTCDate } from "@/lib/utils";
 
 export function RecentActivity() {
   const dispatch = useAppDispatch();
@@ -50,7 +50,7 @@ export function RecentActivity() {
                 </TableCell>
                 <TableCell>{task.assignee.name}</TableCell>
                 <TableCell><StatusBadge status={task.status} /></TableCell>
-                <TableCell className="text-left">{formatDate(task.createdAt, 'dd/MM/yyyy')}</TableCell>
+                <TableCell className="text-left">{formatUTCDate(task.createdAt, 'dd/MM/yyyy')}</TableCell>
               </TableRow>
             ))}
           </TableBody>

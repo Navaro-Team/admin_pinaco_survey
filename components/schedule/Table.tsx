@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Eye } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -22,17 +22,59 @@ export function Table() {
   const requestState = useAppSelector((state) => state.schedule.requestState);
   const isLoading = requestState.status === 'loading' && requestState.type === 'getTasks' && requestState.data !== true;
 
-  useEffect(() => {
-    dispatch(resetPagination());
-    dispatch(getTasks({ page: 1, limit: 20 }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const isInitialMount = useRef(true);
+  const prevTasksLengthRef = useRef(tasks.length);
+  const prevFilterRef = useRef({
+    store: filter.store,
+    area: filter.area,
+    region: filter.region,
+    deadline: filter.deadline,
+    status: filter.status,
+  });
 
+  // Load data when filter changes or on initial mount
   useEffect(() => {
-    dispatch(resetPagination());
-    dispatch(getTasks({ page: 1, limit: 20 }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter.store, filter.area, filter.region, filter.deadline, filter.status]);
+    const prevDeadline = prevFilterRef.current.deadline;
+    const currentDeadline = filter.deadline;
+    
+    const deadlineChanged = 
+      prevDeadline !== currentDeadline &&
+      (
+        (prevDeadline && currentDeadline && !isSameDay(prevDeadline, currentDeadline)) ||
+        (!prevDeadline && currentDeadline) ||
+        (prevDeadline && !currentDeadline)
+      );
+
+    const filterChanged = 
+      prevFilterRef.current.store !== filter.store ||
+      prevFilterRef.current.area !== filter.area ||
+      prevFilterRef.current.region !== filter.region ||
+      deadlineChanged ||
+      prevFilterRef.current.status !== filter.status;
+
+    if (isInitialMount.current || filterChanged) {
+      isInitialMount.current = false;
+      prevFilterRef.current = {
+        store: filter.store,
+        area: filter.area,
+        region: filter.region,
+        deadline: filter.deadline,
+        status: filter.status,
+      };
+      dispatch(resetPagination());
+      dispatch(getTasks({ page: 1, limit: 20, status: filter.status || undefined }));
+    }
+  }, [dispatch, filter.store, filter.area, filter.region, filter.deadline, filter.status]);
+
+  // Reload when tasks become empty after having data (e.g., after back from detail page)
+  useEffect(() => {
+    const tasksBecameEmpty = prevTasksLengthRef.current > 0 && tasks.length === 0;
+    if (!isInitialMount.current && tasksBecameEmpty && !isLoading && requestState.status !== 'loading') {
+      dispatch(resetPagination());
+      dispatch(getTasks({ page: 1, limit: 20, status: filter.status || undefined }));
+    }
+    prevTasksLengthRef.current = tasks.length;
+  }, [dispatch, tasks.length, isLoading, requestState.status, filter.status]);
 
   const filteredTasks = tasks.filter((task) => {
     // Filter by store (search in store name)

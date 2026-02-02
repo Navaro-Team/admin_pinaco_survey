@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Status } from "@/components/ui/status-badge";
 import { useToastContext } from "@/context/ToastContext";
-import { getTaskById } from "@/features/schedule/schedule.slice";
+import { clearFilter, getTaskById } from "@/features/schedule/schedule.slice";
 import { approveResurveyRequest, rejectResurveyRequest } from "@/features/survey/survey.slice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { ArrowLeftIcon, CircleCheckBig, CircleX, Download } from "lucide-react";
@@ -78,7 +78,7 @@ export function HeaderDetailSchedule() {
           Xuất PDF
         </Button>
         <Link href="/schedule" className="cursor-pointer">
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => dispatch(clearFilter())}>
             <ArrowLeftIcon className="size-4" />
             Quay lại
           </Button>

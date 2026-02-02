@@ -43,11 +43,6 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const accessToken = (await cookies()).get('access_token')?.value;
   const { surveyId, assignee, storeId, campaignId, dueDate } = await request.json();
-  console.log('surveyId: ', surveyId);
-  console.log('assignee: ', assignee);
-  console.log('storeId: ', storeId);
-  console.log('campaignId: ', campaignId);
-  console.log('dueDate: ', dueDate);
   try {
     if (!accessToken) throw new Error('No access token');
     if (!surveyId) return missingRequiredFieldsResponse('surveyId')

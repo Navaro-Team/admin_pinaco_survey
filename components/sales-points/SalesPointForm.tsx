@@ -36,7 +36,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
         code: store?.code || "",
         address: store?.location?.address || "",
         salesScale: store?.salesScale || 0,
-        contactName: store?.contactPersonName || "",
+        contactPersonName: store?.contactPersonName || "",
         phone: store?.phone || "",
         supplierCode: store?.nppCode || "",
         supplierName: store?.nppName || "",
@@ -72,7 +72,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
         code: data.code,
         address: data.address,
         salesScale: data.salesScale,
-        contactPersonName: data.contactName,
+        contactPersonName: data.contactPersonName,
         phone: data.phone,
         nppCode: data.supplierCode,
         nppName: data.supplierName,
@@ -220,7 +220,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
               <Label className="text-sm text-gray-500">Tên người liên hệ</Label>
               <Controller
                 control={control}
-                name="contactName"
+                name="contactPersonName"
                 render={({ field }) => (
                   <Input
                     className="bg-gray-100 text-black opacity-100"

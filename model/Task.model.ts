@@ -11,9 +11,10 @@ export interface Task {
   resurveyRequest: any,
   isResurveyRequested: boolean,
   resurveyStatus: string,
-  createdAt: Date,
+  createdAt: string,
   completedAt: Date,
-  updatedAt: Date
+  updatedAt: Date,
+  checkInAssets: any[]
 }
 
 export function parseTask(data: any): Task {
@@ -33,6 +34,7 @@ export function parseTask(data: any): Task {
     createdAt: data.createdAt,
     completedAt: data.completedAt,
     updatedAt: data.updatedAt,
+    checkInAssets: data.checkInAssets,
   };
 }
 

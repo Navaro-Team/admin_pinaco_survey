@@ -1,29 +1,48 @@
 export interface Submission {
   _id: string;
-  submissionId: string;
   surveyId: string;
-  submittedBy: string;
-  submittedAt: string;
+  createdBy: string;
   store: any,
-  answers: any[],
   metadata: any,
+  status: string;
+  pendingQuestionCodes: string[];
+  checkinTime: string;
+  checkoutTime: string;
+  updateStore: boolean;
   createdAt: string;
   updatedAt: string;
-
+  reviewAction: string;
+  reviewNote: string;
+  reviewedAt: string;
+  reviewedBy: string;
+  submissionId: string;
+  submittedBy: string;
+  submittedAt: string;
+  answers: any[],
 }
 
 export function parseSubmission(data: any): Submission {
   return {
     _id: data._id,
-    submissionId: data.submissionId,
     surveyId: data.surveyId,
-    submittedBy: data.submittedBy,
-    submittedAt: data.submittedAt,
+    createdBy: data.createdBy,
     store: data.store,
-    answers: data.answers,
     metadata: data.metadata,
+    status: data.status,
+    pendingQuestionCodes: data.pendingQuestionCodes,
+    checkinTime: data.checkinTime,
+    checkoutTime: data.checkoutTime,
+    updateStore: data.updateStore,
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
+    reviewAction: data.reviewAction,
+    reviewNote: data.reviewNote,
+    reviewedAt: data.reviewedAt,
+    reviewedBy: data.reviewedBy,
+    submissionId: data.submissionId,
+    submittedBy: data.submittedBy,
+    submittedAt: data.submittedAt,
+    answers: data.answers,
   };
 }
 
