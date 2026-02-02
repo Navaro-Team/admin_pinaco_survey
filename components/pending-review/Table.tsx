@@ -117,9 +117,9 @@ export function PendingReviewTable() {
                         </TableCell>
                         <TableCell className="text-left w-32">
                           {submission.status ?
-                            submission.status === SubmissionStatus.SUBMITTED ? (<SubmissionStatusBadge status={submission.reviewAction} />) : (
-                              <SubmissionStatusBadge status={submission.status} />
-                            ) : (
+                            (submission.status === SubmissionStatus.SUBMITTED && submission.reviewAction) ?
+                              (<SubmissionStatusBadge status={submission.reviewAction} />) :
+                              (<SubmissionStatusBadge status={submission.status} />) : (
                               "-"
                             )}
                         </TableCell>

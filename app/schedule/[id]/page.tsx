@@ -2,6 +2,7 @@
 
 import { AssigneeInfo } from "@/components/schedule/common/AssigneeInfo"
 import { HeaderDetailSchedule } from "@/components/schedule/common/HeaderDetailSchedule"
+import { PhotoCheckIn } from "@/components/schedule/common/PhotoCheckIn"
 import { ResultServey } from "@/components/schedule/common/ResultServey"
 import { StoreInfo } from "@/components/schedule/common/StoreInfo"
 import { changeTask, getTaskById } from "@/features/schedule/schedule.slice"
@@ -55,6 +56,7 @@ export default function Page() {
           checkinTime={submission?.checkinTime}
           checkoutTime={submission?.checkoutTime} />
       </div>
+      <PhotoCheckIn />
       <ResultServey />
     </div>
   )

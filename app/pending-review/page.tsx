@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { 
@@ -15,40 +15,46 @@ export default function PagePendingReview() {
   const dispatch = useAppDispatch();
   const pagination = useAppSelector((state) => state.submission.pagination);
   const filter = useAppSelector((state) => state.submission.filter);
+  const isInitialMount = useRef(true);
+  const prevFilterStatus = useRef<string | undefined>(filter.status);
+  const prevPage = useRef<number>(pagination.page);
 
-  // Load initial data
   useEffect(() => {
-    dispatch(resetPagination());
-    dispatch(getPendingSubmissions({ 
-      skip: 0, 
-      limit: pagination.limit, 
-      status: filter.status || undefined 
-    }));
-  }, []);
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      dispatch(resetPagination());
+      dispatch(getPendingSubmissions({ 
+        skip: 0, 
+        limit: pagination.limit, 
+        status: filter.status || undefined 
+      }));
+      prevFilterStatus.current = filter.status;
+      prevPage.current = 1;
+      return;
+    }
 
-  // Reload when filter changes
-  useEffect(() => {
-    dispatch(resetPagination());
-    dispatch(getPendingSubmissions({ 
-      skip: 0, 
-      limit: pagination.limit, 
-      status: filter.status || undefined 
-    }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter.status]);
+    if (prevFilterStatus.current !== filter.status) {
+      prevFilterStatus.current = filter.status;
+      dispatch(resetPagination());
+      dispatch(getPendingSubmissions({ 
+        skip: 0, 
+        limit: pagination.limit, 
+        status: filter.status || undefined 
+      }));
+      prevPage.current = 1;
+      return;
+    }
 
-  // Load more when page changes (if not page 1)
-  useEffect(() => {
-    if (pagination.page > 1) {
+    if (prevPage.current !== pagination.page && pagination.page > 1) {
       const skip = (pagination.page - 1) * pagination.limit;
       dispatch(getPendingSubmissions({ 
         skip, 
         limit: pagination.limit, 
         status: filter.status || undefined 
       }));
+      prevPage.current = pagination.page;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.page]);
+  }, [dispatch, filter.status, pagination.page, pagination.limit]);
 
   return (
     <div className="h-[calc(100vh-var(--header-height))] overflow-hidden flex flex-col gap-4 p-4 md:gap-6 md:p-6">

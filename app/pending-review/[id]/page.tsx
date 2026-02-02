@@ -14,6 +14,7 @@ import { AssigneeInfo } from "@/components/schedule/common/AssigneeInfo";
 import { ResultServey } from "@/components/schedule/common/ResultServey";
 import { SubmissionStatus } from "@/components/pending-review/StatusBadge";
 import { useDialogContext } from "@/context/DialogContext";
+import { PhotoCheckIn } from "@/components/schedule/common/PhotoCheckIn";
 
 export default function PendingReviewDetailPage() {
   const params = useParams<{ id: string }>();
@@ -115,6 +116,7 @@ export default function PendingReviewDetailPage() {
             checkinTime={submission?.checkinTime}
             checkoutTime={submission?.checkoutTime} />
         </div>
+        <PhotoCheckIn />
         <ResultServey />
       </div>
     </div>
