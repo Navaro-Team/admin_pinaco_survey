@@ -61,7 +61,7 @@ export function Table() {
         deadline: filter.deadline,
         status: filter.status,
       };
-      dispatch(resetPagination());
+    dispatch(resetPagination());
       dispatch(getTasks({ page: 1, limit: 20, status: filter.status || undefined }));
     }
   }, [dispatch, filter.store, filter.area, filter.region, filter.deadline, filter.status]);
@@ -70,7 +70,7 @@ export function Table() {
   useEffect(() => {
     const tasksBecameEmpty = prevTasksLengthRef.current > 0 && tasks.length === 0;
     if (!isInitialMount.current && tasksBecameEmpty && !isLoading && requestState.status !== 'loading') {
-      dispatch(resetPagination());
+    dispatch(resetPagination());
       dispatch(getTasks({ page: 1, limit: 20, status: filter.status || undefined }));
     }
     prevTasksLengthRef.current = tasks.length;

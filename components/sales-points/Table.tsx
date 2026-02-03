@@ -8,7 +8,7 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableCaption, T
 import { TablePagination } from "../ui/table-pagination";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { changePage, deleteStore, getStores, resetPagination } from "@/features/sales-points/sales-points.slice";
+import { changePage, deleteStore, getStores, resetPagination, searchStores } from "@/features/sales-points/sales-points.slice";
 import { Spinner } from "../ui/spinner";
 import { useDialog } from "@/hooks/use-dialog";
 
@@ -20,7 +20,6 @@ export function Table() {
   const filter = useAppSelector((state) => state.salesPoints.filter);
   const pagination = useAppSelector((state) => state.salesPoints.pagination);
   const requestState = useAppSelector((state) => state.salesPoints.requestState);
-
   const isLoading = requestState.status === 'loading' && requestState.type === 'getStores' && requestState.data === true;
 
   useEffect(() => {
@@ -31,28 +30,9 @@ export function Table() {
 
   useEffect(() => {
     dispatch(resetPagination());
-    dispatch(getStores({ page: pagination.page, limit: pagination.limit }));
+    dispatch(searchStores({ q: filter.search, page: pagination.page, limit: pagination.limit }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter.search, filter.area]);
-
-  const filteredStores = stores.filter((store) => {
-    if (filter.search) {
-      const searchLower = filter.search.toLowerCase();
-      const nameMatch = store.name?.toLowerCase().includes(searchLower);
-      const codeMatch = store.code?.toLowerCase().includes(searchLower);
-      if (!nameMatch && !codeMatch) {
-        return false;
-      }
-    }
-
-    if (filter.area) {
-      if (store.area !== filter.area) {
-        return false;
-      }
-    }
-
-    return true;
-  });
 
   const handleDeleteStore = (id: string) => {
     showInfo({
@@ -87,7 +67,7 @@ export function Table() {
   };
   const startIndex = (pagination.page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const displayStores = filteredStores.slice(startIndex, endIndex);
+  const displayStores = stores.slice(startIndex, endIndex);
 
   useEffect(() => {
     if (!requestState.type) return;

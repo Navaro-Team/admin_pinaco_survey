@@ -35,6 +35,7 @@ const initialState: SalesPointsState = {
 }
 
 export const getStores = commonCreateAsyncThunk({ type: 'salesPoints/getStores', action: storeService.getStores });
+export const searchStores = commonCreateAsyncThunk({ type: 'salesPoints/searchStores', action: storeService.searchStores });
 export const deleteStore = commonCreateAsyncThunk({ type: 'salesPoints/deleteStore', action: storeService.deleteStore });
 export const getStoreById = commonCreateAsyncThunk({ type: 'salesPoints/getStoreById', action: storeService.getStoreById });
 export const createStore = commonCreateAsyncThunk({ type: 'salesPoints/createStore', action: storeService.createStore });
@@ -166,6 +167,19 @@ export const salesPointsSlice = createSlice({
       .addCase(importStores.rejected, (state, action) => {
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'importStores', error: payload?.message };
+      })
+      .addCase(searchStores.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.stores = parseStores(responseData.data);
+        state.requestState = { status: 'completed', type: 'searchStores' };
+      })
+      .addCase(searchStores.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'searchStores' };
+      })
+      .addCase(searchStores.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'searchStores', error: payload?.message };
       })
   },
 })
