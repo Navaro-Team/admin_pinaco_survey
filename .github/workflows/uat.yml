@@ -1,0 +1,66 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ "uat"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -------------------------
+      # 1. Checkout source
+      # -------------------------
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # -------------------------
+      # 2. Generate ENV
+      # -------------------------
+      - name: Create .env file main branch
+        run: echo "${{ secrets.ENV_UAT }}" > .env
+      # -------------------------
+      # 3. Install + Build BEFORE deploying
+      # -------------------------
+      - name: Install dependencies
+        run: | 
+          npm install
+
+      - name: Build project (stop if fails)
+        run: |
+          npm run build
+      # -------------------------
+      # 4. Setup SSH keys
+      # -------------------------
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_UAT_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Configure SSH
+          cat >> ~/.ssh/config << 'EOF'
+          Host ${{ secrets.SERVER_UAT_HOST }}
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ConnectTimeout 60
+            ServerAliveInterval 30
+          EOF
+
+      # -------------------------
+      # 5. Deploy (PM2)
+      # -------------------------
+      - name: Deploy
+        run: |
+          echo "Deploy and running PM2"
+          rsync -avz --delete --exclude 'node_modules' --exclude '.git' \
+            ./ ${{ secrets.SERVER_UAT_USER }}@${{ secrets.SERVER_UAT_HOST }}:/home/ubuntu/admin_pinaco_survey
+
+          ssh ${{ secrets.SERVER_UAT_USER }}@${{ secrets.SERVER_UAT_HOST }} '
+            cd /home/ubuntu/admin_pinaco_survey &&
+            npm install &&
+            (pm2 delete pinaco-admin || true) &&
+            pm2 start "npm run start" --name pinaco-admin
+          '
