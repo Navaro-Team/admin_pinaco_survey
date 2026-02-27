@@ -39,7 +39,7 @@ export function Filter() {
               value={store}
               onChange={(e) => dispatch(changeStore(e.target.value))} />
           </div>
-          <div className="flex-1 min-w-0 flex flex-col gap-2">
+          <div hidden className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Khu vực</Label>
             <Combobox
               className="w-full"
@@ -51,7 +51,7 @@ export function Filter() {
               placeholder="Chọn khu vực"
               onChange={(value) => dispatch(changeArea(value))} />
           </div>
-          <div className="flex-1 min-w-0 flex flex-col gap-2">
+          <div hidden className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Vùng</Label>
             <Combobox
               options={[

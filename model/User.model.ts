@@ -51,12 +51,13 @@ export const getRoleLabel = (roles: string[]): string => {
   const roleMap: Record<string, string> = {
     admin: "Quản trị viên",
     manager: "Quản lý",
-    officer: "Nhân viên",
     sales: "Nhân viên bán hàng",
+    sales_supervisor: "Quản lý bán hàng",
+    area_sales_manager: "Quản lý khu vực",
   };
 
   // Get the first role or default
-  const primaryRole = roles[0]?.toLowerCase() || "officer";
+  const primaryRole = roles[0]?.toLowerCase() || "sales";
   return roleMap[primaryRole] || primaryRole;
 };
 
@@ -78,11 +79,4 @@ export const getStatusLabel = (status: string): string => {
 // Check if status is active
 export const isActiveStatus = (status: string): boolean => {
   return status === "active";
-};
-
-// Generate staff code from id
-export const generateStaffCode = (id: string, index: number): string => {
-  // Use last 3 digits of id or index
-  const num = id.slice(-3) || String(index + 1).padStart(3, "0");
-  return `NV${num}`;
 };
