@@ -165,10 +165,11 @@ export function StaffForm() {
   ];
 
   const roleOptions = [
-    { value: "admin", label: "Quản trị viên" },
+    // { value: "admin", label: "Quản trị viên" },
     { value: "manager", label: "Quản lý" },
-    { value: "officer", label: "Nhân viên" },
     { value: "sales", label: "Nhân viên bán hàng" },
+    { value: "sales_supervisor", label: "Quản lý bán hàng" },
+    { value: "area_sales_manager", label: "Quản lý khu vực" },
   ];
 
   const statusOptions = [
