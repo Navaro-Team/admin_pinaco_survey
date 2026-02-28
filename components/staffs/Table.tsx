@@ -9,7 +9,7 @@ import { TablePagination } from "../ui/table-pagination";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { clearStaffsState, deleteUser, getUsers } from "@/features/staffs/staffs.slice";
-import { getRoleLabel, getStatusLabel, isActiveStatus, generateStaffCode } from "@/model/User.model";
+import { getRoleLabel, getStatusLabel, isActiveStatus } from "@/model/User.model";
 import { useDialog } from "@/hooks/use-dialog";
 import { Skeleton } from "../ui/skeleton";
 
@@ -175,7 +175,7 @@ export function Table() {
                     currentStaffs.map((staff, index) => (
                       <TableRow key={staff.id}>
                         <TableCell className="text-center w-10">{startIndex + index + 1}</TableCell>
-                        <TableCell className="text-left w-30">{generateStaffCode(staff.id, index)}</TableCell>
+                        <TableCell className="text-left w-30">{staff.code}</TableCell>
                         <TableCell className="text-left flex-1">{staff.name}</TableCell>
                         <TableCell className="text-left w-64">{staff.email || "-"}</TableCell>
                         <TableCell className="text-left w-32">{staff.phone || "-"}</TableCell>
