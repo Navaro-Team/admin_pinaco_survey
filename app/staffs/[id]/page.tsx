@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { changeAction, getUserById } from "@/features/staffs/staffs.slice";
+import { changeAction, changeStaff, getUserById } from "@/features/staffs/staffs.slice";
 import { StaffForm } from "@/components/staffs/StaffForm";
 
 export default function Page() {
@@ -13,11 +13,13 @@ export default function Page() {
   const action = useAppSelector((state) => state.staffs.action);
 
   useEffect(() => {
+    if (!id) return;
     if (id === "new") {
+      dispatch(changeStaff(null));
       dispatch(changeAction("INS"));
-    } else if (id) {
-      dispatch(getUserById(id));
+    } else {
       dispatch(changeAction("UPD"));
+      dispatch(getUserById(id));
     }
   }, [id, dispatch]);
 
