@@ -103,6 +103,7 @@ export const staffsSlice = createSlice({
         state.requestState = { status: 'completed', type: 'getUserById', data: responseData };
       })
       .addCase(getUserById.pending, (state) => {
+        state.staff = null;
         state.requestState = { status: 'loading', type: 'getUserById' };
       })
       .addCase(getUserById.rejected, (state, action) => {

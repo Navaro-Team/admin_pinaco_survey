@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -14,15 +14,16 @@ import { StaffFormData, staffFormSchema } from "@/features/staffs/staffs.schema"
 import { Spinner } from "@/components/ui/spinner";
 import { ArrowLeft } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { getUserById, createUser, updateUser, clearStaffsState } from "@/features/staffs/staffs.slice";
+import { createUser, updateUser, clearStaffsState } from "@/features/staffs/staffs.slice";
 import { useDialog } from "@/hooks/use-dialog";
 
 export function StaffForm() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [isLoadingData, setIsLoadingData] = useState(false);
   const { showSuccess, showFailed, showInfo, showLoading } = useDialog();
 
+  const params = useParams();
+  const id = params?.id as string | undefined;
   const action = useAppSelector((state) => state.staffs.action);
   const requestState = useAppSelector((state) => state.staffs.requestState);
   const staff = useAppSelector((state) => state.staffs.staff);
@@ -51,35 +52,25 @@ export function StaffForm() {
     },
   });
 
+  const isLoadingUser = requestState.type === "getUserById" && requestState.status === "loading";
+
   useEffect(() => {
-    if (isEdit) {
-      const fetchData = async () => {
-        try {
-          setIsLoadingData(true);
-          await dispatch(getUserById(staff?.id || ""));
-        } catch (err) {
-          showFailed({
-            title: "Lỗi khi lấy dữ liệu nhân sự",
-            description: (err as any)?.message || "Có lỗi xảy ra. Vui lòng thử lại.",
-            onConfirm() {
-              router.push("/staffs");
-              dispatch(clearStaffsState());
-              setIsLoadingData(false);
-            },
-            onCancel() {
-              router.push("/staffs");
-              dispatch(clearStaffsState());
-              setIsLoadingData(false);
-            },
-          });
-        } finally {
-          setIsLoadingData(false);
-        }
-      };
-      fetchData();
+    if (requestState.type === "getUserById" && requestState.status === "failed") {
+      showFailed({
+        title: "Lỗi khi lấy dữ liệu nhân sự",
+        description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
+        onConfirm() {
+          router.push("/staffs");
+          dispatch(clearStaffsState());
+        },
+        onCancel() {
+          router.push("/staffs");
+          dispatch(clearStaffsState());
+        },
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [action, dispatch]);
+  }, [requestState.type, requestState.status, requestState.error]);
 
   useEffect(() => {
     if (staff && isEdit) {
@@ -150,7 +141,7 @@ export function StaffForm() {
       description: isEdit ? "Bạn có chắc chắn muốn cập nhật nhân sự này không?" : "Bạn có chắc chắn muốn tạo nhân sự mới không?",
       onConfirm() {
         if (isEdit) {
-          dispatch(updateUser({ id: staff?.id || "", data: submitData }));
+          dispatch(updateUser({ id: id || staff?.id || "", data: submitData }));
         } else {
           dispatch(createUser(submitData));
         }
@@ -181,42 +172,39 @@ export function StaffForm() {
   ];
 
   useEffect(() => {
-    if (!requestState.type) return;
-    if (['createUser', 'updateUser', 'deleteUser'].includes(requestState.type)) {
-      switch (requestState.status) {
-        case 'completed':
-          showSuccess({
-            title: "Thành công",
-            description: isEdit ? "Nhân sự đã được cập nhật thành công." : "Nhân sự đã được tạo thành công.",
-            onConfirm() {
-              router.push("/staffs");
-              dispatch(clearStaffsState());
-              setIsLoadingData(false);
-            },
-          });
-          break;
-        case 'failed':
-          showFailed({
-            title: "Lỗi khi " + (isEdit ? "cập nhật" : "tạo") + " nhân sự",
-            description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
-            onConfirm() {
-              router.push("/staffs");
-              dispatch(clearStaffsState());
-              setIsLoadingData(false);
-            },
-          });
-          break;
-        case 'loading':
-          showLoading({
-            title: "Đang xử lý",
-            description: "Vui lòng chờ trong giây lát...",
-          });
-          break;
-      }
+    if (!requestState.type || !['createUser', 'updateUser', 'deleteUser'].includes(requestState.type)) return;
+    switch (requestState.status) {
+      case 'completed':
+        showSuccess({
+          title: "Thành công",
+          description: isEdit ? "Nhân sự đã được cập nhật thành công." : "Nhân sự đã được tạo thành công.",
+          onConfirm() {
+            router.push("/staffs");
+            dispatch(clearStaffsState());
+          },
+        });
+        break;
+      case 'failed':
+        showFailed({
+          title: "Lỗi khi " + (isEdit ? "cập nhật" : "tạo") + " nhân sự",
+          description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
+          onConfirm() {
+            router.push("/staffs");
+            dispatch(clearStaffsState());
+          },
+        });
+        break;
+      case 'loading':
+        showLoading({
+          title: "Đang xử lý",
+          description: "Vui lòng chờ trong giây lát...",
+        });
+        break;
     }
-  }, [requestState, dispatch])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestState.type, requestState.status, isEdit, dispatch]);
 
-  if (isLoadingData) {
+  if (isEdit && isLoadingUser) {
     return (
       <div className="flex items-center justify-center py-8">
         <Spinner className="size-6" />
