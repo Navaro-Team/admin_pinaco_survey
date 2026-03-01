@@ -35,7 +35,7 @@ export function Table() {
 
   const getTasksParams = (page: number) => ({
     page,
-    limit: 20,
+    limit: 10,
     q: filter.q?.trim() || undefined,
     assigneeId: filter.assigneeId?.trim() || undefined,
     status: filter.status || undefined,
