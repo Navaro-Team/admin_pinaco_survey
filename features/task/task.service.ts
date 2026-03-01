@@ -7,6 +7,7 @@ export interface GetTasksParams {
   status?: string;
   assigneeId?: string;
   campaignId?: string;
+  q?: string;
 }
 
 class TaskService {
@@ -16,6 +17,8 @@ class TaskService {
     if (params?.page) queryParams.page = params.page.toString();
     if (params?.limit) queryParams.limit = params.limit.toString();
     if (params?.status) queryParams.status = params.status;
+    if (params?.q) queryParams.q = params.q;
+    if (params?.assigneeId) queryParams.assigneeId = params.assigneeId;
 
     const response = await clientService.get('/tasks', queryParams);
     return parseCommonHttpResult(response);
@@ -41,6 +44,11 @@ class TaskService {
 
   async createMultipleTasks(payload: { surveyId: string, campaignId: string, dueDate: string }) {
     const response = await clientService.post('/tasks/assign-from-mappings', payload);
+    return parseCommonHttpResult(response);
+  }
+
+  async deleteTask(id: string) {
+    const response = await clientService.delete(`/tasks/${id}`, {});
     return parseCommonHttpResult(response);
   }
 }

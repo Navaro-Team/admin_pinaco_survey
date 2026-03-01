@@ -10,6 +10,18 @@ export async function GET(request: NextRequest) {
     if (!accessToken) throw new Error('No access token');
     const urlParams = new URLSearchParams();
 
+    if (params.get('q')) {
+      urlParams.set('q', params.get('q') ?? '');
+    } else {
+      if (params.get('limit')) {
+        urlParams.set('limit', params.get('limit') ?? '20');
+      }
+    }
+
+    if (params.get('assigneeId')) {
+      urlParams.set('assigneeId', params.get('assigneeId') ?? '');
+    }
+
     // Pagination
     if (params.get('page')) {
       urlParams.set('page', params.get('page') ?? '');
