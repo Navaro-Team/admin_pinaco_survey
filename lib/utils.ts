@@ -73,3 +73,35 @@ export function formatUTCDate(utcDateString: string, formatPattern: string): str
     .replace(/m/g, String(minutes))
     .replace(/s/g, String(seconds));
 }
+
+/**
+ * Format ISO date string to LOCAL timezone (browser's timezone).
+ * Use this when displaying user-facing times like checkinTime/checkoutTime
+ * that were stored as UTC (e.g. from toISOString()).
+ *
+ * @param isoDateString - ISO 8601 date string (e.g., "2026-03-01T07:00:00.000Z")
+ * @param formatPattern - Same as formatUTCDate: 'HH:mm', 'dd/MM/yyyy', etc.
+ */
+export function formatLocalDate(isoDateString: string, formatPattern: string): string {
+  const date = new Date(isoDateString);
+  const pad = (n: number, length: number = 2) => String(n).padStart(length, '0');
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  return formatPattern
+    .replace(/yyyy/g, String(year))
+    .replace(/yy/g, String(year).slice(-2))
+    .replace(/MM/g, pad(month))
+    .replace(/dd/g, pad(day))
+    .replace(/HH/g, pad(hours))
+    .replace(/mm/g, pad(minutes))
+    .replace(/ss/g, pad(seconds))
+    .replace(/M/g, String(month))
+    .replace(/d/g, String(day))
+    .replace(/H/g, String(hours))
+    .replace(/m/g, String(minutes))
+    .replace(/s/g, String(seconds));
+}

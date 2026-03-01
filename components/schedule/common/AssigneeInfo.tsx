@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { formatUTCDate } from "@/lib/utils";
+import { formatLocalDate } from "@/lib/utils";
 import { LogIn, LogOut, UserIcon } from "lucide-react";
 import Image from "next/image";
 import { Task } from "@/model/Task.model";
@@ -44,15 +44,15 @@ export function AssigneeInfo({ task, performedByInfo, submittedAt, checkinTime, 
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Ngày thực hiện</Label>
-            <span className="text-lg font-medium">{submittedAt ? formatUTCDate(submittedAt, 'dd/MM/yyyy') : "N/A"}</span>
+            <span className="text-lg font-medium">{submittedAt ? formatLocalDate(submittedAt, 'dd/MM/yyyy') : "N/A"}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground"><LogIn className="size-4 text-green-500" /> Check in</Label>
-            <span className="text-lg font-medium">{checkinTime ? formatUTCDate(checkinTime, 'HH:mm') : "N/A"}</span>
+            <span className="text-lg font-medium">{checkinTime ? formatLocalDate(checkinTime, 'HH:mm') : "N/A"}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground"><LogOut className="size-4 text-red-500" /> Check out</Label>
-            <span className="text-lg font-medium">{checkoutTime ? formatUTCDate(checkoutTime, 'HH:mm') : "N/A"}</span>
+            <span className="text-lg font-medium">{checkoutTime ? formatLocalDate(checkoutTime, 'HH:mm') : "N/A"}</span>
           </div>
         </div>
       </CardContent>
