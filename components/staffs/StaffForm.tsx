@@ -5,14 +5,13 @@ import { useRouter, useParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InputCalendar } from "@/components/ui/InputCalendar";
 import { Combobox } from "@/components/ui/combobox";
 import { StaffFormData, staffFormSchema } from "@/features/staffs/staffs.schema";
 import { Spinner } from "@/components/ui/spinner";
-import { ArrowLeft } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { createUser, updateUser, clearStaffsState } from "@/features/staffs/staffs.slice";
 import { useDialog } from "@/hooks/use-dialog";
@@ -390,19 +389,7 @@ export function StaffForm() {
 
           </div>
         </CardContent>
-      </Card>
-
-      {/* Action buttons */}
-      <div className="flex flex-row justify-between items-center mt-6">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-        >
-          <ArrowLeft className="size-4 mr-2" />
-          Quay lại
-        </Button>
-        <div className="flex flex-row gap-4">
+        <CardFooter className="flex justify-end">
           <Button
             type="submit"
             className="bg-main text-white hover:bg-main/90"
@@ -417,8 +404,8 @@ export function StaffForm() {
               isEdit ? "Cập nhật" : "Tạo mới"
             )}
           </Button>
-        </div>
-      </div>
+        </CardFooter>
+      </Card>
     </form>
   )
 }
