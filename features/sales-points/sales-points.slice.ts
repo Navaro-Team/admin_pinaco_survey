@@ -61,7 +61,7 @@ export const salesPointsSlice = createSlice({
     resetPagination: (state) => {
       state.pagination = {
         page: 1,
-        limit: 20,
+        limit: 10,
         hasMore: true,
       };
     },

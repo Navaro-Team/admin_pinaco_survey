@@ -12,7 +12,7 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/compon
 import { Skeleton } from "@/components/ui/skeleton";
 import { TablePagination } from "@/components/ui/table-pagination";
 import { SubmissionStatus, SubmissionStatusBadge } from "./StatusBadge";
-import { formatUTCDate } from "@/lib/utils";
+import { formatLocalDate } from "@/lib/utils";
 
 export function PendingReviewTable() {
   const dispatch = useAppDispatch();
@@ -125,12 +125,12 @@ export function PendingReviewTable() {
                         </TableCell>
                         <TableCell className="text-left w-32">
                           {submission.checkinTime
-                            ? formatUTCDate(submission.checkinTime, 'HH:mm')
+                            ? formatLocalDate(submission.checkinTime, 'HH:mm')
                             : "-"}
                         </TableCell>
                         <TableCell className="text-left w-32">
                           {submission.checkoutTime
-                            ? formatUTCDate(submission.checkoutTime, 'HH:mm')
+                            ? formatLocalDate(submission.checkoutTime, 'HH:mm')
                             : "-"}
                         </TableCell>
                         <TableCell className="text-center w-24">

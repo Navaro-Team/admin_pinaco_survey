@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAppSelector } from "@/hooks/redux";
-import { formatUTCDate } from "@/lib/utils";
+import { formatLocalDate } from "@/lib/utils";
 import { IconPhoto } from "@tabler/icons-react";
 import Image from "next/image";
 
@@ -31,7 +31,7 @@ export function PhotoCheckIn() {
             const source = `${process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "")}${asset.path}`;
             const imageType = asset.meta?.imageType as keyof typeof IMAGE_TYPE_LABEL_MAP | undefined;
             const imageTypeLabel = imageType ? IMAGE_TYPE_LABEL_MAP[imageType] : undefined;
-            const capturedAt = asset.capturedAt ? formatUTCDate(asset.capturedAt, "dd/MM/yyyy HH:mm") : undefined;
+            const capturedAt = asset.capturedAt ? formatLocalDate(asset.capturedAt, "dd/MM/yyyy HH:mm") : undefined;
             const name = asset.originalName || asset.filename || "";
 
             return (
