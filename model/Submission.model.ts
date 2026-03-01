@@ -18,6 +18,8 @@ export interface Submission {
   submissionId: string;
   submittedBy: string;
   submittedAt: string;
+  performedBy: string;
+  performedByInfo: any;
   answers: any[],
 }
 
@@ -43,6 +45,8 @@ export function parseSubmission(data: any): Submission {
     submittedBy: data.submittedBy,
     submittedAt: data.submittedAt,
     answers: data.answers,
+    performedBy: data.performedBy,
+    performedByInfo: data.performedByInfo,
   };
 }
 

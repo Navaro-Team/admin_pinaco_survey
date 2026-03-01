@@ -52,6 +52,7 @@ export default function Page() {
         <StoreInfo store={task?.store} isLoading={isLoading} />
         <AssigneeInfo
           task={task}
+          performedByInfo={submission?.performedByInfo}
           submittedAt={submission?.submittedAt}
           checkinTime={submission?.checkinTime}
           checkoutTime={submission?.checkoutTime} />
