@@ -112,6 +112,7 @@ export default function PendingReviewDetailPage() {
           <StoreInfo store={submission?.store} isLoading={isLoading} />
           <AssigneeInfo
             task={task}
+            performedByInfo={submission?.performedByInfo}
             submittedAt={submission?.submittedAt}
             checkinTime={submission?.checkinTime}
             checkoutTime={submission?.checkoutTime} />

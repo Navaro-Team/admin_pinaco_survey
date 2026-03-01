@@ -42,6 +42,7 @@ export function StaffForm() {
       name: "",
       phone: "",
       email: "",
+      code: "",
       dateOfBirth: undefined,
       address: "",
       gender: null,
@@ -77,6 +78,7 @@ export function StaffForm() {
         name: staff.name || "",
         phone: staff.phone || "",
         email: staff.email || "",
+        code: staff.code || "",
         dateOfBirth: staff.dateOfBirth
           ? new Date(staff.dateOfBirth)
           : undefined,
@@ -91,6 +93,7 @@ export function StaffForm() {
         name: "",
         phone: "",
         email: "",
+        code: "",
         dateOfBirth: undefined,
         address: "",
         gender: null,
@@ -120,6 +123,7 @@ export function StaffForm() {
       name: data.name ? data.name.trim() : undefined,
       email: data.email && data.email.trim() !== '' ? data.email.trim() : undefined,
       phone: data.phone && data.phone.trim() !== '' ? data.phone.trim() : undefined,
+      code: data.code && data.code.trim() !== '' ? data.code.trim() : undefined,
       dateOfBirth: data.dateOfBirth ? data.dateOfBirth.toISOString() : undefined,
       address: data.address && data.address.trim() !== '' ? data.address.trim() : undefined,
       gender: data.gender || undefined,
@@ -155,7 +159,7 @@ export function StaffForm() {
   ];
 
   const roleOptions = [
-    // { value: "admin", label: "Quản trị viên" },
+    { value: "admin", label: "Quản trị viên" },
     { value: "manager", label: "Quản lý" },
     { value: "sales", label: "Nhân viên bán hàng" },
     { value: "sales_supervisor", label: "Quản lý bán hàng" },
@@ -287,8 +291,26 @@ export function StaffForm() {
               />
             </div>
 
+            {/* Mã nhân sự */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">Mã nhân sự</Label>
+              <Controller
+                control={control}
+                name="code"
+                render={({ field }) => (
+                  <Input
+                    className="bg-gray-100 text-black opacity-100"
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="Nhập mã nhân sự"
+                  />
+                )}
+              />
+            </div>
+
             {/* Địa chỉ */}
-            <div className="flex flex-col gap-2 md:col-span-2">
+            <div className="flex flex-col gap-2">
               <Label className="text-sm text-gray-500">Địa chỉ</Label>
               <Controller
                 control={control}
