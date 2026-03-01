@@ -1,5 +1,5 @@
 import { responseFailed, responseSuccess } from "../../utils";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { serverService } from "@/features/http/ServerService";
 
@@ -23,3 +23,22 @@ export async function GET(
   }
 }
 
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const accessToken = (await cookies()).get('access_token')?.value;
+  try {
+    if (!accessToken) throw new Error('No access token');
+    const { id } = await params;
+    await serverService.delete(`/tasks/${id}`, {});
+    return NextResponse.json({
+      status: 200,
+      statusText: 'Deleted Successfully',
+      data: { id: id },
+    }, { status: 200 });
+  } catch (error: any) {
+    const payload = error as any;
+    return responseFailed(payload, 'Delete task failed');
+  }
+}
