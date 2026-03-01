@@ -13,9 +13,8 @@ interface ScheduleState {
     hasMore: boolean;
   };
   filter: {
-    store: string;
-    area: string;
-    region: string;
+    q: string;
+    assigneeId: string;
     deadline?: Date;
     status: string;
   };
@@ -31,9 +30,8 @@ const initialState: ScheduleState = {
     hasMore: true,
   },
   filter: {
-    store: "",
-    area: "",
-    region: "",
+    q: "",
+    assigneeId: "",
     deadline: undefined,
     status: "",
   },
@@ -42,6 +40,7 @@ const initialState: ScheduleState = {
 
 export const getTasks = commonCreateAsyncThunk({ type: 'schedule/getTasks', action: taskService.getTasks });
 export const getTaskById = commonCreateAsyncThunk({ type: 'schedule/getTaskById', action: taskService.getTaskById });
+export const deleteTask = commonCreateAsyncThunk({ type: 'schedule/deleteTask', action: taskService.deleteTask });
 
 export const scheduleSlice = createSlice({
   name: "schedule",
@@ -63,14 +62,11 @@ export const scheduleSlice = createSlice({
         hasMore: true,
       };
     },
-    changeStore: (state, action) => {
-      state.filter.store = action.payload;
+    changeAssigneeId: (state, action) => {
+      state.filter.assigneeId = action.payload;
     },
-    changeArea: (state, action) => {
-      state.filter.area = action.payload;
-    },
-    changeRegion: (state, action) => {
-      state.filter.region = action.payload;
+    changeSearch: (state, action) => {
+      state.filter.q = action.payload;
     },
     changeDeadline: (state, action) => {
       state.filter.deadline = action.payload;
@@ -129,9 +125,21 @@ export const scheduleSlice = createSlice({
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'getTaskById', error: payload?.message };
       })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        state.tasks = state.tasks.filter(t => t._id !== payload.data.id);
+        state.requestState = { status: 'completed', type: 'deleteTask' };
+      })
+      .addCase(deleteTask.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'deleteTask' };
+      })
+      .addCase(deleteTask.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'deleteTask', error: payload?.message };
+      })
   },
 })
 
-export const { changePage, changeLimit, resetPagination, changeStore, changeArea, changeRegion, changeDeadline, changeStatus, clearScheduleState, clearFilter, changeTask } = scheduleSlice.actions;
+export const { changePage, changeLimit, resetPagination, changeSearch, changeAssigneeId, changeDeadline, changeStatus, clearScheduleState, clearFilter, changeTask } = scheduleSlice.actions;
 
 export default scheduleSlice.reducer;

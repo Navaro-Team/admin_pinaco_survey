@@ -4,17 +4,21 @@ import { Input } from "../ui/input";
 import { InputCalendar } from "../ui/InputCalendar";
 import { Label } from "../ui/label";
 import { Combobox } from "../ui/combobox";
-import { changeArea, changeDeadline, changeRegion, changeStatus, changeStore, clearFilter, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
+import { changeAssigneeId, changeDeadline, changeSearch, changeStatus, clearFilter, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
 import { Status } from "../ui/status-badge";
 import { Button } from "../ui/button";
 import { RefreshCcw, X } from "lucide-react";
+import { SearchableCombobox } from "../ui/searchable-combobox";
+import { searchUsers } from "@/features/staffs/staffs.slice";
 
 export function Filter() {
   const dispatch = useAppDispatch();
 
-  const store = useAppSelector((state) => state.schedule.filter.store);
-  const area = useAppSelector((state) => state.schedule.filter.area);
-  const region = useAppSelector((state) => state.schedule.filter.region);
+  const q = useAppSelector((state) => state.schedule.filter.q);
+  const assigneeId = useAppSelector((state) => state.schedule.filter.assigneeId);
+  const staffs = useAppSelector((state) => state.staffs.staffs);
+  const staffsRequestState = useAppSelector((state) => state.staffs.requestState);
+
   const status = useAppSelector((state) => state.schedule.filter.status);
   const deadline = useAppSelector((state) => state.schedule.filter.deadline);
 
@@ -22,8 +26,27 @@ export function Filter() {
     dispatch(clearFilter());
   }
 
+  const handleChangeStaff = (value: string) => {
+    dispatch(changeAssigneeId(value));
+  }
+
+  const handleSearchStaffs = (searchValue: string) => {
+    const trimmedSearch = searchValue.trim();
+    const params: any = {
+      page: 1,
+    };
+
+    if (trimmedSearch) {
+      params.q = trimmedSearch;
+    } else {
+      params.limit = 50;
+    }
+
+    dispatch(searchUsers(params));
+  };
+
   const handleRefresh = () => {
-    handleClearFilter();
+    dispatch(clearFilter());
     dispatch(resetPagination());
     dispatch(getTasks({ page: 1, limit: 20 }));
   }
@@ -33,35 +56,26 @@ export function Filter() {
       <CardContent>
         <div className="flex flex-col md:flex-row gap-4 md:items-end w-full">
           <div className="flex-1 min-w-0 flex flex-col gap-2">
-            <Label>Tên cửa hàng</Label>
+            <Label>Cửa hàng</Label>
             <Input
               placeholder="Nhập tên cửa hàng"
-              value={store}
-              onChange={(e) => dispatch(changeStore(e.target.value))} />
+              value={q}
+              onChange={(e) => dispatch(changeSearch(e.target.value))} />
           </div>
-          <div hidden className="flex-1 min-w-0 flex flex-col gap-2">
-            <Label>Khu vực</Label>
-            <Combobox
+          <div className="flex-1 min-w-0 flex flex-col gap-2">
+            <Label>Nhân viên</Label>
+            <SearchableCombobox
+              options={staffs.map(staff => ({
+                value: staff.id,
+                label: [staff.code, staff.name.length > 15 ? staff.name.substring(0, 15) + '...' : staff.name].filter(Boolean).join(' - '),
+              }))}
+              value={assigneeId || ""}
+              onChange={handleChangeStaff}
+              placeholder="Chọn nhân viên"
               className="w-full"
-              options={[
-                { value: "1", label: "Khu vực 1" },
-                { value: "2", label: "Khu vực 2" },
-                { value: "3", label: "Khu vực 3" }]}
-              value={area}
-              placeholder="Chọn khu vực"
-              onChange={(value) => dispatch(changeArea(value))} />
-          </div>
-          <div hidden className="flex-1 min-w-0 flex flex-col gap-2">
-            <Label>Vùng</Label>
-            <Combobox
-              options={[
-                { value: "1", label: "Vùng 1" },
-                { value: "2", label: "Vùng 2" },
-                { value: "3", label: "Vùng 3" }]}
-              value={region}
-              className="w-full"
-              placeholder="Chọn vùng"
-              onChange={(value) => dispatch(changeRegion(value))} />
+              isLoading={staffsRequestState.status === 'loading' && staffsRequestState.type === 'searchUsers'}
+              onSearch={handleSearchStaffs}
+            />
           </div>
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Hạn khảo sát</Label>
@@ -87,13 +101,15 @@ export function Filter() {
               placeholder="Chọn trạng thái"
               onChange={(value) => dispatch(changeStatus(value))} />
           </div>
-          <Button variant="outline" className="w-full md:w-24 h-10 md:self-end" onClick={handleClearFilter}>
-            <X className="size-4" />
-            Xoá lọc
-          </Button>
-          <Button variant="outline" className="w-10 h-10 md:self-end" onClick={handleRefresh}>
-            <RefreshCcw className="size-4" />
-          </Button>
+          <div className="flex gap-2 w-full md:w-auto">
+            <Button variant="outline" className="flex-1 md:flex-none md:w-24 h-10 md:self-end" onClick={handleClearFilter}>
+              <X className="size-4" />
+              Xoá lọc
+            </Button>
+            <Button variant="outline" className="flex-1 md:flex-none md:w-10 h-10 md:self-end" onClick={handleRefresh}>
+              <RefreshCcw className="size-4" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

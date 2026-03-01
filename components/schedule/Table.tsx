@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react";
-import { Eye } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "../ui/table";
@@ -12,10 +12,12 @@ import { StatusBadge } from "../ui/status-badge";
 import { formatDate, isSameDay } from "date-fns";
 import { TablePagination } from "../ui/table-pagination";
 import { Skeleton } from "../ui/skeleton";
+import { useDialog } from "@/hooks/use-dialog";
+import { deleteTask } from "@/features/schedule/schedule.slice";
 
 export function Table() {
   const dispatch = useAppDispatch();
-
+  const { showInfo, showSuccess, showFailed, showLoading } = useDialog();
   const tasks = useAppSelector((state) => state.schedule.tasks);
   const filter = useAppSelector((state) => state.schedule.filter);
   const pagination = useAppSelector((state) => state.schedule.pagination);
@@ -25,19 +27,30 @@ export function Table() {
   const isInitialMount = useRef(true);
   const prevTasksLengthRef = useRef(tasks.length);
   const prevFilterRef = useRef({
-    store: filter.store,
-    area: filter.area,
-    region: filter.region,
+    q: filter.q,
+    assigneeId: filter.assigneeId,
     deadline: filter.deadline,
     status: filter.status,
   });
+
+  const getTasksParams = (page: number) => ({
+    page,
+    limit: 20,
+    q: filter.q?.trim() || undefined,
+    assigneeId: filter.assigneeId?.trim() || undefined,
+    status: filter.status || undefined,
+  });
+
+  const fetchTasks = (page: number) => {
+    dispatch(getTasks(getTasksParams(page)));
+  };
 
   // Load data when filter changes or on initial mount
   useEffect(() => {
     const prevDeadline = prevFilterRef.current.deadline;
     const currentDeadline = filter.deadline;
-    
-    const deadlineChanged = 
+
+    const deadlineChanged =
       prevDeadline !== currentDeadline &&
       (
         (prevDeadline && currentDeadline && !isSameDay(prevDeadline, currentDeadline)) ||
@@ -45,48 +58,36 @@ export function Table() {
         (prevDeadline && !currentDeadline)
       );
 
-    const filterChanged = 
-      prevFilterRef.current.store !== filter.store ||
-      prevFilterRef.current.area !== filter.area ||
-      prevFilterRef.current.region !== filter.region ||
+    const filterChanged =
+      prevFilterRef.current.q !== filter.q ||
+      prevFilterRef.current.assigneeId !== filter.assigneeId ||
       deadlineChanged ||
       prevFilterRef.current.status !== filter.status;
 
     if (isInitialMount.current || filterChanged) {
       isInitialMount.current = false;
       prevFilterRef.current = {
-        store: filter.store,
-        area: filter.area,
-        region: filter.region,
+        q: filter.q,
+        assigneeId: filter.assigneeId,
         deadline: filter.deadline,
         status: filter.status,
       };
-    dispatch(resetPagination());
-      dispatch(getTasks({ page: 1, limit: 20, status: filter.status || undefined }));
+      dispatch(resetPagination());
+      fetchTasks(1);
     }
-  }, [dispatch, filter.store, filter.area, filter.region, filter.deadline, filter.status]);
+  }, [dispatch, filter.q, filter.assigneeId, filter.deadline, filter.status]);
 
   // Reload when tasks become empty after having data (e.g., after back from detail page)
   useEffect(() => {
     const tasksBecameEmpty = prevTasksLengthRef.current > 0 && tasks.length === 0;
     if (!isInitialMount.current && tasksBecameEmpty && !isLoading && requestState.status !== 'loading') {
-    dispatch(resetPagination());
-      dispatch(getTasks({ page: 1, limit: 20, status: filter.status || undefined }));
+      dispatch(resetPagination());
+      fetchTasks(1);
     }
     prevTasksLengthRef.current = tasks.length;
-  }, [dispatch, tasks.length, isLoading, requestState.status, filter.status]);
+  }, [dispatch, tasks.length, isLoading, requestState.status, filter.q, filter.assigneeId, filter.status]);
 
   const filteredTasks = tasks.filter((task) => {
-    // Filter by store (search in store name)
-    if (filter.store) {
-      const storeLower = filter.store.toLowerCase();
-      const storeNameMatch = task.store?.name?.toLowerCase().includes(storeLower);
-      if (!storeNameMatch) {
-        return false;
-      }
-    }
-
-    // Filter by deadline (compare dueDate with filter deadline)
     if (filter.deadline && filter.deadline instanceof Date) {
       if (task.dueDate) {
         const taskDueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
@@ -98,39 +99,78 @@ export function Table() {
       }
     }
 
-    if (filter.status) {
-      if (task.status !== filter.status) {
-        return false;
-      }
-    }
-
     return true;
   });
 
-  const handleLoadMore = () => {
-    dispatch(changePage(pagination.page + 1));
-    dispatch(getTasks({ page: pagination.page + 1, limit: 20 }));
-  };
-
   const itemsPerPage = 10;
+
+  const handleLoadMore = () => {
+    const nextPage = pagination.page + 1;
+    dispatch(changePage(nextPage));
+    fetchTasks(nextPage);
+  };
 
   const handlePageChange = (page: number) => {
     const neededItems = page * itemsPerPage;
 
     if (tasks.length < neededItems && pagination.hasMore) {
-      const itemsNeeded = neededItems - tasks.length;
-      const batchesNeeded = Math.ceil(itemsNeeded / 20);
-
-      if (batchesNeeded > 0) {
-        dispatch(getTasks({ page: 1, limit: 20 }));
-      }
+      const nextPageToLoad = Math.floor(tasks.length / 20) + 1;
+      fetchTasks(nextPageToLoad);
     }
 
     dispatch(changePage(page));
   };
+
+  const handleDeleteTask = (id: string) => {
+    showInfo({
+      title: "Xác nhận",
+      description: "Bạn có chắc chắn muốn xóa khảo sát này không?",
+      onConfirm() {
+        dispatch(deleteTask(id));
+      },
+    });
+  }
+
   const startIndex = (pagination.page - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const displayTasks = filteredTasks.slice(startIndex, endIndex);
+
+
+  useEffect(() => {
+    if (!requestState.type) return;
+    if (['deleteTask'].includes(requestState.type)) {
+      switch (requestState.status) {
+        case 'completed':
+          showSuccess({
+            title: "Thành công",
+            description: "Khảo sát đã được xóa thành công.",
+            onConfirm() {
+              dispatch(getTasks());
+              dispatch(resetPagination());
+              fetchTasks(1);
+            },
+          });
+          break;
+        case 'failed':
+          showFailed({
+            title: "Lỗi khi xóa khảo sát",
+            description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
+            onConfirm() {
+              dispatch(getTasks());
+              dispatch(resetPagination());
+              fetchTasks(1);
+            },
+          });
+          break;
+        case 'loading':
+          showLoading({
+            title: "Đang xử lý",
+            description: "Vui lòng chờ trong giây lát...",
+          });
+          break;
+      }
+    }
+  }, [requestState]);
 
   return (
     <Card className="flex flex-col flex-1 min-h-0 pb-0!">
@@ -212,6 +252,9 @@ export function Table() {
                                   <Eye className="size-4 text-blue-500" />
                                 </Button>
                               </Link>
+                              <Button variant="outline" size="icon" onClick={() => handleDeleteTask(task._id)}>
+                                <Trash2 className="size-4 text-red-500" />
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -223,7 +266,7 @@ export function Table() {
           </div>
           <TablePagination
             currentPage={pagination.page}
-            totalItems={tasks.length}
+            totalItems={filteredTasks.length}
             itemsPerPage={itemsPerPage}
             hasMore={pagination.hasMore}
             onLoadMore={handleLoadMore}
