@@ -38,7 +38,7 @@ class StaffsService {
     } else {
       if (params?.limit) queryParams.limit = params.limit.toString();
     }
-    
+
     if (params?.page) queryParams.page = params.page.toString();
     if (params?.status) queryParams.status = params.status;
 
@@ -70,6 +70,16 @@ class StaffsService {
     const formData = new FormData();
     formData.append('file', file);
     const response = await clientService.upload('/users/import', formData);
+    return parseCommonHttpResult(response);
+  }
+
+  async getUserManager(id: string) {
+    const response = await clientService.get(`/users/manager?id=${id}`);
+    return parseCommonHttpResult(response);
+  }
+
+  async updateUserManager(payload: { id: string; managerId: string }) {
+    const response = await clientService.put(`/users/manager`, { id: payload.id, managerId: payload.managerId });
     return parseCommonHttpResult(response);
   }
 }
