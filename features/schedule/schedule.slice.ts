@@ -26,7 +26,7 @@ const initialState: ScheduleState = {
   task: null,
   pagination: {
     page: 1,
-    limit: 20,
+    limit: 10,
     hasMore: true,
   },
   filter: {
@@ -58,7 +58,7 @@ export const scheduleSlice = createSlice({
     resetPagination: (state) => {
       state.pagination = {
         page: 1,
-        limit: 20,
+        limit: 10,
         hasMore: true,
       };
     },
@@ -94,13 +94,13 @@ export const scheduleSlice = createSlice({
 
         if (state.pagination.page === 1) {
           state.tasks = newTasks;
-          state.pagination.hasMore = newTasks.length >= 20;
+          state.pagination.hasMore = newTasks.length >= 10;
         } else {
           const existingIds = new Set(state.tasks.map(t => t._id));
           const uniqueNewTasks = newTasks.filter(t => !existingIds.has(t._id));
           state.tasks = [...state.tasks, ...uniqueNewTasks];
 
-          state.pagination.hasMore = uniqueNewTasks.length >= 20;
+          state.pagination.hasMore = uniqueNewTasks.length >= 10;
         }
 
         state.requestState = { status: 'completed', type: 'getTasks', data: state.pagination.page === 1 };
