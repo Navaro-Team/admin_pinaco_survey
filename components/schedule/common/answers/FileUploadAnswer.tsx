@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import { formatUTCDate } from "@/lib/utils";
+import { formatLocalDate } from "@/lib/utils";
 
 const IMAGE_TYPE_LABEL_MAP = {
   "toan_canh": "Toàn cảnh",
@@ -23,7 +23,7 @@ export function FileUploadAnswer({ answerValue }: FileUploadAnswerProps) {
         const source = `${process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "")}${asset.path}`;
         const imageType = asset.meta?.imageType as keyof typeof IMAGE_TYPE_LABEL_MAP | undefined;
         const imageTypeLabel = imageType ? IMAGE_TYPE_LABEL_MAP[imageType] : undefined;
-        const capturedAt = asset.capturedAt ? formatUTCDate(asset.capturedAt, "dd/MM/yyyy HH:mm") : undefined;
+        const capturedAt = asset.capturedAt ? formatLocalDate(asset.capturedAt, "dd/MM/yyyy HH:mm") : undefined;
         const name = asset.originalName || asset.filename || "";
 
         return (
