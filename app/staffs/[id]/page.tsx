@@ -3,11 +3,16 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { changeAction, changeStaff, getUserById } from "@/features/staffs/staffs.slice";
+import { changeAction, changeManager, changeStaff, getUserById, getUserManager } from "@/features/staffs/staffs.slice";
 import { StaffForm } from "@/components/staffs/StaffForm";
+import Manager from "@/components/staffs/Manager";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const params = useParams();
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const id = params?.id as string;
   const action = useAppSelector((state) => state.staffs.action);
@@ -16,10 +21,12 @@ export default function Page() {
     if (!id) return;
     if (id === "new") {
       dispatch(changeStaff(null));
+      dispatch(changeManager(null));
       dispatch(changeAction("INS"));
     } else {
       dispatch(changeAction("UPD"));
       dispatch(getUserById(id));
+      dispatch(getUserManager(id));
     }
   }, [id, dispatch]);
 
@@ -60,7 +67,16 @@ export default function Page() {
             {getDescription()}
           </p>
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="size-4 mr-2" />
+          Quay lại
+        </Button>
       </div>
+      <Manager />
       <StaffForm />
     </div>
   )

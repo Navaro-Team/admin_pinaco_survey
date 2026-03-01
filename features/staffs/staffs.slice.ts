@@ -8,6 +8,7 @@ import { ACTION } from "@/lib/types";
 interface StaffsState {
   staffs: User[];
   staff: User | null;
+  manager: User | null;
   action: ACTION;
   filter: {
     search: string;
@@ -20,6 +21,7 @@ interface StaffsState {
 const initialState: StaffsState = {
   staffs: [],
   staff: null,
+  manager: null,
   action: "INS",
   filter: {
     search: "",
@@ -36,6 +38,8 @@ export const createUser = commonCreateAsyncThunk({ type: 'staffs/createUser', ac
 export const updateUser = commonCreateAsyncThunk({ type: 'staffs/updateUser', action: staffsService.updateUser });
 export const deleteUser = commonCreateAsyncThunk({ type: 'staffs/deleteUser', action: staffsService.deleteUser });
 export const importUsers = commonCreateAsyncThunk({ type: 'staffs/importUsers', action: staffsService.importUsers });
+export const getUserManager = commonCreateAsyncThunk({ type: 'staffs/getUserManager', action: staffsService.getUserManager });
+export const updateUserManager = commonCreateAsyncThunk({ type: 'staffs/updateUserManager', action: staffsService.updateUserManager });
 
 export const staffsSlice = createSlice({
   name: 'staffs',
@@ -56,8 +60,12 @@ export const staffsSlice = createSlice({
     changeStaff: (state, action) => {
       state.staff = action.payload;
     },
+    changeManager: (state, action) => {
+      state.manager = action.payload;
+    },
     clearStaffsState: (state) => {
       state.staff = null;
+      state.manager = null;
       state.action = "INS";
       state.requestState = { status: 'idle', type: '' };
     },
@@ -171,10 +179,35 @@ export const staffsSlice = createSlice({
       .addCase(importUsers.rejected, (state, action) => {
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'importUsers', error: payload?.message };
+      })
+      .addCase(getUserManager.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.manager = responseData ? parseUser(responseData) : null;
+        state.requestState = { status: 'completed', type: 'getUserManager' };
+      })
+      .addCase(getUserManager.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'getUserManager' };
+      })
+      .addCase(getUserManager.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'getUserManager', error: payload?.message };
+      })
+      .addCase(updateUserManager.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.requestState = { status: 'completed', type: 'updateUserManager', data: responseData };
+      })
+      .addCase(updateUserManager.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'updateUserManager' };
+      })
+      .addCase(updateUserManager.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'updateUserManager', error: payload?.message };
       });
   },
 })
 
-export const { changeAction, changeSearch, changeRole, changeStatus, changeStaff, clearStaffsState, clearFilter } = staffsSlice.actions;
+export const { changeAction, changeSearch, changeRole, changeStatus, changeStaff, changeManager, clearStaffsState, clearFilter } = staffsSlice.actions;
 export default staffsSlice.reducer;
 
