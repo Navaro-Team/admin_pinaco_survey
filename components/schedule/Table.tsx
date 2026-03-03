@@ -240,7 +240,7 @@ export function Table() {
                           </TableCell>
                           <TableCell className="text-left w-48">{task.assignee?.name || "-"}</TableCell>
                           <TableCell className="text-left w-32">
-                            <StatusBadge status={task.status} />
+                            <StatusBadge status={task.submission ? task.submission.status : task.status} />
                           </TableCell>
                           <TableCell className="text-left w-32">
                             {task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : "-"}
