@@ -49,7 +49,7 @@ export function RecentActivity() {
                   <span className="text-xs text-muted-foreground">{task.store.address}</span>
                 </TableCell>
                 <TableCell>{task.assignee.name}</TableCell>
-                <TableCell><StatusBadge status={task.status} /></TableCell>
+                <TableCell><StatusBadge status={task.submission ? task.submission.status : task.status} /></TableCell>
                 <TableCell className="text-left">{formatLocalDate(task.createdAt, 'dd/MM/yyyy')}</TableCell>
               </TableRow>
             ))}

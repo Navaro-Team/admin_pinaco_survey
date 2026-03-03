@@ -9,6 +9,8 @@ export enum Status {
   OVERDUE = "OVERDUE",
   RESURVEY_REQUIRED = "RESURVEY_REQUIRED",
   PENDING = "PENDING",
+  SUBMITTED = "SUBMITTED",
+  PENDING_REVIEW = "PENDING_REVIEW",
 }
 
 interface StatusBadgeProps {
@@ -18,8 +20,10 @@ interface StatusBadgeProps {
 
 const statusConfig: Record<Status, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; color: string }> = {
   [Status.COMPLETED]: { label: "Đã hoàn thành", variant: "default", color: "bg-green-500 text-white" },
+  [Status.SUBMITTED]: { label: "Đã gửi khảo sát", variant: "default", color: "bg-green-500 text-white" },
   [Status.IN_PROGRESS]: { label: "Sắp diễn ra", variant: "secondary", color: "bg-yellow-500 text-white" },
   [Status.PENDING]: { label: "Đã gửi yêu cầu hỗ trợ", variant: "outline", color: "bg-blue-500 text-white" },
+  [Status.PENDING_REVIEW]: { label: "Đang chờ duyệt", variant: "outline", color: "bg-yellow-500 text-white" },
   [Status.OVERDUE]: { label: "Quá hạn khảo sát", variant: "destructive", color: "bg-red-500 text-white" },
   [Status.RESURVEY_REQUIRED]: { label: "Yêu cầu hỗ trợ", variant: "outline", color: "bg-blue-500 text-white" },
 };
