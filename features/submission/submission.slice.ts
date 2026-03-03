@@ -119,6 +119,11 @@ export const submissionSlice = createSlice({
         state.requestState = { status: 'failed', type: 'getPendingSubmissions', error: action.error.message };
       })
       .addCase(reviewSubmission.fulfilled, (state) => {
+        if (!state.submission) return;
+        state.submission = {
+          ...state.submission,
+          status: 'SUBMITTED',
+        } as Submission;
         state.requestState = { status: 'completed', type: 'reviewSubmission' };
       })
       .addCase(reviewSubmission.pending, (state) => {
