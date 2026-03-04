@@ -7,15 +7,25 @@ import { useToastContext } from "@/context/ToastContext";
 import { clearFilter, getTaskById } from "@/features/schedule/schedule.slice";
 import { approveResurveyRequest, rejectResurveyRequest } from "@/features/survey/survey.slice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { exportSurveyToPDF } from "@/utils/pdf-export";
 import { ArrowLeftIcon, CircleCheckBig, CircleX, Download } from "lucide-react";
 import Link from "next/link";
 
 export function HeaderDetailSchedule() {
   const dispatch = useAppDispatch();
   const task = useAppSelector((state) => state.schedule.task);
+  const survey = useAppSelector((state) => state.survey.survey);
+  const submission = useAppSelector((state) => state.submission.submission);
   const requestState = useAppSelector((state) => state.survey.requestState);
   const isLoading = requestState.status === 'loading' && requestState.type === 'approveResurveyRequest' || requestState.type === 'rejectResurveyRequest';
   const { error, success } = useToastContext();
+
+  const handleExportPDF = () => {
+    if (!survey || !submission || !task) {
+      return;
+    }
+    exportSurveyToPDF(survey, submission, task);
+  }
 
   const handleAcceptRequest = async () => {
     await dispatch(approveResurveyRequest(task?.resurveyRequestId ?? ''))
@@ -73,7 +83,7 @@ export function HeaderDetailSchedule() {
           </Button>
         </>
         }
-        <Button variant="outline">
+        <Button variant="outline" onClick={handleExportPDF}>
           <Download className="size-4" />
           Xuất PDF
         </Button>
