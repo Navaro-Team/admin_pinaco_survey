@@ -5,9 +5,9 @@ import { HeaderDetailSchedule } from "@/components/schedule/common/HeaderDetailS
 import { PhotoCheckIn } from "@/components/schedule/common/PhotoCheckIn"
 import { ResultServey } from "@/components/schedule/common/ResultServey"
 import { StoreInfo } from "@/components/schedule/common/StoreInfo"
-import { changeTask, getTaskById } from "@/features/schedule/schedule.slice"
-import { getSubmissionById } from "@/features/submission/submission.slice"
-import { getSurveyById } from "@/features/survey/survey.slice"
+import { getTaskById } from "@/features/schedule/schedule.slice"
+import { getSubmissionById, setSubmission } from "@/features/submission/submission.slice"
+import { changeSurvey, getSurveyById } from "@/features/survey/survey.slice"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { useParams } from "next/navigation"
 import { useEffect } from "react"
@@ -16,7 +16,6 @@ export default function Page() {
   const params = useParams();
   const dispatch = useAppDispatch();
   const id = params.id as string;
-  const tasks = useAppSelector((state) => state.schedule.tasks);
   const task = useAppSelector((state) => state.schedule.task);
   const submission = useAppSelector((state) => state.submission.submission);
   const requestState = useAppSelector((state) => state.schedule.requestState);
@@ -26,24 +25,35 @@ export default function Page() {
 
   useEffect(() => {
     if (id) {
-      const task = tasks.find((task) => task._id === id);
-      if (task) {
-        dispatch(changeTask(task));
-      } else {
-        dispatch(getTaskById(id));
+      try {
+        dispatch(getTaskById(id))
+          .unwrap()
+          .then((response) => {
+            const task = response.data.data;
+            console.log(task);
+            if (task) {
+              if (task.submissionId) {
+                dispatch(getSubmissionById(task.submissionId));
+              } else {
+                dispatch(setSubmission(null))
+              }
+
+              if (task.survey.id) {
+                dispatch(getSurveyById(task.survey.id));
+              } else {
+                dispatch(changeSurvey(null))
+              }
+            }
+          })
+          .catch((error) => {
+            throw error;
+          });
+      } catch (error) {
+        const payload = error as any;
+        console.log(payload);
       }
     }
   }, [id, dispatch]);
-
-  useEffect(() => {
-    if (task?.submissionId) {
-      dispatch(getSubmissionById(task.submissionId));
-    }
-
-    if (task?.survey?.id) {
-      dispatch(getSurveyById(task.survey.id));
-    }
-  }, [task, dispatch])
 
   return (
     <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">

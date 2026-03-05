@@ -41,14 +41,19 @@ export function NavUser() {
   const user = useAppSelector((state) => state.app.user);
 
   const handleLogout = async () => {
-    await dispatch(logout()).unwrap().then(() => {
-      dispatch(clearUser());
-      dispatch(setIsLogged(false));
-      window.location.href = '/login'
-    }).catch((err: any) => {
-      error("Lỗi", err.message || 'Vui lòng thử lại');
-      dispatch(clearAuthState());
-    });
+    await dispatch(logout())
+      .unwrap()
+      .then(() => {
+        dispatch(clearUser());
+        dispatch(setIsLogged(false));
+        window.location.href = '/login'
+      }).catch((err: any) => {
+        console.log('error: ', err)
+        dispatch(clearUser());
+        dispatch(setIsLogged(false));
+        dispatch(clearAuthState());
+        window.location.href = '/login'
+      });
   }
 
   useEffect(() => {
