@@ -10,6 +10,7 @@ import { clearCampaignsState, getCampaigns } from "@/features/campaigns/campaign
 import { AssignSheet } from "./AssignSheet";
 import { clearStaffsState, searchUsers } from "@/features/staffs/staffs.slice";
 import { clearStoreState, searchStores } from "@/features/store/store.slice";
+import { ExportExcelPopover } from "./ExportExcelPopover";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -84,6 +85,7 @@ export function Header() {
         <p className="text-base text-muted-foreground">Xem, lọc và quản lý danh sách các lịch trình khảo sát tại điểm bán</p>
       </div>
       <div className="flex flex-row gap-4 items-center">
+        <ExportExcelPopover />
         <Button variant="outline" onClick={() => setOpenScheduleSheet(true)}>
           <CalendarPlus2 />
           Tạo lịch trình

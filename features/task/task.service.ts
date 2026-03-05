@@ -51,6 +51,11 @@ class TaskService {
     const response = await clientService.delete(`/tasks/${id}`, {});
     return parseCommonHttpResult(response);
   }
+
+  async exportTasks(params: { surveyId: string, startDate: string, endDate: string }) {
+    const response = await clientService.get('/tasks/export', params);
+    return parseCommonHttpResult(response);
+  }
 }
 
 export const taskService = new TaskService();
