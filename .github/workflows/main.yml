@@ -58,5 +58,6 @@ jobs:
             cd /home/googlead/admin_pinaco_survey &&
             npm install &&
             (pm2 delete pinaco-admin || true) &&
-            pm2 start "npm run start" --name pinaco-admin
+            pm2 start "npm run start" --name pinaco-admin &&
+            pm2 save
           '
