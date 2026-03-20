@@ -453,6 +453,82 @@ function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
+const IMAGE_TYPE_LABEL_MAP = {
+  toan_canh: "Toàn cảnh",
+  xung_quanh: "Khung cảnh xung quanh",
+  vi_tri: "Vị trí",
+} as const;
+
+function escapeAttrValue(text: string): string {
+  return escapeHtml(text);
+}
+
+function renderCheckInAssetsHTML(checkInAssets: any[]): string {
+  if (!Array.isArray(checkInAssets) || checkInAssets.length === 0) return "";
+
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || "";
+
+  const validAssets = checkInAssets
+    .map((asset: any) => {
+      const path = asset?.path;
+      if (!path) return null;
+
+      const source = `${apiBaseUrl}${path}`;
+      const imageType = asset?.meta?.imageType as keyof typeof IMAGE_TYPE_LABEL_MAP | undefined;
+      const imageTypeLabel = imageType ? IMAGE_TYPE_LABEL_MAP[imageType] : undefined;
+      const capturedAt = asset?.capturedAt
+        ? format(new Date(asset.capturedAt), 'dd/MM/yyyy HH:mm', { locale: vi })
+        : undefined;
+      const name = asset?.originalName || asset?.filename || "";
+
+      return {
+        source,
+        name,
+        capturedAt,
+        imageTypeLabel,
+      };
+    })
+    .filter(Boolean) as Array<{
+    source: string;
+    name: string;
+    capturedAt?: string;
+    imageTypeLabel?: string;
+  }>;
+
+  if (validAssets.length === 0) return "";
+
+  const itemsHtml = validAssets
+    .map((asset, idx) => {
+      const altText = asset.name || `image-${idx + 1}`;
+      return `
+        <div class="photo-item">
+          <div class="photo-img-wrap">
+            <img
+              class="photo-img"
+              src="${escapeAttrValue(asset.source)}"
+              alt="${escapeAttrValue(altText)}"
+            />
+          </div>
+          <div class="photo-meta">
+            ${asset.name ? `<div class="photo-name" title="${escapeAttrValue(asset.name)}">${escapeHtml(asset.name)}</div>` : ""}
+            ${asset.capturedAt ? `<div class="photo-capturedAt">${escapeHtml(asset.capturedAt)}</div>` : ""}
+            ${asset.imageTypeLabel ? `<div class="photo-imageType">${escapeHtml(asset.imageTypeLabel)}</div>` : ""}
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  return `
+    <div class="photo-section">
+      <div class="photo-title">Hình ảnh check-in</div>
+      <div class="photo-grid">
+        ${itemsHtml}
+      </div>
+    </div>
+  `;
+}
+
 /**
  * Export survey to PDF using browser print
  */
@@ -570,6 +646,65 @@ export function exportSurveyToPDF(
           background: #f3f4f6;
           font-weight: 600;
         }
+        .photo-section {
+          margin-bottom: 30px;
+          page-break-inside: avoid;
+        }
+        .photo-title {
+          font-weight: bold;
+          font-size: 14pt;
+          margin-bottom: 10px;
+        }
+        .photo-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+        }
+        .photo-item {
+          border: 1px solid #e5e7eb;
+          border-radius: 6px;
+          overflow: hidden;
+          background: #fff;
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+        .photo-img-wrap {
+          width: 100%;
+          aspect-ratio: 1 / 1;
+          background: #f3f4f6;
+        }
+        .photo-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .photo-meta {
+          padding: 8px;
+        }
+        .photo-name {
+          font-size: 10pt;
+          font-weight: 600;
+          color: #111827;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .photo-capturedAt {
+          font-size: 9.5pt;
+          color: #374151;
+          margin-top: 4px;
+        }
+        .photo-imageType {
+          font-size: 9.5pt;
+          color: #059669;
+          margin-top: 4px;
+        }
+        @media print {
+          .photo-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
       </style>
     </head>
     <body>
@@ -597,6 +732,11 @@ export function exportSurveyToPDF(
         </div>
       </div>
   `;
+
+  const checkInAssets = task?.checkInAssets || [];
+  if (Array.isArray(checkInAssets) && checkInAssets.length > 0) {
+    htmlContent += renderCheckInAssetsHTML(checkInAssets);
+  }
 
   // Add questions and answers
   questions.forEach((question: any, index: number) => {
