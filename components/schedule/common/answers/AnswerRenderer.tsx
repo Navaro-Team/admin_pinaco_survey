@@ -75,6 +75,7 @@ export function AnswerRenderer({ question, answerValue }: AnswerRendererProps) {
     case "MULTI_CHOICE":
       return <MultiChoiceAnswer question={question} answerValue={answerValue} />;
     case "LONG_TEXT_INPUT":
+    case "STRING_INPUT":
       return <LongTextAnswer answerValue={answerValue} />;
     case "MIXED":
     case "STORE_AUDIT_STOCK":

@@ -8,28 +8,45 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [{ brand: "PINACO", penetration_rate: 60, signboard: 40, oto: 50, gara: 30 },]
+const chartData = [
+  {
+    quota: "L1",
+    progress: 20,
+  },
+  {
+    quota: "L2",
+    progress: 15,
+  },
+  {
+    quota: "L3",
+    progress: 17,
+  },
+  {
+    quota: "L4",
+    progress: 10,
+  },
+  {
+    quota: "L5",
+    progress: 8,
+  },
+  {
+    quota: "L6",
+    progress: 2,
+  },
+  {
+    quota: "L7",
+    progress: 4,
+  },
+]
 
 const chartConfig = {
-  penetration_rate: {
-    label: "Tỷ lệ thâm nhập",
-    color: "#14b8a6",
-  },
-  signboard: {
-    label: "Bảng hiệu",
-    color: "#2dd4bf",
-  },
-  oto: {
-    label: "Ô tô",
-    color: "#5eead4",
-  },
-  gara: {
-    label: "Gara",
-    color: "#99f6e4",
+  progress: {
+    label: "Quy mô doanh số",
+    color: "#2563eb",
   },
 } satisfies ChartConfig
 
-export function BarChartComponent() {
+export function OperationProgress() {
   return (
     <div className="w-full h-full flex flex-col px-4">
       <div className="flex-1 flex items-center justify-center min-h-0">
@@ -37,7 +54,7 @@ export function BarChartComponent() {
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="brand"
+              dataKey="quota"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
@@ -46,10 +63,7 @@ export function BarChartComponent() {
               cursor={false}
               content={<ChartTooltipContent />}
             />
-            <Bar dataKey="penetration_rate" fill="var(--color-penetration_rate)" radius={8} />
-            <Bar dataKey="signboard" fill="var(--color-signboard)" radius={8} />
-            <Bar dataKey="oto" fill="var(--color-oto)" radius={8} />
-            <Bar dataKey="gara" fill="var(--color-gara)" radius={8} />
+            <Bar dataKey="progress" fill="var(--color-progress)" radius={8} />
             <ChartLegend content={<ChartLegendContent />} />
           </BarChart>
         </ChartContainer>
