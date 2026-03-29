@@ -157,8 +157,16 @@ function formatAnswerValue(
   switch (effectiveType) {
     case "BOOLEAN": {
       if (typeof raw === "object" && raw !== null && "hasSignage" in raw) {
-        const v = raw.hasSignage ? "Có" : "Không";
-        return raw.amount != null ? `${v} (SL: ${raw.amount})` : v;
+        const label = raw.hasSignage ? "Có" : "Không";
+        const detail =
+          raw.value !== undefined && raw.value !== null && raw.value !== ""
+            ? raw.hasSignage
+              ? ` (SL: ${raw.value})`
+              : ` — ${raw.value}`
+            : raw.amount != null
+              ? ` (SL: ${raw.amount})`
+              : "";
+        return `${label}${detail}`;
       }
       return raw ? "Có" : "Không";
     }

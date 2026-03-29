@@ -31,7 +31,10 @@ export function MixedAnswer({ question, answerValue }: MixedAnswerProps) {
   switch (code) {
     case "PINACO_SIGNAGE_USAGE": {
       const hasSignage = answerValue.hasSignage;
-      const amount = answerValue.amount;
+      const rawVal =
+        answerValue.value !== undefined && answerValue.value !== null
+          ? answerValue.value
+          : answerValue.amount;
       
       return (
         <div className="space-y-2">
@@ -43,8 +46,11 @@ export function MixedAnswer({ question, answerValue }: MixedAnswerProps) {
               </Badge>
             } 
           />
-          {hasSignage && amount !== undefined && amount !== null && (
-            <InfoRow label="Số lượng" value={amount} />
+          {hasSignage === true && rawVal !== undefined && rawVal !== null && rawVal !== "" && (
+            <InfoRow label="Số lượng" value={typeof rawVal === "number" ? rawVal : String(rawVal)} />
+          )}
+          {hasSignage === false && typeof rawVal === "string" && rawVal.trim() !== "" && (
+            <InfoRow label="Nguyên nhân" value={rawVal} />
           )}
         </div>
       );
