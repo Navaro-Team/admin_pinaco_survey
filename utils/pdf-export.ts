@@ -195,17 +195,26 @@ function renderMixedAnswerHTML(question: any, answerValue: any): string {
   switch (code) {
     case 'PINACO_SIGNAGE_USAGE': {
       const hasSignage = answerValue.hasSignage;
-      const amount = answerValue.amount;
+      const rawVal =
+        answerValue.value !== undefined && answerValue.value !== null
+          ? answerValue.value
+          : answerValue.amount;
       const badgeClass = hasSignage ? 'background: #007bff; color: white;' : 'background: #e5e7eb; color: #374151;';
       let html = `<div style="display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 12px; color: #6b7280;">Có sử dụng biển hiệu PINACO:</span>
           <span style="display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 12px; ${badgeClass}">${hasSignage ? 'Có' : 'Không'}</span>
         </div>`;
-      if (hasSignage && amount !== undefined && amount !== null) {
+      if (hasSignage && rawVal !== undefined && rawVal !== null && rawVal !== '') {
         html += `<div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 12px; color: #6b7280;">Số lượng:</span>
-          <span style="font-size: 16px; font-weight: 600;">${amount}</span>
+          <span style="font-size: 16px; font-weight: 600;">${escapeHtml(String(rawVal))}</span>
+        </div>`;
+      }
+      if (hasSignage === false && typeof rawVal === 'string' && rawVal.trim() !== '') {
+        html += `<div style="display: flex; align-items: flex-start; gap: 8px;">
+          <span style="font-size: 12px; color: #6b7280;">Nguyên nhân:</span>
+          <span style="font-size: 14px; font-weight: 500;">${escapeHtml(rawVal)}</span>
         </div>`;
       }
       html += `</div>`;
