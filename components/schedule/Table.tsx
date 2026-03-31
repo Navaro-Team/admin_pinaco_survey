@@ -243,7 +243,7 @@ export function Table() {
                             <StatusBadge status={task.submission ? task.submission.status : task.status} />
                           </TableCell>
                           <TableCell className="text-left w-32">
-                            {task.dueDate ? formatDate(new Date(task.dueDate), 'dd/MM/yyyy') : "-"}
+                            {task.dueDate ? formatDate(new Date(task.completedAt ?? task.createdAt), 'dd/MM/yyyy') : "-"}
                           </TableCell>
                           <TableCell className="text-center w-24">
                             <div className="flex flex-row gap-2 justify-center">
