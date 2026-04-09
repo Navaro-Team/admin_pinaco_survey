@@ -199,7 +199,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
 
             {/* Quy mô doanh số */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Quy mô doanh số</Label>
+              <Label className="text-sm text-gray-500">Doanh số trung bình Ắc quy Pinaco</Label>
               <Controller
                 control={control}
                 name="salesScale"
@@ -209,7 +209,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
                     value={field.value?.toFixed(2) || ""}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
-                    placeholder="Nhập quy mô doanh số"
+                    placeholder="Nhập doanh số trung bình Ắc quy Pinaco"
                   />
                 )}
               />
