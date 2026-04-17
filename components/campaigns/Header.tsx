@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Plus, Upload } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import CampaignsSheet from "./CampaignsSheet";
 

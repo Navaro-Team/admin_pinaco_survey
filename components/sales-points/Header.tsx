@@ -39,6 +39,7 @@ export function Header() {
         }).catch((e: any) => {
           throw e;
         })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       showFailed({
         title: "Thất bại",

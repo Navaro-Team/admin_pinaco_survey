@@ -35,7 +35,8 @@ export function Header() {
       }).catch((e: any) => {
         throw e;
       })
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e: any) {
       showFailed({
         title: "Thất bại",
         description: "Không thể xuất dữ liệu nhân sự.",
