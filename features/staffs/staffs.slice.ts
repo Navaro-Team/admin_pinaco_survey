@@ -32,6 +32,7 @@ const initialState: StaffsState = {
 }
 
 export const getUsers = commonCreateAsyncThunk({ type: 'staffs/getUsers', action: staffsService.getUsers });
+export const exportUsers = commonCreateAsyncThunk({ type: 'staffs/exportUsers', action: staffsService.getUsers });
 export const searchUsers = commonCreateAsyncThunk({ type: 'staffs/searchUsers', action: staffsService.searchUsers });
 export const getUserById = commonCreateAsyncThunk({ type: 'staffs/getUserById', action: staffsService.getUserById });
 export const createUser = commonCreateAsyncThunk({ type: 'staffs/createUser', action: staffsService.createUser });
@@ -204,7 +205,17 @@ export const staffsSlice = createSlice({
       .addCase(updateUserManager.rejected, (state, action) => {
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'updateUserManager', error: payload?.message };
-      });
+      })
+      .addCase(exportUsers.fulfilled, (state) => {
+        state.requestState = { status: 'completed', type: 'exportUsers' };
+      })
+      .addCase(exportUsers.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'exportUsers' };
+      })
+      .addCase(exportUsers.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'exportUsers', error: payload?.message };
+      })
   },
 })
 

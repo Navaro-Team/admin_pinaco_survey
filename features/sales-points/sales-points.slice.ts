@@ -35,6 +35,7 @@ const initialState: SalesPointsState = {
 }
 
 export const getStores = commonCreateAsyncThunk({ type: 'salesPoints/getStores', action: storeService.getStores });
+export const exportSalesPoints = commonCreateAsyncThunk({ type: 'salesPoints/exportSalesPoints', action: storeService.getStores });
 export const searchStores = commonCreateAsyncThunk({ type: 'salesPoints/searchStores', action: storeService.searchStores });
 export const deleteStore = commonCreateAsyncThunk({ type: 'salesPoints/deleteStore', action: storeService.deleteStore });
 export const getStoreById = commonCreateAsyncThunk({ type: 'salesPoints/getStoreById', action: storeService.getStoreById });
@@ -180,6 +181,16 @@ export const salesPointsSlice = createSlice({
       .addCase(searchStores.rejected, (state, action) => {
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'searchStores', error: payload?.message };
+      })
+      .addCase(exportSalesPoints.fulfilled, (state) => {
+        state.requestState = { status: 'completed', type: 'exportSalesPoints' };
+      })
+      .addCase(exportSalesPoints.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'exportSalesPoints' };
+      })
+      .addCase(exportSalesPoints.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'exportSalesPoints', error: payload?.message };
       })
   },
 })

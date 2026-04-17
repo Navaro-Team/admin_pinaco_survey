@@ -23,6 +23,10 @@ export async function GET(request: NextRequest) {
       urlParams.set('status', params.get('status') ?? '');
     }
 
+    if (params.get('search')) {
+      urlParams.set('search', params.get('search') ?? '');
+    }
+
     const queryString = urlParams.toString();
     const url = queryString ? `/campaigns?${queryString}` : '/campaigns';
     const response = await serverService.get(url);
@@ -33,3 +37,16 @@ export async function GET(request: NextRequest) {
   }
 }
 
+export async function POST(request: NextRequest) {
+  const accessToken = (await cookies()).get('access_token')?.value;
+  const payload = await request.json();
+  try {
+    if (!accessToken) throw new Error('No access token');
+    const response = await serverService.post('/campaigns', payload);
+    return responseSuccess(response);
+  } catch (error: any) {
+    const payload = error as any;
+    console.log('error: ', payload);
+    return responseFailed(payload, 'Create campaign failed');
+  }
+}

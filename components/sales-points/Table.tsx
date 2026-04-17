@@ -24,12 +24,6 @@ export function Table() {
 
   useEffect(() => {
     dispatch(resetPagination());
-    dispatch(getStores({ page: pagination.page, limit: pagination.limit }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    dispatch(resetPagination());
     dispatch(searchStores({ q: filter.search, page: pagination.page, limit: pagination.limit }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter.search, filter.area]);
