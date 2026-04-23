@@ -7,13 +7,15 @@ import { TablePagination } from "../ui/table-pagination";
 import { Button } from "../ui/button";
 import { Eye } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { getQuestions } from "@/features/questions/questions.slice";
+import { clearQuestionsState, getQuestions } from "@/features/questions/questions.slice";
 import { QuestionDetailSheet } from "./QuestionDetailSheet";
 import { getQuestionTypeLabel } from "@/features/questions/questions.constants";
 import { Skeleton } from "../ui/skeleton";
+import { useDialog } from "@/hooks/use-dialog";
 
 export function TableQuestion() {
   const dispatch = useAppDispatch();
+  const { showSuccess, showFailed, showLoading } = useDialog();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -25,17 +27,6 @@ export function TableQuestion() {
   const requestState = useAppSelector((state) => state.questions.requestState);
 
   const isLoading = requestState.status === 'loading' && requestState.type === 'getQuestions';
-
-  useEffect(() => {
-    const params: any = {
-      page: 1,
-      limit: itemsPerPage,
-      status: 'active',
-    };
-
-    dispatch(getQuestions(params));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -67,6 +58,49 @@ export function TableQuestion() {
     setSelectedQuestionId(questionId);
     setIsSheetOpen(true);
   };
+
+  useEffect(() => {
+    if (!isSheetOpen) {
+      setSelectedQuestionId(null);
+    }
+  }, [isSheetOpen]);
+
+  useEffect(() => {
+    if (!requestState.type) return;
+    if (['deleteQuestion', 'createQuestion', 'updateQuestion'].includes(requestState.type)) {
+      const action = requestState.type === 'deleteQuestion' ? 'xóa' : requestState.type === 'createQuestion' ? 'tạo' : 'cập nhật';
+      switch (requestState.status) {
+        case 'completed':
+          showSuccess({
+            title: "Thành công",
+            description: "Câu hỏi đã được " + action + " thành công.",
+            onConfirm() {
+              dispatch(clearQuestionsState());
+              dispatch(getQuestions({}));
+              setIsSheetOpen(false);
+            },
+          });
+          break;
+        case 'failed':
+          showFailed({
+            title: "Lỗi khi " + action + " câu hỏi",
+            description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
+            onConfirm() {
+              dispatch(clearQuestionsState());
+              dispatch(getQuestions({}));
+              setIsSheetOpen(false);
+            },
+          });
+          break;
+        case 'loading':
+          showLoading({
+            title: "Đang xử lý",
+            description: "Vui lòng chờ trong giây lát...",
+          });
+          break;
+      }
+    }
+  }, [requestState]);
 
   return (
     <Card className="flex flex-col flex-1 min-h-0 pb-0!">

@@ -24,15 +24,9 @@ export function Table() {
 
   useEffect(() => {
     dispatch(resetPagination());
-    dispatch(getStores({ page: pagination.page, limit: pagination.limit }));
+    dispatch(searchStores({ q: filter.search, province: filter.province, area: filter.area, page: pagination.page, limit: pagination.limit }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    dispatch(resetPagination());
-    dispatch(searchStores({ q: filter.search, page: pagination.page, limit: pagination.limit }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter.search, filter.area]);
+  }, [filter]);
 
   const handleDeleteStore = (id: string) => {
     showInfo({
@@ -133,6 +127,7 @@ export function Table() {
                   <TableHead className="text-left w-40">Mã điểm bán</TableHead>
                   <TableHead className="text-left w-40">Tên cửa hàng</TableHead>
                   <TableHead className="text-left w-full">Địa chỉ</TableHead>
+                  <TableHead className="text-left w-40">Tỉnh/Thành phố</TableHead>
                   <TableHead className="text-left w-40">Khu vực</TableHead>
                   <TableHead className="text-left w-40">Số điện thoại</TableHead>
                   <TableHead className="text-center w-24"></TableHead>
@@ -153,6 +148,7 @@ export function Table() {
                       <TableCell className="text-left w-40">{store.name || "-"}</TableCell>
                       <TableCell className="text-left w-full">{getAddress(store)}</TableCell>
                       <TableCell className="text-left w-40">{store.province || "-"}</TableCell>
+                      <TableCell className="text-left w-40">{store.area || "-"}</TableCell>
                       <TableCell className="text-left w-40">{store.phone || "-"}</TableCell>
                       <TableCell className="text-center w-24">
                         <div className="flex flex-row gap-2 justify-center">

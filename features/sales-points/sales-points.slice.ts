@@ -14,6 +14,7 @@ interface SalesPointsState {
   };
   filter: {
     search: string;
+    province: string;
     area: string;
   },
   requestState: RequestState;
@@ -29,12 +30,14 @@ const initialState: SalesPointsState = {
   },
   filter: {
     search: "",
+    province: "",
     area: "",
   },
   requestState: { status: 'idle', type: '' },
 }
 
 export const getStores = commonCreateAsyncThunk({ type: 'salesPoints/getStores', action: storeService.getStores });
+export const exportSalesPoints = commonCreateAsyncThunk({ type: 'salesPoints/exportSalesPoints', action: storeService.getStores });
 export const searchStores = commonCreateAsyncThunk({ type: 'salesPoints/searchStores', action: storeService.searchStores });
 export const deleteStore = commonCreateAsyncThunk({ type: 'salesPoints/deleteStore', action: storeService.deleteStore });
 export const getStoreById = commonCreateAsyncThunk({ type: 'salesPoints/getStoreById', action: storeService.getStoreById });
@@ -48,6 +51,9 @@ export const salesPointsSlice = createSlice({
   reducers: {
     changeSearch: (state, action) => {
       state.filter.search = action.payload;
+    },
+    changeProvince: (state, action) => {
+      state.filter.province = action.payload;
     },
     changeArea: (state, action) => {
       state.filter.area = action.payload;
@@ -71,6 +77,7 @@ export const salesPointsSlice = createSlice({
     },
     clearFilter: (state) => {
       state.filter.search = "";
+      state.filter.province = "";
       state.filter.area = "";
     },
   },
@@ -181,10 +188,20 @@ export const salesPointsSlice = createSlice({
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'searchStores', error: payload?.message };
       })
+      .addCase(exportSalesPoints.fulfilled, (state) => {
+        state.requestState = { status: 'completed', type: 'exportSalesPoints' };
+      })
+      .addCase(exportSalesPoints.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'exportSalesPoints' };
+      })
+      .addCase(exportSalesPoints.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'exportSalesPoints', error: payload?.message };
+      })
   },
 })
 
-export const { changeSearch, changeArea, clearSalesPointsState, clearFilter, changePage, changeLimit, resetPagination } = salesPointsSlice.actions;
+export const { changeSearch, changeProvince, changeArea, clearSalesPointsState, clearFilter, changePage, changeLimit, resetPagination } = salesPointsSlice.actions;
 
 export default salesPointsSlice.reducer;
 

@@ -109,7 +109,6 @@ export const submissionSlice = createSlice({
           state.submissions = [...state.submissions, ...uniqueNewSubmissions];
           state.pagination.hasMore = uniqueNewSubmissions.length >= state.pagination.limit;
         }
-        console.log('state.submissions: ', state.submissions);
         state.requestState = { status: 'completed', type: 'getPendingSubmissions', data: state.pagination.page === 1 };
       })
       .addCase(getPendingSubmissions.pending, (state) => {

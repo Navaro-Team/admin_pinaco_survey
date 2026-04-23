@@ -40,6 +40,9 @@ export async function GET(request: NextRequest) {
     if (params.get('campaignId')) {
       urlParams.set('campaignId', params.get('campaignId') ?? '');
     }
+    if (params.get('areaOrProvince')) {
+      urlParams.set('areaOrProvince', params.get('areaOrProvince') ?? '');
+    }
 
     const queryString = urlParams.toString();
     const url = queryString ? `/tasks?${queryString}` : '/tasks';
