@@ -41,6 +41,8 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
         supplierCode: store?.nppCode || "",
         supplierName: store?.nppName || "",
         sellerName: store?.salesEmployeeName || "",
+        province: store?.province || "",
+        area: store?.area || "",
       };
     }
 
@@ -194,6 +196,48 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
               />
               {errors.address && (
                 <FieldError errors={[errors.address]} />
+              )}
+            </div>
+
+            {/* Địa chỉ */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">Tỉnh/Thành phố</Label>
+              <Controller
+                control={control}
+                name="province"
+                render={({ field }) => (
+                  <Input
+                    className={`bg-gray-100 text-black opacity-100 ${errors.province ? "border-destructive" : ""}`}
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="Nhập tỉnh/thành phố"
+                  />
+                )}
+              />
+              {errors.province && (
+                <FieldError errors={[errors.province]} />
+              )}
+            </div>
+
+            {/* Địa chỉ */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">Khu vực</Label>
+              <Controller
+                control={control}
+                name="area"
+                render={({ field }) => (
+                  <Input
+                    className={`bg-gray-100 text-black opacity-100 ${errors.area ? "border-destructive" : ""}`}
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="Nhập khu vực"
+                  />
+                )}
+              />
+              {errors.area && (
+                <FieldError errors={[errors.area]} />
               )}
             </div>
 

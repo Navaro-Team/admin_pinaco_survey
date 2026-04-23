@@ -1,19 +1,20 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { 
-  getPendingSubmissions, 
-  resetPagination, 
-  changeStore, 
-  changeStatus, 
+import {
+  getPendingSubmissions,
+  resetPagination,
+  changeStore,
+  changeStatus,
   clearFilter,
-  changePage 
+  changePage
 } from "@/features/submission/submission.slice";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
+import { RefreshCcw } from "lucide-react";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Tất cả trạng thái" },
@@ -40,21 +41,12 @@ export function PendingReviewFilter() {
   };
 
   const handleRefresh = () => {
-    dispatch(resetPagination());
-    dispatch(getPendingSubmissions({ 
-      skip: 0, 
-      limit: pagination.limit, 
-      status: filter.status || undefined 
-    }));
-  };
-
-  const handleClear = () => {
     dispatch(clearFilter());
     dispatch(resetPagination());
-    dispatch(getPendingSubmissions({ 
-      skip: 0, 
-      limit: pagination.limit, 
-      status: "" 
+    dispatch(getPendingSubmissions({
+      skip: 0,
+      limit: pagination.limit,
+      status: filter.status || undefined
     }));
   };
 
@@ -82,17 +74,10 @@ export function PendingReviewFilter() {
           </div>
           <Button
             variant="outline"
-            className="w-full md:w-28 h-10 md:self-end"
-            onClick={handleClear}
-          >
-            Xoá lọc
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full md:w-28 h-10 md:self-end"
+            className="h-10 md:self-end"
             onClick={handleRefresh}
           >
-            Làm mới
+            <RefreshCcw className="size-4" />
           </Button>
         </div>
       </CardContent>

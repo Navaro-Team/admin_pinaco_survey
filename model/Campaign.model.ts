@@ -11,7 +11,6 @@ export interface Campaign {
   __v: number;
   isDeleted: boolean;
   deletedAt: string | null;
-  areas: string[];
 }
 
 export const parseCampaign = (campaign: any): Campaign => {
@@ -28,7 +27,6 @@ export const parseCampaign = (campaign: any): Campaign => {
     __v: campaign.__v,
     isDeleted: campaign.isDeleted,
     deletedAt: campaign.deletedAt,
-    areas: campaign.areas,
   };
 };
 

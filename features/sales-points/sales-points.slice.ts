@@ -14,6 +14,7 @@ interface SalesPointsState {
   };
   filter: {
     search: string;
+    province: string;
     area: string;
   },
   requestState: RequestState;
@@ -29,6 +30,7 @@ const initialState: SalesPointsState = {
   },
   filter: {
     search: "",
+    province: "",
     area: "",
   },
   requestState: { status: 'idle', type: '' },
@@ -49,6 +51,9 @@ export const salesPointsSlice = createSlice({
   reducers: {
     changeSearch: (state, action) => {
       state.filter.search = action.payload;
+    },
+    changeProvince: (state, action) => {
+      state.filter.province = action.payload;
     },
     changeArea: (state, action) => {
       state.filter.area = action.payload;
@@ -72,6 +77,7 @@ export const salesPointsSlice = createSlice({
     },
     clearFilter: (state) => {
       state.filter.search = "";
+      state.filter.province = "";
       state.filter.area = "";
     },
   },
@@ -195,7 +201,7 @@ export const salesPointsSlice = createSlice({
   },
 })
 
-export const { changeSearch, changeArea, clearSalesPointsState, clearFilter, changePage, changeLimit, resetPagination } = salesPointsSlice.actions;
+export const { changeSearch, changeProvince, changeArea, clearSalesPointsState, clearFilter, changePage, changeLimit, resetPagination } = salesPointsSlice.actions;
 
 export default salesPointsSlice.reducer;
 

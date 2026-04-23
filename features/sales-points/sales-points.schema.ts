@@ -10,6 +10,8 @@ export const initialValues = {
   sellerName: "",
   supplierCode: "",
   supplierName: "",
+  province: "",
+  area: "",
 };
 
 export const salesPointSchema = z.object({
@@ -22,6 +24,8 @@ export const salesPointSchema = z.object({
   sellerName: z.string().optional(),
   supplierCode: z.string().optional(),
   supplierName: z.string().optional(),
+  province: z.string().optional(),
+  area: z.string().optional(),
 });
 
 export type SalesPointFormData = z.infer<typeof salesPointSchema>;

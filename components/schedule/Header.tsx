@@ -1,16 +1,16 @@
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { Button } from "../ui/button";
-import { CalendarPlus2, UserPlus } from "lucide-react";
+import { CalendarPlus2, RefreshCcw, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDialog } from "@/hooks/use-dialog";
 import { ScheduleSheet } from "./ScheduleSheet";
-import { clearTaskState, getTasks } from "@/features/task/task.slice";
 import { clearSurveyState, getSurveys } from "@/features/survey/survey.slice";
 import { clearCampaignsState, getCampaigns } from "@/features/campaigns/campaigns.slice";
 import { AssignSheet } from "./AssignSheet";
 import { clearStaffsState, searchUsers } from "@/features/staffs/staffs.slice";
 import { clearStoreState, searchStores } from "@/features/store/store.slice";
 import { ExportExcelPopover } from "./ExportExcelPopover";
+import { clearFilter, clearScheduleState, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -19,8 +19,14 @@ export function Header() {
   const [openScheduleSheet, setOpenScheduleSheet] = useState<boolean>(false);
   const [openAssignSheet, setOpenAssignSheet] = useState<boolean>(false);
 
+  const handleRefresh = () => {
+    dispatch(clearFilter());
+    dispatch(resetPagination());
+    dispatch(getTasks({ page: 1, limit: 20 }));
+  }
+
   const clearState = () => {
-    dispatch(clearTaskState());
+    dispatch(clearScheduleState());
     dispatch(clearSurveyState());
     dispatch(clearCampaignsState());
     dispatch(clearStaffsState());
@@ -84,7 +90,7 @@ export function Header() {
         <h1 className="text-2xl font-bold">Quản lý lịch trình khảo sát</h1>
         <p className="text-base text-muted-foreground">Xem, lọc và quản lý danh sách các lịch trình khảo sát tại điểm bán</p>
       </div>
-      <div className="flex flex-row gap-4 items-center">
+      <div className="flex flex-col gap-4 items-center lg:flex-row">
         <ExportExcelPopover />
         <Button variant="outline" onClick={() => setOpenScheduleSheet(true)}>
           <CalendarPlus2 />
@@ -93,6 +99,9 @@ export function Header() {
         <Button variant="outline" onClick={() => setOpenAssignSheet(true)}>
           <UserPlus />
           Gán lịch trình
+        </Button>
+        <Button variant="outline" className="h-10 w-full md:w-10" onClick={handleRefresh}>
+          <RefreshCcw className="size-4" />
         </Button>
       </div>
       <ScheduleSheet open={openScheduleSheet} onOpenChange={setOpenScheduleSheet} />

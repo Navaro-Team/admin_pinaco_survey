@@ -8,6 +8,8 @@ export interface GetStoresParams {
 
 export interface SearchStoresParams {
   q?: string;
+  province?: string;
+  area?: string;
   page?: number;
   limit?: number;
 }
@@ -31,10 +33,20 @@ class StoreService {
 
     if (params?.q) {
       queryParams.q = params.q;
-    } else {
-      if (params?.limit) queryParams.limit = params.limit.toString();
     }
-    
+
+    if (params?.province) {
+      queryParams.province = params.province;
+    }
+
+    if (params?.area) {
+      queryParams.area = params.area;
+    }
+
+    if (params?.limit) {
+      queryParams.limit = params.limit.toString();
+    }
+
     if (params?.page) queryParams.page = params.page.toString();
 
     const response = await clientService.get('/stores/search', queryParams);

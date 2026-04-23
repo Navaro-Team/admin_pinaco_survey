@@ -23,7 +23,6 @@ interface CampaignsSheetProps {
 
 interface CampaignFormData {
   campaignName: string;
-  areas: string;
   startDate: Date | null;
   endDate: Date | null;
   description: string;
@@ -38,7 +37,6 @@ export default function CampaignsSheet(props: CampaignsSheetProps) {
   const { control, reset, watch, handleSubmit } = useForm<CampaignFormData>({
     defaultValues: {
       campaignName: "",
-      areas: "",
       startDate: new Date(),
       endDate: new Date(new Date().setDate(new Date().getDate() + 30)),
       description: "",
@@ -51,7 +49,6 @@ export default function CampaignsSheet(props: CampaignsSheetProps) {
 
     reset({
       campaignName: campaign?.campaignName || "",
-      areas: campaign?.areas?.join(", ") || "",
       startDate: campaign?.startDate ? new Date(campaign.startDate) : new Date(),
       endDate: campaign?.endDate ? new Date(campaign.endDate) : new Date(new Date().setDate(new Date().getDate() + 30)),
       description: campaign?.description || "",
@@ -64,7 +61,6 @@ export default function CampaignsSheet(props: CampaignsSheetProps) {
   const onSubmit = handleSubmit((data) => {
     const payload = {
       campaignName: data.campaignName,
-      areas: data.areas.split(",").map((area) => area.trim()),
       startDate: data.startDate,
       endDate: data.endDate,
       description: data.description,
@@ -94,23 +90,6 @@ export default function CampaignsSheet(props: CampaignsSheetProps) {
                 name="campaignName"
                 render={({ field }) => (
                   <Input {...field} className="mt-2" placeholder="Nhập tên chiến dịch" />
-                )}
-              />
-            </div>
-
-            <Separator />
-
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground mb-2">Khu vực</Label>
-              <Controller
-                control={control}
-                name="areas"
-                render={({ field }) => (
-                  <Textarea
-                    {...field}
-                    className="mt-2 min-h-[90px]"
-                    placeholder="Nhập các khu vực, phân tách bằng dấu phẩy"
-                  />
                 )}
               />
             </div>

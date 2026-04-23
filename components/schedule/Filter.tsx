@@ -4,10 +4,8 @@ import { Input } from "../ui/input";
 import { InputCalendar } from "../ui/InputCalendar";
 import { Label } from "../ui/label";
 import { Combobox } from "../ui/combobox";
-import { changeAssigneeId, changeDeadline, changeSearch, changeStatus, clearFilter, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
+import { changeAreaOrProvince, changeAssigneeId, changeCampaignId, changeDeadline, changeSearch, changeStatus } from "@/features/schedule/schedule.slice";
 import { Status } from "../ui/status-badge";
-import { Button } from "../ui/button";
-import { RefreshCcw, X } from "lucide-react";
 import { SearchableCombobox } from "../ui/searchable-combobox";
 import { searchUsers } from "@/features/staffs/staffs.slice";
 
@@ -16,15 +14,14 @@ export function Filter() {
 
   const q = useAppSelector((state) => state.schedule.filter.q);
   const assigneeId = useAppSelector((state) => state.schedule.filter.assigneeId);
+  const areaOrProvince = useAppSelector((state) => state.schedule.filter.areaOrProvince);
+  const campaignId = useAppSelector((state) => state.schedule.filter.campaignId);
   const staffs = useAppSelector((state) => state.staffs.staffs);
+  const campaigns = useAppSelector((state) => state.campaigns.campaigns);
   const staffsRequestState = useAppSelector((state) => state.staffs.requestState);
 
   const status = useAppSelector((state) => state.schedule.filter.status);
   const deadline = useAppSelector((state) => state.schedule.filter.deadline);
-
-  const handleClearFilter = () => {
-    dispatch(clearFilter());
-  }
 
   const handleChangeStaff = (value: string) => {
     dispatch(changeAssigneeId(value));
@@ -45,24 +42,18 @@ export function Filter() {
     dispatch(searchUsers(params));
   };
 
-  const handleRefresh = () => {
-    dispatch(clearFilter());
-    dispatch(resetPagination());
-    dispatch(getTasks({ page: 1, limit: 20 }));
-  }
-
   return (
     <Card>
       <CardContent>
-        <div className="flex flex-col md:flex-row gap-4 md:items-end w-full">
-          <div className="flex-1 min-w-0 flex flex-col gap-2">
+        <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="min-w-0 flex flex-col gap-2">
             <Label>Cửa hàng</Label>
             <Input
               placeholder="Nhập tên cửa hàng"
               value={q}
               onChange={(e) => dispatch(changeSearch(e.target.value))} />
           </div>
-          <div className="flex-1 min-w-0 flex flex-col gap-2">
+          <div className="min-w-0 flex flex-col gap-2">
             <Label>Nhân viên</Label>
             <SearchableCombobox
               options={staffs.map(staff => ({
@@ -77,7 +68,26 @@ export function Filter() {
               onSearch={handleSearchStaffs}
             />
           </div>
-          <div className="flex-1 min-w-0 flex flex-col gap-2">
+          <div className="min-w-0 flex flex-col gap-2">
+            <Label>Khu vực</Label>
+            <Input
+              placeholder="Nhập khu vực hoặc tỉnh/thành phố"
+              value={areaOrProvince}
+              onChange={(e) => dispatch(changeAreaOrProvince(e.target.value))} />
+          </div>
+          <div className="min-w-0 flex flex-col gap-2">
+            <Label>Chiến dịch</Label>
+            <Combobox
+              className="w-full"
+              options={campaigns.map(campaign => ({
+                value: campaign._id,
+                label: campaign.campaignName,
+              }))}
+              value={campaignId}
+              placeholder="Chọn chiến dịch"
+              onChange={(value) => dispatch(changeCampaignId(value))} />
+          </div>
+          <div className="min-w-0 flex flex-col gap-2">
             <Label>Hạn khảo sát</Label>
             <InputCalendar
               placeholder="Chọn hạn khảo sát"
@@ -87,7 +97,7 @@ export function Filter() {
               onChange={(value) => dispatch(changeDeadline(value))}
             />
           </div>
-          <div className="flex-1 min-w-0 flex flex-col gap-2">
+          <div className="min-w-0 flex flex-col gap-2">
             <Label>Trạng thái</Label>
             <Combobox
               className="w-full"
@@ -100,15 +110,6 @@ export function Filter() {
               value={status}
               placeholder="Chọn trạng thái"
               onChange={(value) => dispatch(changeStatus(value))} />
-          </div>
-          <div className="flex gap-2 w-full md:w-auto">
-            <Button variant="outline" className="flex-1 md:flex-none md:w-24 h-10 md:self-end" onClick={handleClearFilter}>
-              <X className="size-4" />
-              Xoá lọc
-            </Button>
-            <Button variant="outline" className="flex-1 md:flex-none md:w-10 h-10 md:self-end" onClick={handleRefresh}>
-              <RefreshCcw className="size-4" />
-            </Button>
           </div>
         </div>
       </CardContent>
