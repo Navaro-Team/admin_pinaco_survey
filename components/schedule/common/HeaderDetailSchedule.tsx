@@ -21,7 +21,7 @@ export function HeaderDetailSchedule() {
   const { error, success } = useToastContext();
 
   const handleExportPDF = () => {
-    if (!survey || !submission || !task) {
+    if (!survey || !task) {
       return;
     }
     exportSurveyToPDF(survey, submission, task);

@@ -6,7 +6,8 @@ import {
   Users,
   FileText,
   Calendar,
-  List
+  List,
+  Backpack
 } from "lucide-react"
 
 import { NavMain } from '@/components/nav-main'
@@ -32,6 +33,11 @@ const data = {
       title: "Dashboard",
       url: "/dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      title: "Quản lý chiến dịch",
+      url: "/campaigns",
+      icon: Backpack,
     },
     {
       title: "Quản lý lịch trình",

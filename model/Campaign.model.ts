@@ -9,6 +9,8 @@ export interface Campaign {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  isDeleted: boolean;
+  deletedAt: string | null;
 }
 
 export const parseCampaign = (campaign: any): Campaign => {
@@ -23,6 +25,8 @@ export const parseCampaign = (campaign: any): Campaign => {
     createdAt: campaign.createdAt,
     updatedAt: campaign.updatedAt,
     __v: campaign.__v,
+    isDeleted: campaign.isDeleted,
+    deletedAt: campaign.deletedAt,
   };
 };
 

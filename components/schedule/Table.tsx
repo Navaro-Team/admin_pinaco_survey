@@ -29,8 +29,10 @@ export function Table() {
   const prevFilterRef = useRef({
     q: filter.q,
     assigneeId: filter.assigneeId,
+    areaOrProvince: filter.areaOrProvince,
     deadline: filter.deadline,
     status: filter.status,
+    campaignId: filter.campaignId,
   });
 
   const getTasksParams = (page: number) => ({
@@ -38,7 +40,9 @@ export function Table() {
     limit: 10,
     q: filter.q?.trim() || undefined,
     assigneeId: filter.assigneeId?.trim() || undefined,
+    areaOrProvince: filter.areaOrProvince?.trim() || undefined,
     status: filter.status || undefined,
+    campaignId: filter.campaignId || undefined,
   });
 
   const fetchTasks = (page: number) => {
@@ -61,21 +65,25 @@ export function Table() {
     const filterChanged =
       prevFilterRef.current.q !== filter.q ||
       prevFilterRef.current.assigneeId !== filter.assigneeId ||
+      prevFilterRef.current.areaOrProvince !== filter.areaOrProvince ||
       deadlineChanged ||
-      prevFilterRef.current.status !== filter.status;
+      prevFilterRef.current.status !== filter.status ||
+      prevFilterRef.current.campaignId !== filter.campaignId;
 
     if (isInitialMount.current || filterChanged) {
       isInitialMount.current = false;
       prevFilterRef.current = {
         q: filter.q,
         assigneeId: filter.assigneeId,
+        areaOrProvince: filter.areaOrProvince,
         deadline: filter.deadline,
         status: filter.status,
+        campaignId: filter.campaignId,
       };
       dispatch(resetPagination());
       fetchTasks(1);
     }
-  }, [dispatch, filter.q, filter.assigneeId, filter.deadline, filter.status]);
+  }, [dispatch, filter]);
 
   // Reload when tasks become empty after having data (e.g., after back from detail page)
   useEffect(() => {

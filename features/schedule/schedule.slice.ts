@@ -15,6 +15,8 @@ interface ScheduleState {
   filter: {
     q: string;
     assigneeId: string;
+    areaOrProvince: string;
+    campaignId: string;
     deadline?: Date;
     status: string;
   };
@@ -32,6 +34,8 @@ const initialState: ScheduleState = {
   filter: {
     q: "",
     assigneeId: "",
+    areaOrProvince: "",
+    campaignId: "",
     deadline: undefined,
     status: "",
   },
@@ -63,16 +67,34 @@ export const scheduleSlice = createSlice({
       };
     },
     changeAssigneeId: (state, action) => {
-      state.filter.assigneeId = action.payload;
+      if (action.payload === state.filter.assigneeId) {
+        state.filter.assigneeId = "";
+      } else {
+        state.filter.assigneeId = action.payload;
+      }
     },
     changeSearch: (state, action) => {
       state.filter.q = action.payload;
+    },
+    changeAreaOrProvince: (state, action) => {
+      state.filter.areaOrProvince = action.payload;
     },
     changeDeadline: (state, action) => {
       state.filter.deadline = action.payload;
     },
     changeStatus: (state, action) => {
-      state.filter.status = action.payload;
+      if (action.payload === state.filter.status) {
+        state.filter.status = "";
+      } else {
+        state.filter.status = action.payload;
+      }
+    },
+    changeCampaignId: (state, action) => {
+      if (action.payload === state.filter.campaignId) {
+        state.filter.campaignId = "";
+      } else {
+        state.filter.campaignId = action.payload;
+      }
     },
     clearScheduleState: (state) => {
       state.requestState = { status: 'idle', type: '' };
@@ -140,6 +162,6 @@ export const scheduleSlice = createSlice({
   },
 })
 
-export const { changePage, changeLimit, resetPagination, changeSearch, changeAssigneeId, changeDeadline, changeStatus, clearScheduleState, clearFilter, changeTask } = scheduleSlice.actions;
+export const { changePage, changeLimit, resetPagination, changeSearch, changeAssigneeId, changeAreaOrProvince, changeDeadline, changeStatus, changeCampaignId, clearScheduleState, clearFilter, changeTask } = scheduleSlice.actions;
 
 export default scheduleSlice.reducer;

@@ -19,6 +19,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    if (params.get('province')) {
+      urlParams.set('province', params.get('province') ?? '');
+    }
+
+    if (params.get('area')) {
+      urlParams.set('area', params.get('area') ?? '');
+    }
+
     if (params.get('page')) {
       urlParams.set('page', params.get('page') ?? '1');
     }
