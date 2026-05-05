@@ -11,6 +11,7 @@ export enum Status {
   PENDING = "PENDING",
   SUBMITTED = "SUBMITTED",
   PENDING_REVIEW = "PENDING_REVIEW",
+  FAILED = "FAILED",
 }
 
 interface StatusBadgeProps {
@@ -26,6 +27,7 @@ const statusConfig: Record<Status, { label: string; variant: "default" | "second
   [Status.PENDING_REVIEW]: { label: "Đang chờ duyệt", variant: "outline", color: "bg-yellow-500 text-white" },
   [Status.OVERDUE]: { label: "Quá hạn khảo sát", variant: "destructive", color: "bg-red-500 text-white" },
   [Status.RESURVEY_REQUIRED]: { label: "Yêu cầu hỗ trợ", variant: "outline", color: "bg-blue-500 text-white" },
+  [Status.FAILED]: { label: "Không đạt", variant: "destructive", color: "bg-red-500 text-white" },
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {

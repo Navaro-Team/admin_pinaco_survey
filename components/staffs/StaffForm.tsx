@@ -15,6 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { createUser, updateUser, clearStaffsState } from "@/features/staffs/staffs.slice";
 import { useDialog } from "@/hooks/use-dialog";
+import { getRoles } from "@/features/role/role.slice";
 
 export function StaffForm() {
   const router = useRouter();
@@ -26,6 +27,9 @@ export function StaffForm() {
   const action = useAppSelector((state) => state.staffs.action);
   const requestState = useAppSelector((state) => state.staffs.requestState);
   const staff = useAppSelector((state) => state.staffs.staff);
+
+  const roles = useAppSelector((state) => state.role.roles);
+  const rolesState = useAppSelector((state) => state.role.requestState);
 
   const isEdit = action === "UPD";
 
@@ -158,14 +162,6 @@ export function StaffForm() {
     { value: "other", label: "Khác" },
   ];
 
-  const roleOptions = [
-    { value: "admin", label: "Quản trị viên" },
-    { value: "manager", label: "Quản lý" },
-    { value: "sales", label: "Nhân viên bán hàng" },
-    { value: "sales_supervisor", label: "Quản lý bán hàng" },
-    { value: "area_sales_manager", label: "Quản lý khu vực" },
-  ];
-
   const statusOptions = [
     { value: "active", label: "Hoạt động" },
     { value: "inactive", label: "Không hoạt động" },
@@ -206,6 +202,10 @@ export function StaffForm() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestState.type, requestState.status, isEdit, dispatch]);
+
+  useEffect(() => {
+    dispatch(getRoles(""));
+  }, [dispatch]);
 
   if (isEdit && isLoadingUser) {
     return (
@@ -379,8 +379,9 @@ export function StaffForm() {
                     : "";
                   return (
                     <Combobox
-                      options={roleOptions}
+                      options={roles.map((role) => ({ value: role.name, label: role.description }))}
                       value={selectedRole}
+                      disabled={rolesState.type === "getRoles" && rolesState.status === "loading"}
                       placeholder="Chọn vai trò"
                       onChange={(value) => {
                         field.onChange(value ? [value] : []);
