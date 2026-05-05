@@ -1,9 +1,8 @@
 import { serverService } from "@/features/http/ServerService";
 import { responseFailed, responseSuccess } from "../utils";
-import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   const accessToken = (await cookies()).get('access_token')?.value;
   try {
     if (!accessToken) throw new Error('No access token');
