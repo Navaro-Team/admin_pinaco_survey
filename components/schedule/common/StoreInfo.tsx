@@ -35,19 +35,19 @@ export function StoreInfo({ store, isLoading }: StoreInfoProps) {
         <div className="flex flex-col gap-2">
           <div>
             <Label className="text-sm text-muted-foreground">Tên cửa hàng</Label>
-            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.name ?? "N/A"}</span>}
+            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.name ?? ""}</span>}
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Địa chỉ</Label>
-            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.location?.address ?? "N/A"}</span>}
+            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.location?.address ?? ""}</span>}
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Người liên hệ</Label>
-            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.contactPersonName ?? "N/A"}</span>}
+            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.contactPersonName ?? ""}</span>}
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Số điện thoại</Label>
-            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.phone ?? "N/A"}</span>}
+            {isLoading ? <Skeleton className="w-full h-4" /> : <span className="text-lg font-medium">{store?.phone ?? ""}</span>}
           </div>
         </div>
       </CardContent>
