@@ -25,6 +25,7 @@ export function Combobox({
   options,
   value,
   onChange,
+  disabled,
   placeholder = "Select option...",
 }: {
   className?: string
@@ -32,7 +33,8 @@ export function Combobox({
   value: string
   onChange: (value: string) => void
   placeholder?: string
-}) {
+  disabled?: boolean
+  }) {
   const [open, setOpen] = useState(false)
   const [selectedValue, setSelectedValue] = useState(value)
 
@@ -53,6 +55,7 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          disabled={disabled}
           className={cn("w-80 justify-between h-10", className)}>
           <p className="text-sm text-gray-600">{selectedValue
             ? options.find((option) => option.value === selectedValue)?.label

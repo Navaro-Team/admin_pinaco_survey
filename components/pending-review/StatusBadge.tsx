@@ -11,6 +11,8 @@ export enum SubmissionStatus {
   PENDING_REVIEW = "PENDING_REVIEW",
   REJECTED_REVIEW = "REJECTED_REVIEW",
   APPROVED = "APPROVED",
+  FAILED = "FAILED",
+  COMPLETED = "COMPLETED",
 }
 
 interface SubmissionStatusBadgeProps {
@@ -60,7 +62,17 @@ const statusConfig: Record<
     label: "Đã phê duyệt",
     variant: "default",
     color: "bg-green-500 hover:bg-green-600 text-white"
-  }
+  },
+  [SubmissionStatus.FAILED]: {
+    label: "Không đạt",
+    variant: "destructive",
+    color: "bg-red-500 hover:bg-red-600 text-white",
+  },
+  [SubmissionStatus.COMPLETED]: {
+    label: "Đã hoàn thành",
+    variant: "default",
+    color: "bg-green-500 hover:bg-green-600 text-white",
+  },
 };
 
 export function SubmissionStatusBadge({
