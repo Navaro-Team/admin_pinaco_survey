@@ -263,11 +263,11 @@ export function QuestionDetailSheet({
                 <>
                   <Separator />
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Các lựa chọn</h3>
+                    <h3 className="text-lg font-semibold">Các câu hỏi</h3>
                     <div className="space-y-2">
                       {selectedQuestion.items.map((item, index) => (
-                        <div key={index} className="flex items-center gap-4 p-2 border rounded-md">
-                          <span className="text-sm font-medium w-12">{item.code}</span>
+                        <div key={index} className="flex flex-col items-start gap-4 p-2 border rounded-md">
+                          <span className="text-sm font-medium">Mã: {item.code}</span>
                           <span className="text-sm flex-1">{item.title}</span>
                         </div>
                       ))}
