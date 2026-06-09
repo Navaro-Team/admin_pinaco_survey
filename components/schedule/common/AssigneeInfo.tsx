@@ -32,23 +32,23 @@ export function AssigneeInfo({ task, performedByInfo, submittedAt, checkinTime, 
             height={100}
             className="rounded-full border border-dotted" />
           <div className="flex flex-col gap-2">
-            <Label className="text-lg font-medium">{performedByInfo?.name || task?.assignee?.name || "N/A"}</Label>
-            <span className="text-sm text-muted-foreground">{performedByInfo?.email || task?.assignee?.email || "N/A"}</span>
+            <Label className="text-lg font-medium">{performedByInfo?.name || task?.assignee?.name || ""}</Label>
+            <span className="text-sm text-muted-foreground">{performedByInfo?.email || task?.assignee?.email || ""}</span>
           </div>
         </div>
         <Separator />
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-sm text-muted-foreground">Số điện thoại</Label>
-            <span className="text-lg font-medium">{performedByInfo?.phone || task?.assignee?.phone || "N/A"}</span>
+            <span className="text-lg font-medium">{performedByInfo?.phone || task?.assignee?.phone || ""}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Ngày thực hiện</Label>
-            <span className="text-lg font-medium">{submittedAt ? formatLocalDate(submittedAt, 'dd/MM/yyyy') : "N/A"}</span>
+            <span className="text-lg font-medium">{submittedAt ? formatLocalDate(submittedAt, 'dd/MM/yyyy') : ""}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground"><LogIn className="size-4 text-green-500" /> Check in</Label>
-            <span className="text-lg font-medium">{checkinTime ? formatLocalDate(checkinTime, 'HH:mm') : "N/A"}</span>
+            <span className="text-lg font-medium">{checkinTime ? formatLocalDate(checkinTime, 'HH:mm') : ""}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground"><LogOut className="size-4 text-red-500" /> Check out</Label>
