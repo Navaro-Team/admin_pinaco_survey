@@ -11,6 +11,7 @@ import { clearStaffsState, searchUsers } from "@/features/staffs/staffs.slice";
 import { clearStoreState, searchStores } from "@/features/store/store.slice";
 import { ExportExcelPopover } from "./ExportExcelPopover";
 import { clearFilter, clearScheduleState, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
+import { clearTaskState } from "@/features/task/task.slice";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -31,6 +32,7 @@ export function Header() {
     dispatch(clearCampaignsState());
     dispatch(clearStaffsState());
     dispatch(clearStoreState());
+    dispatch(clearTaskState());
     dispatch(getTasks({ page: 1, limit: 20 }));
   }
 
