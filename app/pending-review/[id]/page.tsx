@@ -11,7 +11,7 @@ import { getTaskBySubmissionAndSurvey } from "@/features/task/task.slice";
 import { getSurveyById } from "@/features/survey/survey.slice";
 import { StoreInfo } from "@/components/schedule/common/StoreInfo";
 import { AssigneeInfo } from "@/components/schedule/common/AssigneeInfo";
-import { ResultServey } from "@/components/schedule/common/ResultServey";
+import { ResultSurvey } from "@/components/schedule/common/ResultSurvey";
 import { SubmissionStatus } from "@/components/pending-review/StatusBadge";
 import { useDialogContext } from "@/context/DialogContext";
 import { PhotoCheckIn } from "@/components/schedule/common/PhotoCheckIn";
@@ -118,7 +118,7 @@ export default function PendingReviewDetailPage() {
             checkoutTime={submission?.checkoutTime} />
         </div>
         <PhotoCheckIn />
-        <ResultServey />
+        <ResultSurvey />
       </div>
     </div>
   );

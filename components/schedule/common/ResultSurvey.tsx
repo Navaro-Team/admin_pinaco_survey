@@ -5,8 +5,9 @@ import { useAppSelector } from "@/hooks/redux";
 import { useMemo } from "react";
 import { AnswerRenderer } from "./answers/AnswerRenderer";
 import { LikertScaleGroupAnswer } from "./answers/LikertScaleGroupAnswer";
+import { sortQuestionsByCode } from "@/lib/questions.utils";
 
-export function ResultServey() {
+export function ResultSurvey() {
   const survey = useAppSelector((state) => state.survey.survey);
   const submission = useAppSelector((state) => state.submission.submission);
 
@@ -25,10 +26,10 @@ export function ResultServey() {
     return map;
   }, [submission]);
 
-  // Get questions from survey data
+  // Get questions from survey data and sort by predefined code order
   const questions = useMemo(() => {
     if (!survey?.surveyData?.questions) return [];
-    return survey.surveyData.questions;
+    return sortQuestionsByCode(survey.surveyData.questions);
   }, [survey]);
 
   if (!questions.length) {
@@ -88,12 +89,12 @@ export function ResultServey() {
                     </h3>
                   </div>
                   <div className="pt-2 border-t">
-                    <AnswerRenderer 
+                    <AnswerRenderer
                       question={{
                         ...question,
                         questionType: submissionQuestionType || question.type,
                         code: question.code,
-                      }} 
+                      }}
                       answerValue={answerValue}
                     />
                   </div>
