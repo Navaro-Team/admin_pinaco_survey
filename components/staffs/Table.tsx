@@ -12,6 +12,7 @@ import { clearStaffsState, deleteUser, getUsers } from "@/features/staffs/staffs
 import { getRoleLabel, getStatusLabel, isActiveStatus } from "@/model/User.model";
 import { useDialog } from "@/hooks/use-dialog";
 import { Skeleton } from "../ui/skeleton";
+import { getRoles } from "@/features/role/role.slice";
 
 export function Table() {
   const dispatch = useAppDispatch();
@@ -27,6 +28,7 @@ export function Table() {
 
   useEffect(() => {
     dispatch(getUsers());
+    dispatch(getRoles(""));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

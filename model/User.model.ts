@@ -50,10 +50,11 @@ export const getRoleLabel = (roles: string[]): string => {
 
   const roleMap: Record<string, string> = {
     admin: "Quản trị viên",
-    manager: "Quản lý",
+    manager: "Giám đốc vùng",
     sales: "Nhân viên bán hàng",
     sales_supervisor: "Quản lý bán hàng",
     area_sales_manager: "Quản lý khu vực",
+    region_manager: "Giám Đốc Bán hàng Toàn Quốc"
   };
 
   // Get the first role or default
