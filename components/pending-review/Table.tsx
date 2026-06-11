@@ -43,7 +43,7 @@ export function PendingReviewTable() {
   return (
     <Card className="flex flex-col flex-1 min-h-0 pb-0!">
       <CardHeader>
-        <CardTitle>Danh sách câu trả lời đang chờ duyệt</CardTitle>
+        <CardTitle>Danh sách câu trả lời</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col flex-1 p-0 overflow-hidden min-h-0">
         <div className="flex flex-col flex-1 overflow-hidden min-h-0">
