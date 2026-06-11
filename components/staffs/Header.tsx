@@ -44,6 +44,22 @@ export function Header() {
     }
   }
 
+  const handleDownloadTemplate = async () => {
+    try {
+      const link = document.createElement("a");
+      link.href = "/excel/template_employee.xlsx";
+      link.download = "template_employee.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      showFailed({
+        title: "Thất bại",
+        description: "Không thể tải file template.",
+      });
+    }
+  }
+
   return (
     <div className="flex flex-row justify-between items-center">
       <div className="flex flex-col gap-1">
@@ -60,6 +76,10 @@ export function Header() {
         <Button variant="outline" onClick={handleExportExcel} disabled={isExporting}>
           <Download className="size-4" />
           {isExporting ? <Spinner className="size-4 animate-spin" /> : 'Xuất Excel'}
+        </Button>
+        <Button variant="outline" onClick={handleDownloadTemplate}>
+          <Download className="size-4" />
+          Template
         </Button>
         <Button variant="outline" onClick={() => setOpenStaffSheet(true)}>
           <Import className="size-4" />

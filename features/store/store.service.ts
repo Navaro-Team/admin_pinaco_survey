@@ -79,6 +79,14 @@ class StoreService {
     const response = await clientService.upload('/stores/import', formData);
     return parseCommonHttpResult(response);
   }
+
+  async validateFileImportStores(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await clientService.upload('/stores/import/validate', formData);
+    return parseCommonHttpResult(response);
+  }
+
 }
 
 export const storeService = new StoreService();
