@@ -111,7 +111,6 @@ export function StaffForm() {
     // Trigger validation for all fields before submit
     const isValid = await trigger();
     if (!isValid) {
-      // Form has validation errors, React Hook Form will prevent submit
       return;
     }
 
@@ -185,7 +184,7 @@ export function StaffForm() {
       case 'failed':
         showFailed({
           title: "Lỗi khi " + (isEdit ? "cập nhật" : "tạo") + " nhân sự",
-          description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
+          description: requestState.error?.replace("body.body:", "") || "Có lỗi xảy ra. Vui lòng thử lại.",
           onConfirm() {
             router.push("/staffs");
             dispatch(clearStaffsState());
@@ -217,7 +216,7 @@ export function StaffForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Họ và tên */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Họ và tên</Label>
+              <Label className="text-sm text-gray-500">Họ và tên {!isEdit && <span className="text-red-500">*</span>}</Label>
               <Controller
                 control={control}
                 name="name"
@@ -234,7 +233,7 @@ export function StaffForm() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Số điện thoại</Label>
+              <Label className="text-sm text-gray-500">Số điện thoại {!isEdit && <span className="text-red-500">*</span>}</Label>
               <Controller
                 control={control}
                 name="phone"
@@ -252,7 +251,7 @@ export function StaffForm() {
 
             {/* Email */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Email</Label>
+              <Label className="text-sm text-gray-500">Email {!isEdit && <span className="text-red-500">*</span>}</Label>
               <Controller
                 control={control}
                 name="email"
@@ -271,7 +270,7 @@ export function StaffForm() {
 
             {/* Ngày sinh */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Ngày sinh</Label>
+              <Label className="text-sm text-gray-500">Ngày sinh {!isEdit && <span className="text-red-500">*</span>}</Label>
               <Controller
                 control={control}
                 name="dateOfBirth"
@@ -288,13 +287,13 @@ export function StaffForm() {
 
             {/* Mã nhân sự */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Mã nhân sự</Label>
+              <Label className="text-sm text-gray-500">Mã nhân sự {!isEdit && <span className="text-red-500">*</span>}</Label>
               <Controller
                 control={control}
                 name="code"
                 render={({ field }) => (
                   <Input
-                    className="bg-gray-100 text-black opacity-100"
+                    className={`bg-gray-100 text-black opacity-100 ${errors.code ? "border-destructive" : ""}`}
                     value={field.value || ""}
                     onChange={field.onChange}
                     onBlur={field.onBlur}

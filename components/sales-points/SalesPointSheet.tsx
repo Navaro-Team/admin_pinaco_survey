@@ -14,7 +14,7 @@ import { Button } from "../ui/button";
 import { Upload, FileSpreadsheet, CheckCircle2, XCircle, AlertCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { clearSalesPointsState, getStores, importStores } from "@/features/sales-points/sales-points.slice";
+import { clearSalesPointsState, getStores, importStores, validateFileImportStores } from "@/features/sales-points/sales-points.slice";
 
 interface ImportLog {
   id: string;
@@ -34,10 +34,12 @@ export function SalesPointSheet({
 }: SalesPointSheetProps) {
   const dispatch = useAppDispatch();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isValid, setIsValid] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState(false);
   const [logs, setLogs] = useState<ImportLog[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const salesPointsState = useAppSelector((state) => state.salesPoints.requestState);
+  const isValidating = salesPointsState.status === 'loading' && salesPointsState.type === 'validateFileImportStores';
   const isImporting = salesPointsState.status === 'loading' && salesPointsState.type === 'importStores';
 
   const acceptedTypes = [
@@ -76,6 +78,7 @@ export function SalesPointSheet({
     if (validateFile(file)) {
       setLogs([])
       setSelectedFile(file);
+      setIsValid(false);
       addLog({
         message: `Đã chọn file: ${file.name}`,
         type: "success",
@@ -230,9 +233,54 @@ export function SalesPointSheet({
         type: "error",
       });
     } finally {
+      setIsValid(false);
       dispatch(getStores({ page: 1, limit: 20 }));
     }
   };
+
+  const handleValidateFileImport = async () => {
+    if (!selectedFile) {
+      addLog({
+        message: "Vui lòng chọn file để kiểm tra",
+        type: "warning",
+      });
+      return;
+    }
+
+    addLog({
+      message: `Đang kiểm tra file: ${selectedFile.name}...`,
+      type: "success",
+    });
+
+    try {
+      const res = await dispatch(validateFileImportStores(selectedFile)).unwrap();
+      const payload = res as any;
+      const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+      console.log('responseData ', responseData)
+      const { validCount, invalidCount, totalRows } = responseData
+      addLog({
+        message: `Đã kiểm tra: ${totalRows ?? 0} dòng`,
+        type: "success",
+      });
+      addLog({
+        message: `Số dòng hợp lệ: ${validCount ?? 0} dòng`,
+        type: "success",
+      });
+
+      if (invalidCount && invalidCount > 0) {
+        addLog({
+          message: `Số dòng không hợp lệ: ${invalidCount} dòng`,
+          type: "error",
+        });
+      }
+      setIsValid(true);
+    } catch (err: any) {
+      addLog({
+        message: `Lỗi import: ${err?.message || "Có lỗi xảy ra khi import file"}`,
+        type: "error",
+      });
+    }
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -356,8 +404,16 @@ export function SalesPointSheet({
             type="button"
             variant="default"
             className="bg-main hover:bg-main/90"
-            onClick={handleImport}
+            onClick={handleValidateFileImport}
             disabled={!selectedFile || isImporting}>
+            {isValidating ? "Đang kiểm tra..." : "Kiểm tra"}
+          </Button>
+          <Button
+            type="button"
+            variant="default"
+            className="bg-main hover:bg-main/90"
+            onClick={handleImport}
+            disabled={!selectedFile || !isValid || isImporting}>
             {isImporting ? "Đang import..." : "Import"}
           </Button>
         </SheetFooter>

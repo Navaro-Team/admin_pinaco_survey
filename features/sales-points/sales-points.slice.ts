@@ -44,6 +44,7 @@ export const getStoreById = commonCreateAsyncThunk({ type: 'salesPoints/getStore
 export const createStore = commonCreateAsyncThunk({ type: 'salesPoints/createStore', action: storeService.createStore });
 export const updateStore = commonCreateAsyncThunk({ type: 'salesPoints/updateStore', action: storeService.updateStore });
 export const importStores = commonCreateAsyncThunk({ type: 'salesPoints/importStores', action: storeService.importStores });
+export const validateFileImportStores = commonCreateAsyncThunk({ type: 'salesPoints/validateFileImportStores', action: storeService.validateFileImportStores });
 
 export const salesPointsSlice = createSlice({
   name: 'salesPoints',
@@ -174,6 +175,18 @@ export const salesPointsSlice = createSlice({
       .addCase(importStores.rejected, (state, action) => {
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'importStores', error: payload?.message };
+      })
+      .addCase(validateFileImportStores.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.requestState = { status: 'completed', type: 'validateFileImportStores', data: responseData };
+      })
+      .addCase(validateFileImportStores.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'validateFileImportStores' };
+      })
+      .addCase(validateFileImportStores.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'validateFileImportStores', error: payload?.message };
       })
       .addCase(searchStores.fulfilled, (state, action) => {
         const payload = action.payload as any;
