@@ -257,7 +257,25 @@ export function SalesPointSheet({
       const payload = res as any;
       const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
       console.log('responseData ', responseData)
-      const { validCount, invalidCount, totalRows } = responseData
+      const { validCount, invalidCount, totalRows, rows } = responseData;
+      if (rows && Array.isArray(rows)) {
+        rows.forEach(row => {
+          if (!row.valid) {
+            const messages: string[] = [];
+            if (row?.errors && Array.isArray(row?.errors)) {
+              row?.errors?.forEach((error: any) => {
+                messages.push(`${error.field} with error ${error.message}`)
+              });
+            }
+
+            if (Array.isArray(messages))
+              addLog({
+                message: `Dòng ${row?.row} - ${row?.data.code}: ${messages.join("\n")}`,
+                type: "error",
+              });
+          }
+        })
+      }
       addLog({
         message: `Đã kiểm tra: ${totalRows ?? 0} dòng`,
         type: "success",

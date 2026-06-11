@@ -45,7 +45,7 @@ const data = {
       icon: Calendar,
     },
     {
-      title: "Đang chờ duyệt",
+      title: "Danh sách câu trả lời",
       url: "/pending-review",
       icon: FileText,
     },
