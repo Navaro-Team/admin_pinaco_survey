@@ -56,6 +56,7 @@ export function Header() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       showFailed({
         title: "Thất bại",
