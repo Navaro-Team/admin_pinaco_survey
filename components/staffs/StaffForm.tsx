@@ -15,7 +15,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { createUser, updateUser, clearStaffsState } from "@/features/staffs/staffs.slice";
 import { useDialog } from "@/hooks/use-dialog";
-import { getRoles } from "@/features/role/role.slice";
 
 export function StaffForm() {
   const router = useRouter();
@@ -202,10 +201,6 @@ export function StaffForm() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestState.type, requestState.status, isEdit, dispatch]);
-
-  useEffect(() => {
-    dispatch(getRoles(""));
-  }, [dispatch]);
 
   if (isEdit && isLoadingUser) {
     return (

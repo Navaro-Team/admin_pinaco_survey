@@ -15,6 +15,9 @@ export function Filter() {
   const role = useAppSelector((state) => state.staffs.filter.role);
   const status = useAppSelector((state) => state.staffs.filter.status);
 
+  const roles = useAppSelector((state) => state.role.roles);
+  const rolesState = useAppSelector((state) => state.role.requestState);
+
   const handleClearFilter = () => {
     dispatch(clearFilter());
   };
@@ -39,14 +42,10 @@ export function Filter() {
             <Label>Vai trò</Label>
             <Combobox
               className="w-full"
-              options={[
-                { value: "admin", label: "Quản trị viên" },
-                { value: "manager", label: "Quản lý" },
-                { value: "officer", label: "Nhân viên" },
-                { value: "sales", label: "Nhân viên bán hàng" },
-              ]}
+              options={roles.map((role) => ({ value: role.name, label: role.description }))}
               value={role}
               placeholder="Chọn vai trò"
+              disabled={rolesState.type === "getRoles" && rolesState.status === "loading"}
               onChange={(value) => dispatch(changeRole(value))} />
           </div>
           <div className="flex-1 min-w-0 flex flex-col gap-2">
