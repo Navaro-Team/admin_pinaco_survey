@@ -52,7 +52,8 @@ export function Header() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e: any) {
       showFailed({
         title: "Thất bại",
         description: "Không thể tải file template.",
