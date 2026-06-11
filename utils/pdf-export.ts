@@ -1,3 +1,4 @@
+import { sortQuestionsByCode } from '@/lib/questions.utils';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
@@ -55,8 +56,8 @@ function renderAnswerHTML(question: any, answerValue: any): string {
     case 'NUMERIC_INPUT':
     case 'NUMBER_INPUT': {
       const unit = question.input?.unit || '';
-      const value = typeof answerValue === 'number' 
-        ? answerValue.toLocaleString('vi-VN') 
+      const value = typeof answerValue === 'number'
+        ? answerValue.toLocaleString('vi-VN')
         : answerValue;
       return `<div style="display: flex; align-items: center; gap: 8px;">
         <span style="font-size: 16px; font-weight: 600;">${value}</span>
@@ -122,7 +123,7 @@ function renderAnswerHTML(question: any, answerValue: any): string {
       const scale = question.scale && Array.isArray(question.scale) && question.scale.length > 0 ? question.scale : null;
 
       if (isStarRating) {
-        const stars = [1, 2, 3, 4, 5].map(star => 
+        const stars = [1, 2, 3, 4, 5].map(star =>
           `<span style="font-size: 20px; color: ${star <= numValue ? '#fbbf24' : '#d1d5db'};">★</span>`
         ).join('');
         return `<div style="display: flex; align-items: center; gap: 16px;">
@@ -142,7 +143,7 @@ function renderAnswerHTML(question: any, answerValue: any): string {
       }
 
       // Default: stars
-      const stars = [1, 2, 3, 4, 5].map(star => 
+      const stars = [1, 2, 3, 4, 5].map(star =>
         `<span style="font-size: 20px; color: ${star <= numValue ? '#fbbf24' : '#d1d5db'};">★</span>`
       ).join('');
       return `<div style="display: flex; align-items: center; gap: 12px;">
@@ -183,7 +184,7 @@ function renderMixedAnswerHTML(question: any, answerValue: any): string {
   if (!answerValue) return '<span style="color: #999; font-style: italic;">Không có câu trả lời</span>';
 
   const code = question.code;
-  
+
   // PERCEIVED_MARKET_SHARE and PRICE_CHECK have array answerValue
   if (code === 'PERCEIVED_MARKET_SHARE' || code === 'PRICE_CHECK') {
     // These are handled in the switch case below, allow arrays
@@ -254,7 +255,7 @@ function renderMixedAnswerHTML(question: any, answerValue: any): string {
           <span style="font-size: 12px; color: #6b7280;">Tổng giá trị tồn kho:</span>
           <span style="font-size: 16px; font-weight: 600;">${formatCurrency(totalAmount)} VNĐ</span>
         </div>`;
-      
+
       if (Array.isArray(answerValue.values) && answerValue.values.length > 0) {
         html += `<table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
           <thead>
@@ -364,7 +365,7 @@ function renderMixedAnswerHTML(question: any, answerValue: any): string {
       if (!Array.isArray(answerValue) || answerValue.length === 0) {
         return '<span style="color: #999; font-style: italic;">Không có dữ liệu</span>';
       }
-      
+
       const brandCodes = new Set<string>();
       answerValue.forEach((item: any) => {
         if (item && typeof item === 'object' && item.prices && typeof item.prices === 'object') {
@@ -498,11 +499,11 @@ function renderCheckInAssetsHTML(checkInAssets: any[]): string {
       };
     })
     .filter(Boolean) as Array<{
-    source: string;
-    name: string;
-    capturedAt?: string;
-    imageTypeLabel?: string;
-  }>;
+      source: string;
+      name: string;
+      capturedAt?: string;
+      imageTypeLabel?: string;
+    }>;
 
   if (validAssets.length === 0) return "";
 
@@ -560,7 +561,7 @@ export function exportSurveyToPDF(
   }
 
   // Get questions
-  const questions = survey?.surveyData?.questions || [];
+  const questions = sortQuestionsByCode(survey?.surveyData?.questions || []);
 
   // Create HTML content
   let htmlContent = `
@@ -806,7 +807,7 @@ export function exportSurveyToPDF(
   if (printWindow) {
     printWindow.document.write(htmlContent);
     printWindow.document.close();
-    
+
     // Wait for content to load then trigger print
     setTimeout(() => {
       printWindow.print();

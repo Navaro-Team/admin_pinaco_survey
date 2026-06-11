@@ -3,7 +3,7 @@
 import { AssigneeInfo } from "@/components/schedule/common/AssigneeInfo"
 import { HeaderDetailSchedule } from "@/components/schedule/common/HeaderDetailSchedule"
 import { PhotoCheckIn } from "@/components/schedule/common/PhotoCheckIn"
-import { ResultServey } from "@/components/schedule/common/ResultServey"
+import { ResultSurvey } from "@/components/schedule/common/ResultSurvey"
 import { StoreInfo } from "@/components/schedule/common/StoreInfo"
 import { getTaskById } from "@/features/schedule/schedule.slice"
 import { getSubmissionById, setSubmission } from "@/features/submission/submission.slice"
@@ -68,7 +68,7 @@ export default function Page() {
           checkoutTime={submission?.checkoutTime} />
       </div>
       <PhotoCheckIn />
-      <ResultServey />
+      <ResultSurvey />
     </div>
   )
 }
