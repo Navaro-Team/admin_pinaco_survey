@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff } from "lucide-react"
 import { useEffect, useState } from "react"
-import { clearAuthState, login } from "@/features/auth/auth.slice"
+import { clearAuthState, login, logout } from "@/features/auth/auth.slice"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -46,6 +46,12 @@ export function LoginForm({
       .then((res: any) => {
         const { user } = res?.data?.data?.data || {};
         const userData = parseUser(user);
+        if (userData.roles && Array.isArray(userData.roles) && userData.roles.length > 0 && userData.roles[0] === "sales") {
+          setError("password", { message: 'Bạn không có quyền truy cập vào trang quản trị viên' })
+          dispatch(logout());
+          return;
+        }
+
         dispatch(setUser(userData));
         dispatch(setIsLogged(true));
       })
