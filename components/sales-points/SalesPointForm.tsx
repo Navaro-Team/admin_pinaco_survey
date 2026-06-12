@@ -179,7 +179,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
             </div>
 
             {/* Địa chỉ */}
-            <div className="flex flex-col gap-2 md:col-span-2">
+            <div className="flex flex-col gap-2">
               <Label className="text-sm text-gray-500">Địa chỉ</Label>
               <Controller
                 control={control}
@@ -250,7 +250,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
                 render={({ field }) => (
                   <Input
                     className="bg-gray-100 text-black opacity-100"
-                    value={field.value?.toFixed(2) || ""}
+                    value={field.value || ""}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     placeholder="Nhập doanh số trung bình Ắc quy Pinaco"
@@ -290,24 +290,6 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     placeholder="Nhập số điện thoại"
-                  />
-                )}
-              />
-            </div>
-
-            {/* Tên nhân viên bán hàng */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Tên nhân viên bán hàng</Label>
-              <Controller
-                control={control}
-                name="sellerName"
-                render={({ field }) => (
-                  <Input
-                    className="bg-gray-100 text-black opacity-100"
-                    value={field.value || ""}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    placeholder="Nhập tên nhân viên bán hàng"
                   />
                 )}
               />
