@@ -7,6 +7,7 @@ export enum SubmissionStatus {
   SUBMITTED = "SUBMITTED",
   SUPERSEDED = "SUPERSEDED",
   DELETED = "DELETED",
+  CANCELLED = "CANCELLED",
   RESURVEY_REJECTED = "RESURVEY_REJECTED",
   PENDING_REVIEW = "PENDING_REVIEW",
   REJECTED_REVIEW = "REJECTED_REVIEW",
@@ -40,6 +41,11 @@ const statusConfig: Record<
   },
   [SubmissionStatus.DELETED]: {
     label: "Đã xóa",
+    variant: "destructive",
+    color: "bg-red-500 hover:bg-red-600 text-white",
+  },
+  [SubmissionStatus.CANCELLED]: {
+    label: "Đã huỷ",
     variant: "destructive",
     color: "bg-red-500 hover:bg-red-600 text-white",
   },

@@ -14,6 +14,7 @@ import { TablePagination } from "../ui/table-pagination";
 import { Skeleton } from "../ui/skeleton";
 import { useDialog } from "@/hooks/use-dialog";
 import { deleteTask } from "@/features/schedule/schedule.slice";
+import { getTaskStatus } from "@/model/Task.model";
 
 export function Table() {
   const dispatch = useAppDispatch();
@@ -143,7 +144,6 @@ export function Table() {
   const endIndex = startIndex + itemsPerPage;
   const displayTasks = filteredTasks.slice(startIndex, endIndex);
 
-
   useEffect(() => {
     if (!requestState.type) return;
     if (['deleteTask'].includes(requestState.type)) {
@@ -247,9 +247,7 @@ export function Table() {
                             </div>
                           </TableCell>
                           <TableCell className="text-left w-48">{task.assignee?.name || "-"}</TableCell>
-                          <TableCell className="text-left w-32">
-                            <StatusBadge status={task.submission ? task.submission.status : task.status} />
-                          </TableCell>
+                          <TableCell className="text-left w-32"><StatusBadge status={getTaskStatus(task)} /></TableCell>
                           <TableCell className="text-left w-32">
                             {task.dueDate ? formatDate(new Date(task.completedAt ?? task.createdAt), 'dd/MM/yyyy') : "-"}
                           </TableCell>

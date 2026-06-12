@@ -7,7 +7,7 @@ export interface Task {
   status: string,
   dueDate: Date,
   submissionId: string,
-  submission: any,  
+  submission: any,
   resurveyRequestId: string,
   resurveyRequest: any,
   isResurveyRequested: boolean,
@@ -43,4 +43,17 @@ export function parseTask(data: any): Task {
 export function parseTasks(data: any): Task[] {
   if (!Array.isArray(data)) return [];
   return data.map((item: any) => parseTask(item));
+}
+
+export function getTaskStatus(task: Task): string {
+  if (task.submission) {
+    const statusSubmission = task.submission.status;
+    if (statusSubmission.toUpperCase() === "SUBMITTED") {
+      return task.status
+    } else {
+      return statusSubmission
+    }
+  }
+
+  return task.status;
 }

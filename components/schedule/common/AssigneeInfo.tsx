@@ -9,12 +9,12 @@ import { Task } from "@/model/Task.model";
 interface AssigneeInfoProps {
   task: Task | null;
   performedByInfo?: any;
-  submittedAt?: string;
+  createdAt?: string;
   checkinTime?: string;
   checkoutTime?: string;
 }
 
-export function AssigneeInfo({ task, performedByInfo, submittedAt, checkinTime, checkoutTime }: AssigneeInfoProps) {
+export function AssigneeInfo({ task, performedByInfo, createdAt, checkinTime, checkoutTime }: AssigneeInfoProps) {
   return (
     <Card className="flex flex-col gap-4!">
       <CardHeader>
@@ -44,7 +44,7 @@ export function AssigneeInfo({ task, performedByInfo, submittedAt, checkinTime, 
           </div>
           <div>
             <Label className="text-sm text-muted-foreground">Ngày thực hiện</Label>
-            <span className="text-lg font-medium">{submittedAt ? formatLocalDate(submittedAt, 'dd/MM/yyyy') : ""}</span>
+            <span className="text-lg font-medium">{createdAt ? formatLocalDate(createdAt, 'dd/MM/yyyy') : ""}</span>
           </div>
           <div>
             <Label className="text-sm text-muted-foreground"><LogIn className="size-4 text-green-500" /> Check in</Label>
