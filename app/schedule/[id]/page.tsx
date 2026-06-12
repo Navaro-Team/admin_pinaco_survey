@@ -63,7 +63,7 @@ export default function Page() {
         <AssigneeInfo
           task={task}
           performedByInfo={submission?.performedByInfo}
-          submittedAt={submission?.submittedAt}
+          createdAt={submission?.createdAt}
           checkinTime={submission?.checkinTime}
           checkoutTime={submission?.checkoutTime} />
       </div>

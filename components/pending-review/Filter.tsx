@@ -21,6 +21,7 @@ const STATUS_OPTIONS = [
   { value: "SUBMITTED", label: "Đã gửi" },
   { value: "SUPERSEDED", label: "Đã thay thế" },
   { value: "DELETED", label: "Đã xóa" },
+  { value: "CANCELLED", label: "Đã huỷ" },
   { value: "RESURVEY_REJECTED", label: "Đã bị từ chối khảo sát lại" },
   { value: "PENDING_REVIEW", label: "Đang chờ duyệt" },
   { value: "REJECTED_REVIEW", label: "Đã bị từ chối" },
