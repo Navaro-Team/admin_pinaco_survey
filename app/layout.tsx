@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthGuard from "@/components/auth-guard";
@@ -24,12 +24,19 @@ export const metadata: Metadata = {
   description: "Quản lý khảo sát",
 };
 
+export const viewport: Viewport = {
+  width: 1024,
+  initialScale: 0.2,
+  maximumScale: 5,
+  userScalable: true,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
           <ToastProvider>
