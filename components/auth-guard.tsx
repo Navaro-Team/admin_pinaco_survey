@@ -8,6 +8,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
+import { useGlobalErrorReporter } from "@/hooks/use-global-error-reporter";
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const isLogged = useSelector((state: any) => state.app.isLogged);
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const query = searchParams.toString();
   const pathNotNeedAuth = ['/register', '/forgot-password', '/auth/password/reset', '/sso-callback'];
   const pathWaiting = ['/login', '/']
-
+  useGlobalErrorReporter('ADMIN');
   useEffect(() => {
     if (!isLogged) {
       if (query || pathNotNeedAuth.includes(pathname)) {
