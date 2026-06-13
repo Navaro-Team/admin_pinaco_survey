@@ -13,9 +13,10 @@ const IMAGE_TYPE_LABEL_MAP = {
 } as const;
 
 export function PhotoCheckIn() {
-  const task = useAppSelector((state) => state.schedule.task);
-  const checkInAssets = task?.checkInAssets || [];
-
+  const task = useAppSelector((state) => state.task.task);
+  const taskSchedule = useAppSelector((state) => state.schedule.task);
+  const checkInAssets = task?.checkInAssets ?? taskSchedule?.checkInAssets ?? [];
+  
   return (
     <Card hidden={checkInAssets.length === 0} className="flex flex-col gap-4!">
       <CardHeader>
