@@ -19,6 +19,7 @@ export interface Store {
   nppCode: string;
   nppName: string;
   salesEmployeeName: string;
+  salesEmployeeCode: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +39,7 @@ export function parseStore(data: any): Store {
     nppCode: data.nppCode,
     nppName: data.nppName,
     salesEmployeeName: data.salesEmployeeName,
+    salesEmployeeCode: data.salesEmployeeCode,
     locationId: data.locationId,
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,

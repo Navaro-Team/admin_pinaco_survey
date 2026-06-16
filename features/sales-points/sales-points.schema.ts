@@ -8,10 +8,12 @@ export const initialValues = {
   contactPersonName: "",
   phone: "",
   sellerName: "",
+  sellerCode: "",
   supplierCode: "",
   supplierName: "",
   province: "",
   area: "",
+  type: "",
 };
 
 export const salesPointSchema = z.object({
@@ -22,10 +24,13 @@ export const salesPointSchema = z.object({
   contactPersonName: z.string().optional(),
   phone: z.string().optional(),
   sellerName: z.string().optional(),
+  sellerCode: z.string().optional(),
   supplierCode: z.string().optional(),
   supplierName: z.string().optional(),
   province: z.string().optional(),
   area: z.string().optional(),
+  type: z.string().min(1, "Loại cửa hàng là bắt buộc"),
+
 });
 
 export type SalesPointFormData = z.infer<typeof salesPointSchema>;
