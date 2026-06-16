@@ -17,6 +17,8 @@ import { ArrowLeft } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { useDialog } from "@/hooks/use-dialog";
 import { clearSalesPointsState, createStore, updateStore } from "@/features/sales-points/sales-points.slice";
+import { SearchableCombobox } from "../ui/searchable-combobox";
+import { searchUsers } from "@/features/staffs/staffs.slice";
 
 interface SalesPointFormProps {
   isEdit: boolean;
@@ -28,6 +30,8 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
   const { showSuccess, showFailed, showInfo, showLoading } = useDialog();
   const store = useAppSelector((state) => state.salesPoints.store);
   const requestState = useAppSelector((state) => state.salesPoints.requestState);
+  const staffs = useAppSelector((state) => state.staffs.staffs);
+  const staffsRequestState = useAppSelector((state) => state.staffs.requestState);
 
   const defaultValues = useMemo(() => {
     if (store) {
@@ -41,8 +45,10 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
         supplierCode: store?.nppCode || "",
         supplierName: store?.nppName || "",
         sellerName: store?.salesEmployeeName || "",
+        sellerCode: store?.salesEmployeeCode || "",
         province: store?.province || "",
         area: store?.area || "",
+        type: store?.type || "",
       };
     }
 
@@ -53,11 +59,27 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<SalesPointFormData>({
     resolver: zodResolver(salesPointSchema),
     defaultValues,
   });
+
+  const handleSearchStaffs = (searchValue: string) => {
+    const trimmedSearch = searchValue.trim();
+    const params: any = {
+      page: 1,
+    };
+
+    if (trimmedSearch) {
+      params.q = trimmedSearch;
+    } else {
+      params.limit = 50;
+    }
+
+    dispatch(searchUsers(params));
+  };
 
   useEffect(() => {
     if (isEdit && store) {
@@ -79,10 +101,11 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
         nppCode: data.supplierCode,
         nppName: data.supplierName,
         salesEmployeeName: data.sellerName,
+        salesEmployeeCode: data.sellerCode,
         province: store?.province || "",
         area: store?.area || "",
         locationId: store?.locationId || "",
-        type: store?.type || "",
+        type: data?.type || "",
         location: store?.location || {},
       };
       showInfo({
@@ -134,6 +157,12 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
     }
   }, [requestState, dispatch, router, isEdit, showSuccess, showFailed, showLoading]);
 
+  useEffect(() => {
+    if (store?.salesEmployeeCode) {
+      handleSearchStaffs(store.salesEmployeeCode);
+    }
+  }, [store?.id])
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
@@ -141,7 +170,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Tên điểm bán */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Tên điểm bán</Label>
+              <Label className="text-sm text-gray-500">Tên điểm bán <span className="text-red-500">*</span></Label>
               <Controller
                 control={control}
                 name="name"
@@ -162,7 +191,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
 
             {/* Mã điểm bán */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Mã điểm bán</Label>
+              <Label className="text-sm text-gray-500">Mã điểm bán <span className="text-red-500">*</span></Label>
               <Controller
                 control={control}
                 name="code"
@@ -180,7 +209,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
 
             {/* Địa chỉ */}
             <div className="flex flex-col gap-2">
-              <Label className="text-sm text-gray-500">Địa chỉ</Label>
+              <Label className="text-sm text-gray-500">Địa chỉ <span className="text-red-500">*</span></Label>
               <Controller
                 control={control}
                 name="address"
@@ -199,7 +228,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
               )}
             </div>
 
-            {/* Địa chỉ */}
+            {/* Tỉnh/Thành phố */}
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-gray-500">Tỉnh/Thành phố</Label>
               <Controller
@@ -220,7 +249,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
               )}
             </div>
 
-            {/* Địa chỉ */}
+            {/* Khu vực */}
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-gray-500">Khu vực</Label>
               <Controller
@@ -241,6 +270,27 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
               )}
             </div>
 
+            {/* Loại cửa hàng */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">Loại cửa hàng <span className="text-red-500">*</span></Label>
+              <Controller
+                control={control}
+                name="type"
+                render={({ field }) => (
+                  <Input
+                    className={`bg-gray-100 text-black opacity-100 ${errors.area ? "border-destructive" : ""}`}
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="Nhập loại cửa hàng"
+                  />
+                )}
+              />
+              {errors.type && (
+                <FieldError errors={[errors.type]} />
+              )}
+            </div>
+
             {/* Quy mô doanh số */}
             <div className="flex flex-col gap-2">
               <Label className="text-sm text-gray-500">Doanh số trung bình Ắc quy Pinaco</Label>
@@ -250,7 +300,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
                 render={({ field }) => (
                   <Input
                     className="bg-gray-100 text-black opacity-100"
-                    value={field.value || ""}
+                    value={field.value}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     placeholder="Nhập doanh số trung bình Ắc quy Pinaco"
@@ -292,6 +342,33 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
                     placeholder="Nhập số điện thoại"
                   />
                 )}
+              />
+            </div>
+
+            {/* Tên nhân viên bán hàng */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">Tên nhân viên bán hàng</Label>
+              <Controller
+                control={control}
+                name="sellerCode"
+                render={({ field }) => (
+                  <SearchableCombobox
+                    options={staffs.map(staff => ({
+                      value: staff.code,
+                      label: [staff.code, staff.name].filter(Boolean).join(' - '),
+                    }))}
+                    value={field.value || ""}
+                    onChange={(value) => {
+                      const staff = staffs.find(e => e.code == value)
+                      if (staff) {
+                        setValue("sellerName", staff.name)
+                      }
+                    }}
+                    placeholder="Chọn nhân viên bán hàng"
+                    className="w-full"
+                    isLoading={staffsRequestState.status === 'loading' && staffsRequestState.type === 'searchUsers'}
+                    onSearch={handleSearchStaffs}
+                  />)}
               />
             </div>
 
@@ -371,4 +448,3 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
     </form>
   )
 }
-
