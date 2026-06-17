@@ -100,8 +100,8 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
         phone: data.phone,
         nppCode: data.supplierCode,
         nppName: data.supplierName,
-        salesEmployeeName: data.sellerName,
         salesEmployeeCode: data.sellerCode,
+        salesEmployeeName: data.sellerName,
         province: store?.province || "",
         area: store?.area || "",
         locationId: store?.locationId || "",
@@ -362,6 +362,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
                       const staff = staffs.find(e => e.code == value)
                       if (staff) {
                         setValue("sellerName", staff.name)
+                        setValue("sellerCode", staff.code)
                       }
                     }}
                     placeholder="Chọn nhân viên bán hàng"
