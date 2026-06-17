@@ -45,15 +45,11 @@ export function parseTasks(data: any): Task[] {
   return data.map((item: any) => parseTask(item));
 }
 
-export function getTaskStatus(task: Task): string {
+export function getTaskStatuses(task: Task): string[] {
   if (task.submission) {
     const statusSubmission = task.submission.status;
-    if (statusSubmission.toUpperCase() === "SUBMITTED") {
-      return task.status
-    } else {
-      return statusSubmission
-    }
+    return [task.status, statusSubmission]
   }
 
-  return task.status;
+  return [task.status]
 }

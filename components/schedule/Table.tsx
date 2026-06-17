@@ -14,7 +14,7 @@ import { TablePagination } from "../ui/table-pagination";
 import { Skeleton } from "../ui/skeleton";
 import { useDialog } from "@/hooks/use-dialog";
 import { deleteTask } from "@/features/schedule/schedule.slice";
-import { getTaskStatus } from "@/model/Task.model";
+import { getTaskStatuses } from "@/model/Task.model";
 
 export function Table() {
   const dispatch = useAppDispatch();
@@ -194,7 +194,7 @@ export function Table() {
                   <TableHead className="text-center w-10">STT</TableHead>
                   <TableHead className="text-left flex-1">Cửa hàng</TableHead>
                   <TableHead className="text-left w-48">Nhân viên</TableHead>
-                  <TableHead className="text-left w-32">Trạng thái</TableHead>
+                  <TableHead className="text-left w-64">Trạng thái</TableHead>
                   <TableHead className="text-left w-32">Thời gian</TableHead>
                   <TableHead className="text-center w-24"></TableHead>
                 </TableRow>
@@ -217,7 +217,7 @@ export function Table() {
                         <Skeleton className="h-4 w-48" />
                       </TableCell>
                       <TableCell className="text-left w-32">
-                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-4 w-64" />
                       </TableCell>
                       <TableCell className="text-left w-32">
                         <Skeleton className="h-4 w-32" />
@@ -235,6 +235,7 @@ export function Table() {
                   ) : (
                     displayTasks.map((task, index) => {
                       const actualIndex = startIndex + index + 1;
+                      console.log('getTaskStatuses(task) ', getTaskStatuses(task))
                       return (
                         <TableRow key={task._id}>
                           <TableCell className="text-center w-10">{actualIndex}</TableCell>
@@ -247,7 +248,9 @@ export function Table() {
                             </div>
                           </TableCell>
                           <TableCell className="text-left w-48">{task.assignee?.name || "-"}</TableCell>
-                          <TableCell className="text-left w-32"><StatusBadge status={getTaskStatus(task)} /></TableCell>
+                          <TableCell className="text-left w-64">
+                            <div className="flex flex-row gap-2 justify-start">{getTaskStatuses(task).map((status, index) => <StatusBadge key={index} status={status} />)}</div>
+                          </TableCell>
                           <TableCell className="text-left w-32">
                             {task.dueDate ? formatDate(new Date(task.completedAt ?? task.createdAt), 'dd/MM/yyyy') : "-"}
                           </TableCell>
