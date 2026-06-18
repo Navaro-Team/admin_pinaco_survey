@@ -15,6 +15,9 @@ export async function GET(
     if (params.get('status')) {
       urlParams.set('status', params.get('status') ?? '');
     }
+    if (params.get('createdAt')) {
+      urlParams.set('createdAt', params.get('createdAt') ?? '');
+    }
     if (params.get('limit')) {
       urlParams.set('limit', params.get('limit') ?? '20');
     }

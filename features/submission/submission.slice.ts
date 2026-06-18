@@ -15,6 +15,7 @@ interface SubmissionState {
   filter: {
     store: string;
     status: string;
+    createdAt: Date;
   };
   requestState: RequestState;
 }
@@ -30,6 +31,7 @@ const initialState: SubmissionState = {
   filter: {
     store: "",
     status: "",
+    createdAt: new Date()
   },
   requestState: { status: 'idle', type: '' },
 }
@@ -66,6 +68,9 @@ export const submissionSlice = createSlice({
     },
     changeStatus: (state, action) => {
       state.filter.status = action.payload;
+    },
+    changeCreatedAt: (state, action) => {
+      state.filter.createdAt = action.payload
     },
     clearFilter: (state) => {
       state.filter = initialState.filter;
@@ -142,6 +147,7 @@ export const {
   resetPagination,
   changeStore,
   changeStatus,
+  changeCreatedAt,
   clearFilter,
   clearSubmissionState
 } = submissionSlice.actions;
