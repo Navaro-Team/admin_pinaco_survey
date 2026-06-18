@@ -36,6 +36,10 @@ export function PendingReviewTable() {
   const startIndex = (pagination.page - 1) * pagination.limit;
   const displaySubmissions = filteredSubmissions.slice(startIndex, startIndex + pagination.limit);
 
+  const handleLoadMore = () => {
+    dispatch(changePage(pagination.page + 1));
+  };
+
   const handlePageChange = (newPage: number) => {
     dispatch(changePage(newPage));
   };
@@ -163,7 +167,7 @@ export function PendingReviewTable() {
             totalItems={filteredSubmissions.length}
             itemsPerPage={pagination.limit}
             hasMore={pagination.hasMore}
-            onLoadMore={() => undefined}
+            onLoadMore={handleLoadMore}
             onPageChange={handlePageChange}
             isLoading={isLoading}
           />
