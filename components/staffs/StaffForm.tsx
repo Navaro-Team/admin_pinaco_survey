@@ -50,7 +50,7 @@ export function StaffForm() {
       address: "",
       gender: null,
       password: "",
-      roles: [],
+      roles: ['sales'],
       status: "active",
     },
   });
@@ -129,7 +129,7 @@ export function StaffForm() {
       dateOfBirth: data.dateOfBirth ? data.dateOfBirth.toISOString() : undefined,
       address: data.address && data.address.trim() !== '' ? data.address.trim() : undefined,
       gender: data.gender || undefined,
-      roles: data.roles && data.roles.length > 0 ? data.roles : undefined,
+      roles: data.roles && data.roles.length > 0 ? data.roles : ['sales'],
       status: data.status || undefined,
     };
 
@@ -370,7 +370,7 @@ export function StaffForm() {
                 render={({ field }) => {
                   const selectedRole = Array.isArray(field.value) && field.value.length > 0
                     ? field.value[0]
-                    : "";
+                    : "sales";
                   return (
                     <Combobox
                       options={roles.map((role) => ({ value: role.name, label: role.description }))}

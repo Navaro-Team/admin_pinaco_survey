@@ -56,6 +56,7 @@ export function PendingReviewTable() {
                   <TableHead className="text-left w-32">Trạng thái</TableHead>
                   <TableHead className="text-left w-32">Check-in</TableHead>
                   <TableHead className="text-left w-32">Check-out</TableHead>
+                  <TableHead className="text-left w-32">Ngày thực hiện</TableHead>
                   <TableHead className="text-center w-24"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -72,6 +73,9 @@ export function PendingReviewTable() {
                       </TableCell>
                       <TableCell className="text-left flex-1">
                         <Skeleton className="h-4 w-full flex-1" />
+                      </TableCell>
+                      <TableCell className="text-left w-32">
+                        <Skeleton className="h-4 w-32" />
                       </TableCell>
                       <TableCell className="text-left w-32">
                         <Skeleton className="h-4 w-32" />
@@ -131,6 +135,11 @@ export function PendingReviewTable() {
                         <TableCell className="text-left w-32">
                           {submission.checkoutTime
                             ? formatLocalDate(submission.checkoutTime, 'HH:mm')
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-left w-32">
+                          {submission.createdAt
+                            ? formatLocalDate(submission.createdAt, 'dd/MM/yyyy')
                             : "-"}
                         </TableCell>
                         <TableCell className="text-center w-24">
