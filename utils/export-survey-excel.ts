@@ -3,6 +3,22 @@ import * as XLSX from "xlsx";
 const formatNumber = (n: number | string): string =>
   typeof n === "number" ? n.toLocaleString("vi-VN") : String(n ?? "");
 
+const formatHHmm = (val: any): string => {
+  if (!val) return "";
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", hour12: false });
+};
+
+const formatDDMMYYYY = (val: any): string => {
+  if (!val) return "";
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return "";
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${dd}-${mm}-${d.getFullYear()}`;
+};
+
 type QuestionCol = {
   code: string;
   header: string;
@@ -385,39 +401,45 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
 
   const headerRow1 = [
     "STT",
-    "Tên cửa hàng",
+    "Tên điểm bán",
     "Địa chỉ",
-    "SĐT cửa hàng",
+    "SĐT điểm bán",
     "Loại hình",
     "Quy mô doanh số",
     "Họ tên (assignee)",
     "Email (assignee)",
     "SĐT (assignee)",
     "Người thực hiện",
+    "Check-in",
+    "Check-out",
+    "Ngày khảo sát",
     ...questionCols.map((c) => c.question?.instruction || c.header),
   ];
 
   const headerRow2 = [
     "STT",
-    "Tên cửa hàng",
+    "Tên điểm bán",
     "Địa chỉ",
-    "SĐT cửa hàng",
+    "SĐT điểm bán",
     "Loại hình",
     "Quy mô doanh số",
     "Họ tên (assignee)",
     "Email (assignee)",
     "SĐT (assignee)",
     "Người thực hiện",
+    "Check-in",
+    "Check-out",
+    "Ngày khảo sát",
     ...questionCols.map((c) => c.header),
   ];
 
   const rows: (string | number)[][] = [headerRow1, headerRow2];
   const merges: XLSX.Range[] = [];
 
-  for (let c = 0; c <= 9; c++) {
+  for (let c = 0; c <= 12; c++) {
     merges.push({ s: { r: 0, c }, e: { r: 1, c } });
   }
-  let colIdx = 10;
+  let colIdx = 13;
   for (const col of questionCols) {
     if (!col.isDetail) {
       merges.push({ s: { r: 0, c: colIdx }, e: { r: 1, c: colIdx } });
@@ -476,6 +498,9 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
         i === 0 ? assignee?.email ?? "" : "",
         i === 0 ? assignee?.phone ?? "" : "",
         i === 0 ? performBy : "",
+        i === 0 ? formatHHmm(submission?.checkinTime) : "",
+        i === 0 ? formatHHmm(submission?.checkoutTime) : "",
+        i === 0 ? formatDDMMYYYY(submission?.createdAt) : "",
       ];
 
       const answerCells = questionCols.map((col, idx) => {
@@ -492,8 +517,8 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
 
     if (taskEndRow > taskStartRow) {
       const mergeColIndexes: number[] = [];
-      for (let c = 0; c <= 9; c++) mergeColIndexes.push(c);
-      let colIdx = 10;
+      for (let c = 0; c <= 12; c++) mergeColIndexes.push(c);
+      let colIdx = 13;
       for (const col of questionCols) {
         const shouldMerge =
           !col.isDetail || col.detailField === "totalAmount";
@@ -519,6 +544,9 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
     { wch: 28 },
     { wch: 12 },
     { wch: 22 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 14 },
     ...colWidths,
   ];
   if (merges.length) {
