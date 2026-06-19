@@ -76,7 +76,7 @@ export default function Page() {
 
   const csatMockData = [
     {
-      criteria: "CTKH dễ hiểu",
+      criteria: "CTKM dễ hiểu",
       mean: 4.6,
       median: 3,
       caution: "Theo dõi",
