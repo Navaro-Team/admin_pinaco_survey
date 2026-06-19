@@ -122,13 +122,16 @@ export const submissionSlice = createSlice({
       .addCase(getPendingSubmissions.rejected, (state, action) => {
         state.requestState = { status: 'failed', type: 'getPendingSubmissions', error: action.error.message };
       })
-      .addCase(reviewSubmission.fulfilled, (state) => {
+      .addCase(reviewSubmission.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+
         if (!state.submission) return;
         state.submission = {
           ...state.submission,
-          status: 'SUBMITTED',
+          status: responseData.status,
         } as Submission;
-        state.requestState = { status: 'completed', type: 'reviewSubmission' };
+        state.requestState = { status: 'completed', type: 'reviewSubmission', data: responseData.reviewAction };
       })
       .addCase(reviewSubmission.pending, (state) => {
         state.requestState = { status: 'loading', type: 'reviewSubmission' };
