@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { getSubmissionById, reviewSubmission } from "@/features/submission/submission.slice";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CircleCheckBig } from "lucide-react";
+import { ArrowLeft, CircleCheckBig, X } from "lucide-react";
 import { getTaskBySubmissionAndSurvey } from "@/features/task/task.slice";
 import { getSurveyById } from "@/features/survey/survey.slice";
 import { StoreInfo } from "@/components/schedule/common/StoreInfo";
@@ -57,6 +57,21 @@ export default function PendingReviewDetailPage() {
     });
   };
 
+  const handleReject = () => {
+    showInfo({
+      title: "Từ chối phê duyệt khảo sát",
+      description: "Bạn có muốn từ chối phê duyệt khảo sát này không?",
+      confirmText: "Đồng ý",
+      cancelText: "Hủy",
+      onConfirm: () => {
+        dispatch(reviewSubmission({ id: submission?._id || '', action: 'REJECTED' }));
+      },
+      onCancel: () => {
+        console.log("Hủy");
+      }
+    });
+  };
+
   const handleBack = () => {
     router.push("/pending-review");
   };
@@ -66,15 +81,22 @@ export default function PendingReviewDetailPage() {
     if (['reviewSubmission'].includes(requestState.type)) {
       switch (requestState.status) {
         case 'completed':
-          showSuccess({
-            title: "Phê duyệt khảo sát",
-            description: "Phê duyệt khảo sát thành công",
-          });
+          if (requestState.data === "APPROVED") {
+            showSuccess({
+              title: "Phê duyệt khảo sát",
+              description: "Phê duyệt khảo sát thành công",
+            });
+          } else {
+            showSuccess({
+              title: "Từ chối phê duyệt khảo sát",
+              description: "Từ chối phê duyệt khảo sát thành công",
+            });
+          }
           break;
         case 'failed':
           showFailed({
             title: "Phê duyệt khảo sát",
-            description: "Phê duyệt khảo sát thất bại",
+            description: "Cập nhật trạng thái khảo sát thất bại",
           });
           break;
         case 'loading':
@@ -103,6 +125,10 @@ export default function PendingReviewDetailPage() {
           <Button variant="default" hidden={submission?.status !== SubmissionStatus.PENDING_REVIEW} className="bg-main text-white hover:bg-main/90 hover:text-white" onClick={handleApprove}>
             <CircleCheckBig className="size-4" />
             Phê duyệt
+          </Button>
+          <Button variant="default" hidden={submission?.status !== SubmissionStatus.PENDING_REVIEW} className="bg-red-500 text-white hover:bg-red-500/90 hover:text-white" onClick={handleReject}>
+            <X />
+            Từ chối
           </Button>
         </div>
       </div>
