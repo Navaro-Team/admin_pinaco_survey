@@ -8,7 +8,7 @@ import { TableHeader, TableRow, TableHead, TableBody, TableCell, TableCaption, T
 import { TablePagination } from "../ui/table-pagination";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { changePage, deleteStore, getStores, resetPagination, searchStores } from "@/features/sales-points/sales-points.slice";
+import { changePage, deleteStore, resetPagination, searchStores } from "@/features/sales-points/sales-points.slice";
 import { Spinner } from "../ui/spinner";
 import { useDialog } from "@/hooks/use-dialog";
 
@@ -21,6 +21,7 @@ export function Table() {
   const pagination = useAppSelector((state) => state.salesPoints.pagination);
   const requestState = useAppSelector((state) => state.salesPoints.requestState);
   const isLoading = requestState.status === 'loading' && requestState.type === 'getStores' && requestState.data === true;
+  const totalPages = Math.ceil(pagination.total / pagination.limit) || 1;
 
   useEffect(() => {
     dispatch(resetPagination());
@@ -40,28 +41,16 @@ export function Table() {
 
   const handleLoadMore = () => {
     dispatch(changePage(pagination.page + 1));
-    dispatch(getStores({ page: pagination.page + 1, limit: pagination.limit }));
+    dispatch(searchStores({ page: pagination.page + 1, limit: pagination.limit }));
   };
 
   const itemsPerPage = 10;
 
   const handlePageChange = (page: number) => {
-    const neededItems = page * itemsPerPage;
-
-    if (stores.length < neededItems && pagination.hasMore) {
-      const itemsNeeded = neededItems - stores.length;
-      const batchesNeeded = Math.ceil(itemsNeeded / pagination.limit);
-
-      if (batchesNeeded > 0) {
-        dispatch(getStores({ page: 1, limit: pagination.limit }));
-      }
-    }
-
+    if (page < 1 || page > totalPages) return;
     dispatch(changePage(page));
+    dispatch(searchStores({ page: page, limit: pagination.limit }));
   };
-  const startIndex = (pagination.page - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const displayStores = stores.slice(startIndex, endIndex);
 
   useEffect(() => {
     if (!requestState.type) return;
@@ -73,7 +62,7 @@ export function Table() {
             description: "Điểm bán đã được xóa thành công.",
             onConfirm() {
               dispatch(resetPagination());
-              dispatch(getStores({ page: 1, limit: pagination.limit }));
+              dispatch(searchStores({ page: 1, limit: pagination.limit }));
             },
           });
           break;
@@ -83,7 +72,7 @@ export function Table() {
             description: requestState.error || "Có lỗi xảy ra. Vui lòng thử lại.",
             onConfirm() {
               dispatch(resetPagination());
-              dispatch(getStores({ page: 1, limit: pagination.limit }));
+              dispatch(searchStores({ page: 1, limit: pagination.limit }));
             },
           });
           break;
@@ -134,42 +123,46 @@ export function Table() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {displayStores.length === 0 ? (
+                {stores.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       Không có dữ liệu
                     </TableCell>
                   </TableRow>
                 ) : (
-                  displayStores.map((store, index) => (
-                    <TableRow key={store.id}>
-                      <TableCell className="text-center w-10">{startIndex + index + 1}</TableCell>
-                      <TableCell className="text-left w-40">{store.code || "-"}</TableCell>
-                      <TableCell className="text-left w-40">{store.name || "-"}</TableCell>
-                      <TableCell className="text-left w-full">{getAddress(store)}</TableCell>
-                      <TableCell className="text-left w-40">{store.province || "-"}</TableCell>
-                      <TableCell className="text-left w-40">{store.area || "-"}</TableCell>
-                      <TableCell className="text-left w-40">{store.phone || "-"}</TableCell>
-                      <TableCell className="text-center w-24">
-                        <div className="flex flex-row gap-2 justify-center">
-                          <Link href={`/sales-points/${store.id}`}>
-                            <Button variant="outline" size="icon">
-                              <Eye className="size-4 text-blue-500" />
+                  stores.map((store, index) => {
+                    const actualIndex = (pagination.page - 1) * pagination.limit + index + 1;
+
+                    return (
+                      <TableRow key={store.id}>
+                        <TableCell className="text-center w-10">{actualIndex}</TableCell>
+                        <TableCell className="text-left w-40">{store.code || "-"}</TableCell>
+                        <TableCell className="text-left w-40">{store.name || "-"}</TableCell>
+                        <TableCell className="text-left w-full">{getAddress(store)}</TableCell>
+                        <TableCell className="text-left w-40">{store.province || "-"}</TableCell>
+                        <TableCell className="text-left w-40">{store.area || "-"}</TableCell>
+                        <TableCell className="text-left w-40">{store.phone || "-"}</TableCell>
+                        <TableCell className="text-center w-24">
+                          <div className="flex flex-row gap-2 justify-center">
+                            <Link href={`/sales-points/${store.id}`}>
+                              <Button variant="outline" size="icon">
+                                <Eye className="size-4 text-blue-500" />
+                              </Button>
+                            </Link>
+                            <Button variant="outline" size="icon" onClick={() => handleDeleteStore(store.id)}>
+                              <Trash2 className="size-4 text-red-500" />
                             </Button>
-                          </Link>
-                          <Button variant="outline" size="icon" onClick={() => handleDeleteStore(store.id)}>
-                            <Trash2 className="size-4 text-red-500" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
                 )}
               </TableBody>
             </TableComponent>
             <TablePagination
               currentPage={pagination.page}
-              totalItems={stores.length}
+              totalItems={pagination.total}
               itemsPerPage={itemsPerPage}
               hasMore={pagination.hasMore}
               onLoadMore={handleLoadMore}

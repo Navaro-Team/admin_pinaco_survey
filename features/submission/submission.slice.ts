@@ -11,6 +11,7 @@ interface SubmissionState {
     page: number;
     limit: number;
     hasMore: boolean;
+    total: number;
   };
   filter: {
     store: string;
@@ -25,8 +26,9 @@ const initialState: SubmissionState = {
   submissions: [],
   pagination: {
     page: 1,
-    limit: 20,
+    limit: 10,
     hasMore: true,
+    total: 0,
   },
   filter: {
     store: "",
@@ -59,8 +61,9 @@ export const submissionSlice = createSlice({
     resetPagination: (state) => {
       state.pagination = {
         page: 1,
-        limit: 20,
+        limit: 10,
         hasMore: true,
+        total: 0
       };
     },
     changeStore: (state, action) => {
@@ -100,20 +103,11 @@ export const submissionSlice = createSlice({
       .addCase(getPendingSubmissions.fulfilled, (state, action) => {
         const payload = action.payload as any;
         const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
-        const submissionsArray = Array.isArray(responseData)
-          ? responseData
-          : (responseData?.submissions || []);
+        const submissionsArray = Array.isArray(responseData) ? responseData : (responseData?.submissions || []);
         const newSubmissions = parseSubmissions(submissionsArray);
-
-        if (state.pagination.page === 1) {
-          state.submissions = newSubmissions;
-          state.pagination.hasMore = newSubmissions.length >= state.pagination.limit;
-        } else {
-          const existingIds = new Set(state.submissions.map(s => s._id));
-          const uniqueNewSubmissions = newSubmissions.filter(s => !existingIds.has(s._id));
-          state.submissions = [...state.submissions, ...uniqueNewSubmissions];
-          state.pagination.hasMore = uniqueNewSubmissions.length >= state.pagination.limit;
-        }
+        state.submissions = newSubmissions;
+        state.pagination.total = responseData?.total ?? 0;
+        state.pagination.hasMore = state.pagination.page < Math.ceil(state.pagination.total / state.pagination.limit);
         state.requestState = { status: 'completed', type: 'getPendingSubmissions', data: state.pagination.page === 1 };
       })
       .addCase(getPendingSubmissions.pending, (state) => {

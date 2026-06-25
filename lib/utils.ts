@@ -2,30 +2,33 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { ReasonCodeKey } from "./types"
 import { reasonCode } from "./consts"
-const sendtryAppId = process.env.SENDTRY_APP_ID;
-const sendtryUrl = process.env.SENDTRY_URL;
+
+const sendtryAppId = process.env.NEXT_PUBLIC_SENDTRY_APP_ID;
+const sendtryUrl = process.env.NEXT_PUBLIC_SENDTRY_URL;
+
 export const reportError = (payload: any) => {
-	if (sendtryUrl) {
-		fetch(sendtryUrl, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				project: sendtryAppId,
-				error: {
-					...payload,
-					timestamp: new Date().toISOString(),
-					userAgent: navigator.userAgent,
-					url: window.location.href,
-				},
-			}),
-		});
-	}
+  if (sendtryUrl) {
+    fetch(sendtryUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project: sendtryAppId,
+        error: {
+          ...payload,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          url: window.location.href,
+        },
+      }),
+    });
+  }
 };
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 export const deepCloneObject = (obj: any) => {
-    return JSON.parse(JSON.stringify(obj))
+  return JSON.parse(JSON.stringify(obj))
 }
 export function getErrorMessage(code: ReasonCodeKey): string {
   return reasonCode[code];
@@ -63,10 +66,10 @@ export function isAppleBrowser(): boolean {
  */
 export function formatUTCDate(utcDateString: string, formatPattern: string): string {
   const date = new Date(utcDateString);
-  
+
   // Helper to pad numbers
   const pad = (n: number, length: number = 2) => String(n).padStart(length, '0');
-  
+
   // Get UTC values
   const year = date.getUTCFullYear();
   const month = date.getUTCMonth() + 1;
@@ -74,7 +77,7 @@ export function formatUTCDate(utcDateString: string, formatPattern: string): str
   const hours = date.getUTCHours();
   const minutes = date.getUTCMinutes();
   const seconds = date.getUTCSeconds();
-  
+
   // Replace format tokens (supports common date-fns patterns)
   // Order matters: longer patterns first to avoid partial matches
   return formatPattern

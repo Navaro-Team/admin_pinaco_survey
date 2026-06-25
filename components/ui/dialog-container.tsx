@@ -3,6 +3,8 @@
 import React from 'react';
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -11,10 +13,19 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useDialogContext } from '@/context/DialogContext';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import type { DialogType } from '@/context/DialogContext';
+
+const TYPE_TITLE: Record<DialogType, string> = {
+  success: 'Thành công',
+  failed: 'Thất bại',
+  warning: 'Cảnh báo',
+  info: 'Thông tin',
+  loading: 'Đang xử lý',
+  custom: '',
+};
 
 export const DialogContainer: React.FC = () => {
-  const { state, close, visuals } = useDialogContext();
+  const { state, close, visuals, } = useDialogContext();
 
   if (!state.isOpen) return null;
 
@@ -31,64 +42,73 @@ export const DialogContainer: React.FC = () => {
     close();
   };
 
-  const showButtons = state.type !== 'loading';
-  const showBothButtons = ['success', 'info'].includes(state.type);
-  const showCloseOnly = ['warning', 'failed'].includes(state.type);
+  const isCustom = state.type === 'custom';
+  const isLoading = state.type === 'loading';
+  const showDefaultFooter = !isLoading || state.actions;
 
   return (
     <AlertDialog open={state.isOpen} onOpenChange={close}>
-      <AlertDialogContent className="sm:max-w-md">
-        <AlertDialogHeader>
-          <div className="flex flex-col items-center gap-2">
-            {state.type === 'loading' ? (
-              <Icon className={cn('h-12 w-12', visual.iconColor)} />
+      <AlertDialogContent>
+        {/* Header: only for non-custom types */}
+        {!isCustom && (
+          <AlertDialogHeader>
+            {isLoading ? (
+              <div className="flex justify-center py-1">
+                <Icon className={cn('h-10 w-10 shrink-0', visual.iconColor)} aria-hidden />
+              </div>
             ) : (
-              <Icon className={cn('h-12 w-12', visual.iconColor)} />
+              <div className="flex items-center gap-3">
+                <Icon className={cn('h-6 w-6 shrink-0', visual.iconColor)} />
+                <span
+                  className={cn('text-base font-semibold', visual.iconColor)}
+                  aria-hidden
+                >
+                  {TYPE_TITLE[state.type]}
+                </span>
+              </div>
             )}
-            {state.title && (
-              <AlertDialogTitle className="text-center text-lg font-semibold">{state.title}</AlertDialogTitle>
-            )}
+          </AlertDialogHeader>
+        )}
+
+        {/* Body: Radix requires AlertDialogTitle; sr-only when no visible title */}
+        <div className="space-y-2">
+          {state.title && !isLoading ? (
+            <AlertDialogTitle className="text-center">{state.title}</AlertDialogTitle>
+          ) : (
+            <AlertDialogTitle className="sr-only">
+              {isLoading
+                ? TYPE_TITLE.loading
+                : isCustom
+                  ? 'Thông báo'
+                  : TYPE_TITLE[state.type]}
+            </AlertDialogTitle>
+          )}
+          {state.description && (
+            <AlertDialogDescription className="text-center">
+              {state.description}
+            </AlertDialogDescription>
+          )}
+          {state.content && <>
+            <AlertDialogDescription></AlertDialogDescription>
+            <div aria-describedby="content">{state.content}</div>
+          </>}
+        </div>
+
+        {/* Actions: if custom actions provided, render them instead of default footer */}
+        {state.actions ? (
+          <div className="mt-4 flex items-center justify-center gap-2">
+            {state.actions}
           </div>
-        </AlertDialogHeader>
-
-        {state.description && (
-          <AlertDialogDescription className="text-center text-sm text-gray-700">
-            {state.description}
-          </AlertDialogDescription>
-        )}
-
-        {/* Actions */}
-        {showButtons && (
-          <AlertDialogFooter className="sm:justify-end gap-2">
-            {showCloseOnly && (
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                className="w-full sm:w-auto"
-              >
-                {state.cancelText || 'Đóng'}
-              </Button>
-            )}
-            {showBothButtons && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="w-full sm:w-auto"
-                >
-                  {state.cancelText || 'Đóng'}
-                </Button>
-                <Button
-                  variant="default"
-                  onClick={handleConfirm}
-                  className="w-full sm:w-auto bg-main text-white hover:bg-main/90"
-                >
-                  {state.confirmText || 'Xác nhận'}
-                </Button>
-              </>
-            )}
+        ) : showDefaultFooter ? (
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancel}>
+              {state.cancelText}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm} className='bg-main hover:bg-main/90'>
+              {state.confirmText}
+            </AlertDialogAction>
           </AlertDialogFooter>
-        )}
+        ) : null}
       </AlertDialogContent>
     </AlertDialog>
   );

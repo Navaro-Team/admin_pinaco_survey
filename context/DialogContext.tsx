@@ -1,14 +1,20 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useMemo, useState, ReactNode } from 'react';
-import { CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
-import { Spinner } from '@/components/ui/spinner';
+import { CheckCircle, XCircle, AlertTriangle, Info, Loader2 } from 'lucide-react';
 
-export type DialogType = 'success' | 'failed' | 'warning' | 'info' | 'loading';
+export type DialogType =
+  | 'success'
+  | 'failed'
+  | 'warning'
+  | 'info'
+  | 'loading'
+  | 'custom';
 
 export interface DialogConfig {
   title: string;
   description?: string;
+  content?: ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm?: () => void;
@@ -74,10 +80,16 @@ const visuals: Record<DialogType, DialogVisualConfig> = {
     borderColor: 'border-blue-200',
   },
   loading: {
-    icon: Spinner,
-    iconColor: 'text-gray-600',
-    bgColor: 'bg-gray-50',
-    borderColor: 'border-gray-200',
+    icon: Loader2,
+    iconColor: 'text-primary animate-spin',
+    bgColor: 'bg-muted/40',
+    borderColor: 'border-border',
+  },
+  custom: {
+    icon: Info,
+    iconColor: 'text-muted-foreground',
+    bgColor: '',
+    borderColor: '',
   },
 };
 
@@ -97,8 +109,9 @@ export const DialogProvider = ({ children }: { children: ReactNode }) => {
       type,
       title: config.title,
       description: config.description,
-      confirmText: config.confirmText || 'Xác nhận',
-      cancelText: config.cancelText || 'Đóng',
+      content: config.content,
+      confirmText: config.confirmText || 'OK',
+      cancelText: config.cancelText || 'Cancel',
       onConfirm: config.onConfirm,
       onCancel: config.onCancel,
       actions: config.actions,
