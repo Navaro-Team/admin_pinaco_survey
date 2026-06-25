@@ -207,7 +207,7 @@ export function MixedAnswer({ question, answerValue }: MixedAnswerProps) {
                     <TableCell key={brandCode} className="text-right font-medium">
                       {item.prices && item.prices[brandCode]
                         ? `${formatCurrency(item.prices[brandCode])} VND`
-                        : "-"}
+                        : 0}
                     </TableCell>
                   ))}
                 </TableRow>

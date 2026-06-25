@@ -6,7 +6,6 @@ import {
   Users,
   FileText,
   Calendar,
-  List,
   Backpack
 } from "lucide-react"
 
@@ -49,11 +48,11 @@ const data = {
       url: "/pending-review",
       icon: FileText,
     },
-    {
-      title: "Danh sách câu hỏi",
-      url: "/questions",
-      icon: List,
-    },
+    // {
+    //   title: "Danh sách câu hỏi",
+    //   url: "/questions",
+    //   icon: List,
+    // },
     {
       title: "Danh sách nhân sự",
       url: "/staffs",

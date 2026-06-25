@@ -11,6 +11,7 @@ interface ScheduleState {
     page: number;
     limit: number;
     hasMore: boolean;
+    total: number;
   };
   filter: {
     q: string;
@@ -30,6 +31,7 @@ const initialState: ScheduleState = {
     page: 1,
     limit: 10,
     hasMore: true,
+    total: 0,
   },
   filter: {
     q: "",
@@ -64,6 +66,7 @@ export const scheduleSlice = createSlice({
         page: 1,
         limit: 10,
         hasMore: true,
+        total: 0,
       };
     },
     changeAssigneeId: (state, action) => {
@@ -113,15 +116,14 @@ export const scheduleSlice = createSlice({
         const responseData = payload?.data?.data?.tasks || payload?.data?.data || payload?.data;
         const tasksArray = Array.isArray(responseData) ? responseData : (responseData?.tasks || []);
         const newTasks = parseTasks(tasksArray);
-
         if (state.pagination.page === 1) {
           state.tasks = newTasks;
           state.pagination.hasMore = newTasks.length >= 10;
+          state.pagination.total = payload?.data?.data?.total ?? 0;
         } else {
           const existingIds = new Set(state.tasks.map(t => t._id));
           const uniqueNewTasks = newTasks.filter(t => !existingIds.has(t._id));
           state.tasks = [...state.tasks, ...uniqueNewTasks];
-
           state.pagination.hasMore = uniqueNewTasks.length >= 10;
         }
 

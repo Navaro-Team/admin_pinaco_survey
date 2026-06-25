@@ -11,6 +11,7 @@ interface SalesPointsState {
     page: number;
     limit: number;
     hasMore: boolean;
+    total: number;
   };
   filter: {
     search: string;
@@ -25,8 +26,9 @@ const initialState: SalesPointsState = {
   store: null,
   pagination: {
     page: 1,
-    limit: 20,
+    limit: 10,
     hasMore: true,
+    total: 0,
   },
   filter: {
     search: "",
@@ -70,6 +72,7 @@ export const salesPointsSlice = createSlice({
         page: 1,
         limit: 10,
         hasMore: true,
+        total: 0,
       };
     },
     clearSalesPointsState: (state) => {
@@ -87,17 +90,18 @@ export const salesPointsSlice = createSlice({
       .addCase(getStores.fulfilled, (state, action) => {
         const payload = action.payload as any;
         const responseData = payload?.data?.data?.data?.data || payload?.data?.data || payload?.data;
+        const pagination = payload?.data?.data?.data?.pagination;
         const storesArray = Array.isArray(responseData) ? responseData : [];
         const newStores = parseStores(storesArray);
+        if (pagination) {
+          state.pagination.total = pagination?.total ?? 0;
+        }
 
         if (state.pagination.page === 1) {
           state.stores = newStores;
           state.pagination.hasMore = newStores.length >= state.pagination.limit;
         } else {
           state.stores = [...state.stores, ...newStores];
-          // const existingIds = new Set(state.stores.map(s => s.id));
-          // const uniqueNewStores = newStores.filter(s => !existingIds.has(s.id));
-          // state.stores = [...state.stores, ...uniqueNewStores];
           state.pagination.hasMore = newStores.length >= state.pagination.limit;
         }
 
@@ -191,6 +195,7 @@ export const salesPointsSlice = createSlice({
       .addCase(searchStores.fulfilled, (state, action) => {
         const payload = action.payload as any;
         const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        state.pagination = { page: responseData.pagination.page, limit: responseData.pagination.limit, hasMore: responseData.pagination.hasNext, total: responseData.pagination.total }
         state.stores = parseStores(responseData.data);
         state.requestState = { status: 'completed', type: 'searchStores' };
       })
@@ -217,4 +222,3 @@ export const salesPointsSlice = createSlice({
 export const { changeSearch, changeProvince, changeArea, clearSalesPointsState, clearFilter, changePage, changeLimit, resetPagination } = salesPointsSlice.actions;
 
 export default salesPointsSlice.reducer;
-

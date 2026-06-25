@@ -17,13 +17,15 @@ export function Header() {
   const dispatch = useAppDispatch();
   const { showSuccess, showFailed, showLoading } = useDialog();
   const taskState = useAppSelector((state) => state.task.requestState);
+  const pagination = useAppSelector((state) => state.schedule.pagination);
+
   const [openScheduleSheet, setOpenScheduleSheet] = useState<boolean>(false);
   const [openAssignSheet, setOpenAssignSheet] = useState<boolean>(false);
 
   const handleRefresh = () => {
     dispatch(clearFilter());
     dispatch(resetPagination());
-    dispatch(getTasks({ page: 1, limit: 20 }));
+    dispatch(getTasks({ page: 1, limit: pagination.limit }));
   }
 
   const clearState = () => {
@@ -33,7 +35,7 @@ export function Header() {
     dispatch(clearStaffsState());
     dispatch(clearStoreState());
     dispatch(clearTaskState());
-    dispatch(getTasks({ page: 1, limit: 20 }));
+    dispatch(getTasks({ page: 1, limit: pagination.limit }));
   }
 
   useEffect(() => {
@@ -46,13 +48,13 @@ export function Header() {
             description: 'Lịch trình khảo sát đã được tạo thành công',
             onCancel: () => {
               clearState();
-              dispatch(getTasks({ page: 1, limit: 20 }));
+              dispatch(getTasks({ page: 1, limit: pagination.limit }));
               setOpenScheduleSheet(false);
               setOpenAssignSheet(false);
             },
             onConfirm: () => {
               clearState();
-              dispatch(getTasks({ page: 1, limit: 20 }));
+              dispatch(getTasks({ page: 1, limit: pagination.limit }));
               setOpenScheduleSheet(false);
               setOpenAssignSheet(false);
             }
