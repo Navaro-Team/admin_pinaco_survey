@@ -12,6 +12,7 @@ export enum Status {
   SUBMITTED = "SUBMITTED",
   PENDING_REVIEW = "PENDING_REVIEW",
   FAILED = "FAILED",
+  CANCELLED = "CANCELLED",
   REJECTED_REVIEW = "REJECTED_REVIEW"
 }
 
@@ -29,6 +30,7 @@ const statusConfig: Record<Status, { label: string; variant: "default" | "second
   [Status.OVERDUE]: { label: "Quá hạn khảo sát", variant: "destructive", color: "bg-red-500 text-white" },
   [Status.RESURVEY_REQUIRED]: { label: "Yêu cầu hỗ trợ", variant: "outline", color: "bg-blue-500 text-white" },
   [Status.FAILED]: { label: "Không đạt", variant: "destructive", color: "bg-red-500 text-white" },
+  [Status.CANCELLED]: { label: "Đã huỷ", variant: "destructive", color: "bg-red-500 text-white" },
   [Status.REJECTED_REVIEW]: { label: "Phê duyệt bị từ chối", variant: "destructive", color: "bg-red-500 text-white" },
 };
 

@@ -59,6 +59,12 @@ class TaskService {
     const response = await clientService.get('/tasks/export', params);
     return parseCommonHttpResult(response);
   }
+
+
+  async cancelTask(payload: { id: string, reason: string }) {
+    const response = await clientService.patch(`/tasks/${payload.id}/cancel`, { reason: payload.reason });
+    return parseCommonHttpResult(response);
+  }
 }
 
 export const taskService = new TaskService();

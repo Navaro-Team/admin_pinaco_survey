@@ -20,6 +20,7 @@ export function PendingReviewTable() {
   const pagination = useAppSelector((state) => state.submission.pagination);
   const filter = useAppSelector((state) => state.submission.filter);
   const requestState = useAppSelector((state) => state.submission.requestState);
+  const totalPages = Math.ceil(pagination.total / pagination.limit) || 1;
 
   const isLoading =
     requestState.status === "loading" && requestState.type === "getPendingSubmissions";
@@ -33,9 +34,6 @@ export function PendingReviewTable() {
     );
   }, [submissions, filter.store]);
 
-  const startIndex = (pagination.page - 1) * pagination.limit;
-  const displaySubmissions = filteredSubmissions.slice(startIndex, startIndex + pagination.limit);
-
   const handleLoadMore = () => {
     dispatch(changePage(pagination.page + 1));
   };
@@ -43,7 +41,7 @@ export function PendingReviewTable() {
   const handlePageChange = (newPage: number) => {
     dispatch(changePage(newPage));
   };
-
+  
   return (
     <Card className="flex flex-col flex-1 min-h-0 pb-0!">
       <CardHeader>
@@ -95,18 +93,18 @@ export function PendingReviewTable() {
                       </TableCell>
                     </TableRow>
                   ))
-                ) : displaySubmissions.length === 0 ? (
+                ) : filteredSubmissions.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={6}
                       className="text-center py-8 text-muted-foreground"
                     >
-                      Không có submission nào phù hợp
+                      Không có câu trả lời nào phù hợp
                     </TableCell>
                   </TableRow>
                 ) : (
-                  displaySubmissions.map((submission, index) => {
-                    const actualIndex = startIndex + index + 1;
+                  filteredSubmissions.map((submission, index) => {
+                    const actualIndex = (pagination.page - 1) * pagination.limit + index + 1;
 
                     return (
                       <TableRow key={submission._id}>
@@ -164,7 +162,7 @@ export function PendingReviewTable() {
           </div>
           <TablePagination
             currentPage={pagination.page}
-            totalItems={filteredSubmissions.length}
+            totalItems={pagination.total}
             itemsPerPage={pagination.limit}
             hasMore={pagination.hasMore}
             onLoadMore={handleLoadMore}

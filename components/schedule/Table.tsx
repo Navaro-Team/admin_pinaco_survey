@@ -24,6 +24,7 @@ export function Table() {
   const pagination = useAppSelector((state) => state.schedule.pagination);
   const requestState = useAppSelector((state) => state.schedule.requestState);
   const isLoading = requestState.status === 'loading' && requestState.type === 'getTasks' && requestState.data !== true;
+  const totalPages = Math.ceil(pagination.total / pagination.limit) || 1;
 
   const isInitialMount = useRef(true);
   const prevTasksLengthRef = useRef(tasks.length);
@@ -113,21 +114,16 @@ export function Table() {
 
   const itemsPerPage = 10;
 
-  const handleLoadMore = () => {
-    const nextPage = pagination.page + 1;
-    dispatch(changePage(nextPage));
-    fetchTasks(nextPage);
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    dispatch(changePage(page));
+    dispatch(getTasks(getTasksParams(page)));
   };
 
-  const handlePageChange = (page: number) => {
-    const neededItems = page * itemsPerPage;
-
-    if (tasks.length < neededItems && pagination.hasMore) {
-      const nextPageToLoad = Math.floor(tasks.length / 20) + 1;
-      fetchTasks(nextPageToLoad);
+  const handleLoadMore = () => {
+    if (pagination.page < totalPages) {
+      handlePageChange(pagination.page + 1);
     }
-
-    dispatch(changePage(page));
   };
 
   const handleDeleteTask = (id: string) => {
@@ -139,10 +135,6 @@ export function Table() {
       },
     });
   }
-
-  const startIndex = (pagination.page - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const displayTasks = filteredTasks.slice(startIndex, endIndex);
 
   useEffect(() => {
     if (!requestState.type) return;
@@ -226,24 +218,25 @@ export function Table() {
                         <Skeleton className="h-4 w-24" />
                       </TableCell>
                     </TableRow>
-                  ))) : (displayTasks.length === 0 ? (
+                  ))) : (filteredTasks.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                         Không có dữ liệu hiển thị
                       </TableCell>
                     </TableRow>
                   ) : (
-                    displayTasks.map((task, index) => {
-                      const actualIndex = startIndex + index + 1;
-                      console.log('getTaskStatuses(task) ', getTaskStatuses(task))
+                    filteredTasks.map((task, index) => {
+                      const actualIndex = (pagination.page - 1) * pagination.limit + index + 1;
                       return (
                         <TableRow key={task._id}>
                           <TableCell className="text-center w-10">{actualIndex}</TableCell>
-                          <TableCell className="text-left flex-1">
+                          <TableCell className="text-left flex-1 min-w-0 max-w-100">
                             <div className="flex flex-col gap-1">
                               <span>{task.store?.name || "-"}</span>
                               {task.store?.location?.address && (
-                                <span className="text-xs text-muted-foreground">{task.store.location.address}</span>
+                                <span className="text-xs text-muted-foreground truncate line-clamp-2">
+                                  {task.store.location.address}
+                                </span>
                               )}
                             </div>
                           </TableCell>
@@ -275,7 +268,7 @@ export function Table() {
           </div>
           <TablePagination
             currentPage={pagination.page}
-            totalItems={filteredTasks.length}
+            totalItems={pagination.total}
             itemsPerPage={itemsPerPage}
             hasMore={pagination.hasMore}
             onLoadMore={handleLoadMore}

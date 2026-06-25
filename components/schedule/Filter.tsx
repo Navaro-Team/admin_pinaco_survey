@@ -92,7 +92,6 @@ export function Filter() {
             <InputCalendar
               placeholder="Chọn hạn khảo sát"
               inputFormat="dd/MM/yyyy"
-
               value={deadline}
               onChange={(value) => dispatch(changeDeadline(value))}
             />
@@ -105,7 +104,8 @@ export function Filter() {
                 { value: Status.COMPLETED, label: "Đã hoàn thành" },
                 { value: Status.IN_PROGRESS, label: "Sắp diễn ra" },
                 { value: Status.OVERDUE, label: "Quá hạn khảo sát" },
-                { value: Status.RESURVEY_REQUIRED, label: "Yêu cầu hỗ trợ" }
+                { value: Status.RESURVEY_REQUIRED, label: "Yêu cầu hỗ trợ" },
+                { value: Status.CANCELLED, label: "Đã huỷ" }
               ]}
               value={status}
               placeholder="Chọn trạng thái"
