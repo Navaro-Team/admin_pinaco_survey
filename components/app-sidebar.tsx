@@ -6,7 +6,6 @@ import {
   Users,
   FileText,
   Calendar,
-  List,
   Backpack
 } from "lucide-react"
 

@@ -20,7 +20,6 @@ export function PendingReviewTable() {
   const pagination = useAppSelector((state) => state.submission.pagination);
   const filter = useAppSelector((state) => state.submission.filter);
   const requestState = useAppSelector((state) => state.submission.requestState);
-  const totalPages = Math.ceil(pagination.total / pagination.limit) || 1;
 
   const isLoading =
     requestState.status === "loading" && requestState.type === "getPendingSubmissions";

@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import {
   getPendingSubmissions,
-  resetPagination
 } from "@/features/submission/submission.slice";
 import { PendingReviewHeader } from "@/components/pending-review/Header";
 import { PendingReviewFilter } from "@/components/pending-review/Filter";
