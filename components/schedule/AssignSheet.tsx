@@ -11,7 +11,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import { clearTaskState, createTask } from "@/features/task/task.slice";
+import { addStores, clearTaskState, createTasks, removeStores } from "@/features/task/task.slice";
 import { changeCampaign } from "@/features/campaigns/campaigns.slice";
 import { Label } from "../ui/label";
 import { Combobox } from "../ui/combobox";
@@ -23,7 +23,9 @@ import { useDialog } from "@/hooks/use-dialog";
 import { changeStaff, searchUsers } from "@/features/staffs/staffs.slice";
 import { User } from "@/model/User.model";
 import { Store } from "@/model/Store.model";
-import { changeStore, searchStores } from "@/features/store/store.slice";
+import { clearStore, searchStores } from "@/features/store/store.slice";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Trash2 } from "lucide-react";
 
 interface AssignSheetProps {
   open: boolean;
@@ -44,8 +46,8 @@ export function AssignSheet({
   const staffs = useAppSelector((state) => state.staffs.staffs);
   const staff = useAppSelector((state) => state.staffs.staff);
   const staffsRequestState = useAppSelector((state) => state.staffs.requestState);
-  const stores = useAppSelector((state) => state.store.stores);
-  const store = useAppSelector((state) => state.store.store);
+  const remoteStores = useAppSelector((state) => state.store.stores);
+  const localStores = useAppSelector((state) => state.task.stores);
   const storesRequestState = useAppSelector((state) => state.store.requestState);
 
   const handleChangeCampaign = (value: string) => {
@@ -70,17 +72,17 @@ export function AssignSheet({
     const selectedStaff = staffs.find((staff: User) => staff?.id === value);
     if (selectedStaff) {
       dispatch(changeStaff(selectedStaff));
+      dispatch(searchStores({ page: 1, limit: 50, salesEmployeeCode: selectedStaff.code }))
     } else {
       dispatch(changeStaff(null));
+      dispatch(clearStore(""))
     }
   };
 
   const handleChangeStore = (value: string) => {
-    const selectedStore = stores.find((store: Store) => store?.id === value);
+    const selectedStore = remoteStores.find((store: Store) => store?.id === value);
     if (selectedStore) {
-      dispatch(changeStore(selectedStore));
-    } else {
-      dispatch(changeStore(null));
+      dispatch(addStores(selectedStore));
     }
   };
 
@@ -100,9 +102,14 @@ export function AssignSheet({
   };
 
   const handleSearchStores = (searchValue: string) => {
+    if (!staff?.code) {
+      showWarning({ title: 'Cảnh báo', description: 'Vui lòng chọn nhân viên' });
+      return;
+    }
     const trimmedSearch = searchValue.trim();
     const params: any = {
       page: 1,
+      salesEmployeeCode: staff?.code
     };
 
     if (trimmedSearch) {
@@ -130,7 +137,7 @@ export function AssignSheet({
       return;
     }
 
-    if (!store?.id) {
+    if (localStores?.length === 0) {
       showWarning({ title: 'Cảnh báo', description: 'Vui lòng chọn cửa hàng' });
       return;
     }
@@ -141,7 +148,7 @@ export function AssignSheet({
       cancelText: 'Hủy',
       onCancel: () => onOpenChange(false),
       onConfirm: () => {
-        dispatch(createTask({
+        dispatch(createTasks({
           surveyId: survey?._id || '',
           assignee: {
             id: staff?.id || '',
@@ -149,13 +156,24 @@ export function AssignSheet({
             email: staff?.email || '',
             phone: staff?.phone || '',
           },
-          storeId: store?.id || '',
+          storeIds: localStores.map(store => store.id),
           campaignId: campaign?._id || '',
           dueDate: campaign?.endDate || new Date().toISOString()
         }));
       }
     });
   }
+
+  const getAddress = (store: any) => {
+    if (store.location?.address) {
+      return store?.location.address;
+    }
+    if (store.province) {
+      return store.province;
+    }
+    return "-";
+  };
+
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -221,15 +239,13 @@ export function AssignSheet({
 
           {/* Combobox Cửa hàng */}
           <div className="flex flex-row gap-2 justify-between">
-            <Label htmlFor="storeId" className="text-sm w-1/4">
-              Cửa hàng <span className="text-red-500">*</span>
-            </Label>
+            <Label htmlFor="storeId" className="text-sm w-1/4">Cửa hàng</Label>
             <SearchableCombobox
-              options={stores.map(store => ({
+              options={remoteStores.map(store => ({
                 value: store.id,
                 label: [store.code, store.name].filter(Boolean).join(' - '),
               }))}
-              value={store?.id || ""}
+              value={""}
               onChange={handleChangeStore}
               placeholder="Chọn cửa hàng"
               className="w-3/4"
@@ -237,6 +253,51 @@ export function AssignSheet({
               onSearch={handleSearchStores}
             />
           </div>
+
+          {/* Danh sách cửa hàng */}
+          <Label htmlFor="storeId" className="text-sm">Danh sách cửa hàng <span className="text-red-500">*</span></Label>
+          <Table className="w-full flex-1">
+            <TableCaption hidden>Danh sách cửa hàng.</TableCaption>
+            <TableHeader>
+              <TableRow className="w-xl">
+                <TableHead className="text-center w-10">STT</TableHead>
+                <TableHead className="text-left w-32">Mã điểm bán</TableHead>
+                <TableHead className="text-left flex-1">Tên cửa hàng</TableHead>
+                <TableHead className="text-center w-12"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {localStores.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    Không có dữ liệu
+                  </TableCell>
+                </TableRow>
+              ) : (
+                localStores.map((store, index) => {
+                  return (
+                    <TableRow key={store.id} className="w-xl">
+                      <TableCell className="text-center w-10">{index + 1}</TableCell>
+                      <TableCell className="text-left w-32">{store.code || "-"}</TableCell>
+                      <TableCell className="text-left flex-1 min-w-0">
+                        <div className="flex flex-col min-w-0 max-w-100">
+                          <span>{store.name || "-"}</span>
+                          <span className="truncate">
+                            {getAddress(store)}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center w-12">
+                        <Button variant="outline" size="icon" onClick={() => { dispatch(removeStores(store)) }}>
+                          <Trash2 className="size-4 text-red-500" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
         </div>
         <Separator />
 

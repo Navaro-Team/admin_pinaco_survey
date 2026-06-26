@@ -36,6 +36,9 @@ export const storeSlice = createSlice({
     changeStore: (state, action) => {
       state.store = action.payload;
     },
+    clearStore: (state, action) => {
+      state.stores = [];
+    },
     clearStoreState: (state) => {
       state.store = null;
       state.requestState = { status: 'idle', type: '' };
@@ -84,5 +87,5 @@ export const storeSlice = createSlice({
   },
 });
 
-export const { changeAction, changeStore, clearStoreState } = storeSlice.actions;
+export const { changeAction, changeStore, clearStore, clearStoreState } = storeSlice.actions;
 export default storeSlice.reducer;
