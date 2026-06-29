@@ -46,10 +46,9 @@ export function parseTasks(data: any): Task[] {
 }
 
 export function getTaskStatuses(task: Task): string[] {
-  if (task.submission) {
-    const statusSubmission = task.submission.status;
-    return [task.status, statusSubmission]
-  }
+  const statuses = task.resurveyStatus
+    ? [task.status, task.resurveyStatus]
+    : [task.status, task.submission?.status];
 
-  return [task.status]
+  return [...new Set(statuses.filter(Boolean))];
 }

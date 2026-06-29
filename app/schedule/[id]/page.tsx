@@ -20,8 +20,7 @@ export default function Page() {
   const submission = useAppSelector((state) => state.submission.submission);
   const requestState = useAppSelector((state) => state.schedule.requestState);
 
-  const isLoading =
-    requestState.status === "loading" && requestState.type === "getTaskById";
+  const isLoading = requestState.status === "loading" && requestState.type === "getTaskById";
 
   useEffect(() => {
     if (id) {
@@ -30,7 +29,6 @@ export default function Page() {
           .unwrap()
           .then((response) => {
             const task = response.data.data;
-            console.log(task);
             if (task) {
               if (task.submissionId) {
                 dispatch(getSubmissionById(task.submissionId));

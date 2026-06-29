@@ -50,6 +50,11 @@ class TaskService {
     return parseCommonHttpResult(response);
   }
 
+  async createTasks(payload: { surveyId: string, assignee: any, storeIds: string[], campaignId: string, dueDate: string }) {
+    const response = await clientService.post('/tasks/bulk-by-stores', payload);
+    return parseCommonHttpResult(response);
+  }
+
   async deleteTask(id: string) {
     const response = await clientService.delete(`/tasks/${id}`, {});
     return parseCommonHttpResult(response);

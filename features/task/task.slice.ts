@@ -1,18 +1,21 @@
-import { parseTask, Task } from "@/model/Task.model";
+import { parseTask, parseTasks, Task } from "@/model/Task.model";
 import { RequestState } from "@/store/state";
 import { commonCreateAsyncThunk } from "@/store/thunk";
 import { createSlice } from "@reduxjs/toolkit";
 import { taskService } from "./task.service";
+import { Store } from "@/model/Store.model";
 
 interface TaskState {
   tasks: Task[];
   task: Task | null;
+  stores: Store[];
   requestState: RequestState;
 }
 
 const initialState: TaskState = {
   tasks: [],
   task: null,
+  stores: [],
   requestState: { status: 'idle', type: '' },
 }
 
@@ -20,6 +23,7 @@ export const getTasks = commonCreateAsyncThunk({ type: "getTasks", action: taskS
 export const getTaskById = commonCreateAsyncThunk({ type: "getTaskById", action: taskService.getTaskById });
 export const getTaskBySubmissionAndSurvey = commonCreateAsyncThunk({ type: "getTaskBySubmissionAndSurvey", action: taskService.getTaskBySubmissionAndSurvey });
 export const createTask = commonCreateAsyncThunk({ type: "createTask", action: taskService.createTask });
+export const createTasks = commonCreateAsyncThunk({ type: "createTasks", action: taskService.createTasks });
 export const createMultipleTasks = commonCreateAsyncThunk({ type: "createMultipleTasks", action: taskService.createMultipleTasks });
 export const exportTasks = commonCreateAsyncThunk({ type: "exportTasks", action: taskService.exportTasks });
 export const cancelTask = commonCreateAsyncThunk({ type: "cancelTask", action: taskService.cancelTask });
@@ -33,6 +37,22 @@ export const taskSlice = createSlice({
     },
     setTask: (state, action) => {
       state.task = action.payload;
+    },
+    addStores: (state, action) => {
+      const store = action.payload;
+      const index = state.stores.findIndex(s => s.id === store.id);
+      if (index >= 0) {
+        state.stores[index] = store;
+      } else {
+        state.stores.push(store);
+      }
+    },
+    removeStores: (state, action) => {
+      const { id } = action.payload;
+      state.stores = state.stores.filter(s => s.id !== id);
+    },
+    clearStores: (state) => {
+      state.stores = [];
     },
     clearTaskState: (state) => {
       state.tasks = [];
@@ -122,8 +142,22 @@ export const taskSlice = createSlice({
       .addCase(cancelTask.rejected, (state) => {
         state.requestState = { status: "failed", type: "cancelTask" };
       })
+      .addCase(createTasks.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'createTasks' };
+      })
+      .addCase(createTasks.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        const newTasks = responseData ? parseTasks(responseData) : []
+        state.tasks = [...state.tasks, ...newTasks];
+        state.requestState = { status: 'completed', type: 'createTasks' };
+      })
+      .addCase(createTasks.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'createTasks', error: payload?.message };
+      })
   }
 })
 
-export const { setTasks, setTask, clearTaskState } = taskSlice.actions;
+export const { setTasks, setTask, addStores, removeStores, clearStores, clearTaskState } = taskSlice.actions;
 export default taskSlice.reducer;

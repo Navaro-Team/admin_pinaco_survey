@@ -8,10 +8,10 @@ import { clearSurveyState, getSurveys } from "@/features/survey/survey.slice";
 import { clearCampaignsState, getCampaigns } from "@/features/campaigns/campaigns.slice";
 import { AssignSheet } from "./AssignSheet";
 import { clearStaffsState, searchUsers } from "@/features/staffs/staffs.slice";
-import { clearStoreState, searchStores } from "@/features/store/store.slice";
+import { clearStoreState, } from "@/features/store/store.slice";
 import { ExportExcelPopover } from "./ExportExcelPopover";
 import { clearFilter, clearScheduleState, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
-import { clearTaskState } from "@/features/task/task.slice";
+import { clearStores, clearTaskState } from "@/features/task/task.slice";
 
 export function Header() {
   const dispatch = useAppDispatch();
@@ -35,12 +35,12 @@ export function Header() {
     dispatch(clearStaffsState());
     dispatch(clearStoreState());
     dispatch(clearTaskState());
-    dispatch(getTasks({ page: 1, limit: pagination.limit }));
+    dispatch(clearStores());
   }
 
   useEffect(() => {
     if (!taskState.type) return;
-    if (['createMultipleTasks', 'createTask'].includes(taskState.type)) {
+    if (['createMultipleTasks', 'createTask', 'createTasks'].includes(taskState.type)) {
       switch (taskState.status) {
         case 'completed':
           showSuccess({
@@ -79,7 +79,6 @@ export function Header() {
     dispatch(getCampaigns());
     dispatch(getSurveys({}));
     dispatch(searchUsers({ page: 1, limit: 50 }));
-    dispatch(searchStores({ page: 1, limit: 50 }));
   }, [dispatch]);
 
   useEffect(() => {

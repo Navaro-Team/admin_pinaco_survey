@@ -12,6 +12,7 @@ export interface SearchStoresParams {
   area?: string;
   page?: number;
   limit?: number;
+  salesEmployeeCode?: string;
 }
 
 class StoreService {
@@ -48,6 +49,8 @@ class StoreService {
     }
 
     if (params?.page) queryParams.page = params.page.toString();
+
+    if (params?.salesEmployeeCode) queryParams.salesEmployeeCode = params.salesEmployeeCode;
 
     const response = await clientService.get('/stores/search', queryParams);
     return parseCommonHttpResult(response);

@@ -13,7 +13,10 @@ export enum Status {
   PENDING_REVIEW = "PENDING_REVIEW",
   FAILED = "FAILED",
   CANCELLED = "CANCELLED",
-  REJECTED_REVIEW = "REJECTED_REVIEW"
+  RESURVEY_REJECTED = "RESURVEY_REJECTED",
+  REJECTED = "REJECTED",
+  REJECTED_REVIEW = "REJECTED_REVIEW",
+  APPROVED = "APPROVED"
 }
 
 interface StatusBadgeProps {
@@ -23,6 +26,7 @@ interface StatusBadgeProps {
 
 const statusConfig: Record<Status, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; color: string }> = {
   [Status.COMPLETED]: { label: "Đã hoàn thành", variant: "default", color: "bg-green-500 text-white" },
+  [Status.APPROVED]: { label: "Y/c đã duyệt", variant: "default", color: "bg-green-500 text-white" },
   [Status.SUBMITTED]: { label: "Đã gửi khảo sát", variant: "default", color: "bg-green-500 text-white" },
   [Status.IN_PROGRESS]: { label: "Sắp diễn ra", variant: "secondary", color: "bg-yellow-500 text-white" },
   [Status.PENDING]: { label: "Đã gửi yêu cầu hỗ trợ", variant: "outline", color: "bg-blue-500 text-white" },
@@ -31,7 +35,9 @@ const statusConfig: Record<Status, { label: string; variant: "default" | "second
   [Status.RESURVEY_REQUIRED]: { label: "Yêu cầu hỗ trợ", variant: "outline", color: "bg-blue-500 text-white" },
   [Status.FAILED]: { label: "Không đạt", variant: "destructive", color: "bg-red-500 text-white" },
   [Status.CANCELLED]: { label: "Đã huỷ", variant: "destructive", color: "bg-red-500 text-white" },
-  [Status.REJECTED_REVIEW]: { label: "Phê duyệt bị từ chối", variant: "destructive", color: "bg-red-500 text-white" },
+  [Status.REJECTED]: { label: "Y/c đã từ chối", variant: "destructive", color: "bg-red-500 text-white" },
+  [Status.REJECTED_REVIEW]: { label: "Đã từ chối", variant: "destructive", color: "bg-red-500 text-white" },
+  [Status.RESURVEY_REJECTED]: { label: "Y/c bị từ chối", variant: "destructive", color: "bg-red-500 text-white" },
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
