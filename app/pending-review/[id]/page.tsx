@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { getSubmissionById, reviewSubmission } from "@/features/submission/submission.slice";
+import { clearSubmissionState, getSubmissionById, reviewSubmission } from "@/features/submission/submission.slice";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CircleCheckBig, X } from "lucide-react";
 import { getTaskBySubmissionAndSurvey } from "@/features/task/task.slice";
@@ -85,11 +85,17 @@ export default function PendingReviewDetailPage() {
             showSuccess({
               title: "Phê duyệt khảo sát",
               description: "Phê duyệt khảo sát thành công",
+              onConfirm() {
+                dispatch(clearSubmissionState());
+              },
             });
           } else {
             showSuccess({
               title: "Từ chối phê duyệt khảo sát",
               description: "Từ chối phê duyệt khảo sát thành công",
+              onConfirm() {
+                dispatch(clearSubmissionState());
+              },
             });
           }
           break;
@@ -97,6 +103,9 @@ export default function PendingReviewDetailPage() {
           showFailed({
             title: "Phê duyệt khảo sát",
             description: "Cập nhật trạng thái khảo sát thất bại",
+            onConfirm() {
+              dispatch(clearSubmissionState());
+            },
           });
           break;
         case 'loading':

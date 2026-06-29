@@ -53,6 +53,7 @@ export const surveySlice = createSlice({
         const payload = action.payload as any;
         const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
         state.survey = responseData ? parseSurvey(responseData) : null;
+        state.requestState = { status: 'completed', type: 'getSurveyById' };
       })
       .addCase(getSurveyById.pending, (state) => {
         state.requestState = { status: 'loading', type: 'getSurveyById' };

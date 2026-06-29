@@ -24,7 +24,10 @@ export function HeaderDetailSchedule() {
   const survey = useAppSelector((state) => state.survey.survey);
   const submission = useAppSelector((state) => state.submission.submission);
   const requestState = useAppSelector((state) => state.survey.requestState);
-  const isLoading = requestState.status === 'loading' && requestState.type === 'approveResurveyRequest' || requestState.type === 'rejectResurveyRequest';
+  const isLoading = requestState.status === 'loading';
+
+  const isApproved = requestState.type === 'approveResurveyRequest';
+  const isReject = requestState.type === 'rejectResurveyRequest';
   const taskState = useAppSelector(state => state.task.requestState);
   const { error, success } = useToastContext();
   const { showSuccess, showFailed, showDialog, showLoading } = useDialog();
@@ -44,6 +47,7 @@ export function HeaderDetailSchedule() {
         dispatch(getTaskById(task?._id ?? ''));
         setTimeout(() => {
           success('Thành công', 'Yêu cầu hỗ trợ đã được chấp nhận');
+          dispatch(clearTaskState());
         }, 500);
       })
       .catch((err: any) => {
@@ -59,6 +63,7 @@ export function HeaderDetailSchedule() {
         dispatch(getTaskById(task?._id ?? ''));
         setTimeout(() => {
           success('Thành công', 'Yêu cầu hỗ trợ đã được từ chối');
+          dispatch(clearTaskState());
         }, 500);
       })
       .catch((err: any) => {
@@ -140,20 +145,20 @@ export function HeaderDetailSchedule() {
       <div className="flex flex-row gap-4 items-center">
         {task?.status === Status.RESURVEY_REQUIRED && <>
           <Button
-            disabled={isLoading}
+            disabled={isLoading && isApproved}
             onClick={handleAcceptRequest}
             variant="outline"
             className="bg-green-500 text-white hover:bg-green-500/90 hover:text-white">
-            {isLoading ? <Spinner className="size-4" /> : <CircleCheckBig className="size-4" />}
-            {isLoading ? 'Đang chấp nhận yêu cầu...' : 'Chấp nhận yêu cầu'}
+            {isLoading && isApproved ? <Spinner className="size-4" /> : <CircleCheckBig className="size-4" />}
+            {isLoading && isApproved ? 'Đang chấp nhận yêu cầu...' : 'Chấp nhận yêu cầu'}
           </Button>
           <Button
-            disabled={isLoading}
+            disabled={isLoading && isReject}
             onClick={handleRejectRequest}
             variant="outline"
             className="bg-red-500 text-white hover:bg-red-500/90 hover:text-white">
-            {isLoading ? <Spinner className="size-4" /> : <CircleX className="size-4" />}
-            {isLoading ? 'Đang từ chối yêu cầu...' : 'Từ chối yêu cầu'}
+            {isLoading && isReject ? <Spinner className="size-4" /> : <CircleX className="size-4" />}
+            {isLoading && isReject ? 'Đang từ chối yêu cầu...' : 'Từ chối yêu cầu'}
           </Button>
         </>}
         <Button

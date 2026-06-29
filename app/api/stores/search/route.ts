@@ -31,6 +31,10 @@ export async function GET(request: NextRequest) {
       urlParams.set('page', params.get('page') ?? '1');
     }
 
+    if (params.get('salesEmployeeCode')) {
+      urlParams.set('salesEmployeeCode', params.get('salesEmployeeCode') ?? "")
+    }
+    
     const queryString = urlParams.toString();
     const url = queryString ? `/stores/search?${queryString}` : '/stores/search';
     const response = await serverService.get(url);
