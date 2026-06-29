@@ -50,7 +50,7 @@ const statusConfig: Record<
     color: "bg-red-500 hover:bg-red-600 text-white",
   },
   [SubmissionStatus.RESURVEY_REJECTED]: {
-    label: "Đã bị từ chối khảo sát lại",
+    label: "Từ chối khảo sát lại",
     variant: "destructive",
     color: "bg-orange-500 hover:bg-orange-600 text-white",
   },
