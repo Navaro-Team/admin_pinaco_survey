@@ -70,6 +70,12 @@ class TaskService {
     const response = await clientService.patch(`/tasks/${payload.id}/cancel`, { reason: payload.reason });
     return parseCommonHttpResult(response);
   }
+
+
+  async getScheduleStats() {
+    const response = await clientService.get(`/tasks/schedule-stats`);
+    return parseCommonHttpResult(response);
+  }
 }
 
 export const taskService = new TaskService();
