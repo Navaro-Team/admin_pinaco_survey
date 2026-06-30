@@ -9,6 +9,12 @@ interface TaskState {
   tasks: Task[];
   task: Task | null;
   stores: Store[];
+  scheduleStats: {
+    totalTasks: number;
+    totalSubmissions: number;
+    completedSubmissions: number;
+    crossCheckRate: number;
+  },
   requestState: RequestState;
 }
 
@@ -16,6 +22,12 @@ const initialState: TaskState = {
   tasks: [],
   task: null,
   stores: [],
+  scheduleStats: {
+    totalTasks: 0,
+    totalSubmissions: 0,
+    completedSubmissions: 0,
+    crossCheckRate: 0
+  },
   requestState: { status: 'idle', type: '' },
 }
 
@@ -27,6 +39,7 @@ export const createTasks = commonCreateAsyncThunk({ type: "createTasks", action:
 export const createMultipleTasks = commonCreateAsyncThunk({ type: "createMultipleTasks", action: taskService.createMultipleTasks });
 export const exportTasks = commonCreateAsyncThunk({ type: "exportTasks", action: taskService.exportTasks });
 export const cancelTask = commonCreateAsyncThunk({ type: "cancelTask", action: taskService.cancelTask });
+export const getScheduleStats = commonCreateAsyncThunk({ type: "getScheduleStats", action: taskService.getScheduleStats });
 
 export const taskSlice = createSlice({
   name: 'task',
@@ -155,6 +168,17 @@ export const taskSlice = createSlice({
       .addCase(createTasks.rejected, (state, action) => {
         const payload = action.payload as any;
         state.requestState = { status: 'failed', type: 'createTasks', error: payload?.message };
+      })
+      .addCase(getScheduleStats.pending, (state) => {
+        state.requestState = { status: "loading", type: "getScheduleStats" };
+      })
+      .addCase(getScheduleStats.fulfilled, (state, action) => {
+        state.scheduleStats = action.payload?.data?.data;
+        state.requestState = { status: "completed", type: "getScheduleStats" };
+      })
+      .addCase(getScheduleStats.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: "failed", type: "getScheduleStats", error: payload?.message };
       })
   }
 })
