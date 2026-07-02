@@ -18,6 +18,10 @@ export async function GET(request: NextRequest) {
     urlParams.set('startDate', params.get('startDate') ?? '');
     urlParams.set('endDate', params.get('endDate') ?? '');
 
+    if (params.get('status')) {
+      urlParams.set('status', params.get('status') ?? '');
+    }
+
     const queryString = urlParams.toString();
     const response = await serverService.get(`/tasks/export?${queryString}`);
     return responseSuccess(response);

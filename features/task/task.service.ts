@@ -60,7 +60,7 @@ class TaskService {
     return parseCommonHttpResult(response);
   }
 
-  async exportTasks(params: { surveyId: string, startDate: string, endDate: string }) {
+  async exportTasks(params: { status: string[], surveyId: string, startDate: string, endDate: string }) {
     const response = await clientService.get('/tasks/export', params);
     return parseCommonHttpResult(response);
   }

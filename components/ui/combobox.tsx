@@ -27,6 +27,7 @@ export function Combobox({
   onChange,
   disabled,
   placeholder = "Select option...",
+  multiple = false,
 }: {
   className?: string
   options: { value: string, label: string }[]
@@ -34,7 +35,8 @@ export function Combobox({
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  }) {
+  multiple?: boolean
+}) {
   const [open, setOpen] = useState(false)
   const [selectedValue, setSelectedValue] = useState(value)
 
