@@ -34,7 +34,7 @@ export function Combobox({
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  }) {
+}) {
   const [open, setOpen] = useState(false)
   const [selectedValue, setSelectedValue] = useState(value)
 

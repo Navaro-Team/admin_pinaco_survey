@@ -11,6 +11,8 @@ import DateRangeFilter from "../ui/DateRangeFilter";
 import { exportTasks } from "@/features/task/task.slice";
 import { useToastContext } from "@/context/ToastContext";
 import { exportSurveyToExcel } from "@/utils/export-survey-excel";
+import { Status } from "../ui/status-badge";
+import { ComboboxMultiple } from "../ui/combobox-multiple";
 
 type DateRange = {
   from: Date | undefined;
@@ -23,6 +25,7 @@ export function ExportExcelPopover() {
   const surveys = useAppSelector((state) => state.survey.surveys);
   const [open, setOpen] = useState(false);
   const [surveyId, setSurveyId] = useState<string>("");
+  const [status, setStatus] = useState<string[]>([]);
   const [range, setRange] = useState<DateRange>({
     from: new Date(),
     to: new Date(),
@@ -39,7 +42,7 @@ export function ExportExcelPopover() {
     try {
       const startDate = range.from?.toISOString();
       const endDate = range.to?.toISOString();
-      await dispatch(exportTasks({ surveyId, startDate, endDate }))
+      await dispatch(exportTasks({ status, surveyId, startDate, endDate }))
         .unwrap()
         .then((res) => {
           const payload = res as any;
@@ -83,7 +86,7 @@ export function ExportExcelPopover() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline">
-          <CalendarRange className="mr-2 size-4" />
+          <CalendarRange className="size-4" />
           Xuất Excel
         </Button>
       </PopoverTrigger>
@@ -96,6 +99,31 @@ export function ExportExcelPopover() {
             value={surveyId}
             placeholder="Chọn khảo sát"
             onChange={setSurveyId}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Trạng thái</Label>
+          <ComboboxMultiple
+            className="w-full"
+            maxDisplayItems={1}
+            options={[
+              { value: Status.COMPLETED, label: "Đã hoàn thành" },
+              { value: Status.IN_PROGRESS, label: "Sắp diễn ra" },
+              { value: Status.OVERDUE, label: "Quá hạn khảo sát" },
+              { value: Status.RESURVEY_REQUIRED, label: "Yêu cầu hỗ trợ" },
+              { value: Status.CANCELLED, label: "Đã huỷ" }
+            ]}
+            value={status}
+            placeholder="Chọn trạng thái"
+            setValue={(value) => {
+              if (typeof value === "function") {
+                const newValue = value(status);
+                setStatus(newValue);
+              } else {
+                setStatus(value);
+              }
+            }}
           />
         </div>
 
