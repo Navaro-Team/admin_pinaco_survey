@@ -23,8 +23,8 @@ export function SectionCards() {
 
   return (
     <div className={`*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs px-0 @xl/main:grid-cols-2 ${isSale ? "@5xl/main:grid-cols-3" : "@5xl/main:grid-cols-4"}`}>
-      <Card className="@container/card">
-        <CardHeader>
+      <Card className="@container/card gap-2 p-3! h-fit">
+        <CardHeader className="p-0">
           <CardDescription className="font-semibold text-black text-md">Tổng điểm cần khảo sát</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             <CountUp className="text-yellow-500" end={scheduleStats.totalTasks} duration={4} />
@@ -32,8 +32,8 @@ export function SectionCards() {
         </CardHeader>
       </Card>
 
-      <Card className="@container/card">
-        <CardHeader>
+      <Card className="@container/card gap-2 p-3! h-fit">
+        <CardHeader className="p-0">
           <CardDescription className="font-semibold text-black text-md">Số điểm đã khảo sát</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             <CountUp className="text-orange-500" end={scheduleStats.totalSubmissions} duration={4} />
@@ -41,8 +41,8 @@ export function SectionCards() {
         </CardHeader>
       </Card>
 
-      <Card className="@container/card">
-        <CardHeader>
+      <Card className="@container/card gap-2 p-3! h-fit">
+        <CardHeader className="p-0">
           <CardDescription className="font-semibold text-black text-md">Số khảo sát đã hoàn thành</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             <CountUp className="text-green-500" end={scheduleStats.completedSubmissions} duration={2} />
@@ -50,8 +50,8 @@ export function SectionCards() {
         </CardHeader>
       </Card>
 
-      {!isSale && <Card className="@container/card">
-        <CardHeader>
+      {!isSale && <Card className="@container/card gap-2 p-3! h-fit">
+        <CardHeader className="p-0">
           <CardDescription className="font-semibold text-black text-md">Tỷ lệ kiểm tra đối chiếu</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             <CountUp

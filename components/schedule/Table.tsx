@@ -173,13 +173,13 @@ export function Table() {
   }, [requestState]);
 
   return (
-    <Card className="flex flex-col flex-1 min-h-0 pb-0!">
-      <CardHeader>
+    <Card className="flex flex-col flex-1 min-h-0 gap-2 p-3! pb-0!">
+      <CardHeader className="p-0">
         <CardTitle>Danh sách khảo sát</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col flex-1 p-0 overflow-hidden min-h-0">
         <div className="flex flex-col flex-1 overflow-hidden min-h-0">
-          <div className="border-b px-4">
+          <div className="border-b px-0">
             <table className="w-full caption-bottom text-sm">
               <TableHeader>
                 <TableRow>
@@ -193,7 +193,7 @@ export function Table() {
               </TableHeader>
             </table>
           </div>
-          <div className="flex-1 overflow-y-auto min-h-0 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex-1 overflow-y-auto min-h-0 p-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <table className="w-full caption-bottom text-sm">
               <TableBody>
                 {isLoading ? (

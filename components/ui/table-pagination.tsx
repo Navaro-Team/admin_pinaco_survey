@@ -105,7 +105,7 @@ export function TablePagination({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t ${className}`}
+      className={`flex flex-col sm:flex-row items-center justify-between gap-4 p-3 border-t ${className}`}
     >
       <div className="text-sm text-muted-foreground w-full sm:w-auto">
         Hiển thị {startItem} đến {endItem} trong tổng số {totalItems} mục

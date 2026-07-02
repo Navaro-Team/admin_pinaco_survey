@@ -116,17 +116,9 @@ export const scheduleSlice = createSlice({
         const responseData = payload?.data?.data?.tasks || payload?.data?.data || payload?.data;
         const tasksArray = Array.isArray(responseData) ? responseData : (responseData?.tasks || []);
         const newTasks = parseTasks(tasksArray);
-        if (state.pagination.page === 1) {
-          state.tasks = newTasks;
-          state.pagination.hasMore = newTasks.length >= 10;
-          state.pagination.total = payload?.data?.data?.total ?? 0;
-        } else {
-          const existingIds = new Set(state.tasks.map(t => t._id));
-          const uniqueNewTasks = newTasks.filter(t => !existingIds.has(t._id));
-          state.tasks = [...state.tasks, ...uniqueNewTasks];
-          state.pagination.hasMore = uniqueNewTasks.length >= 10;
-        }
-
+        state.tasks = newTasks;
+        state.pagination.hasMore = newTasks.length >= state.pagination.limit;
+        state.pagination.total = payload?.data?.data?.total ?? 0;
         state.requestState = { status: 'completed', type: 'getTasks', data: state.pagination.page === 1 };
       })
       .addCase(getTasks.pending, (state) => {
