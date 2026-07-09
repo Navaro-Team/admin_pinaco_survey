@@ -8,7 +8,7 @@ import {
   changeStatus,
   clearFilter,
   changePage,
-  changeCreatedAt
+  changeDateRange
 } from "@/features/submission/submission.slice";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,8 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { RefreshCcw } from "lucide-react";
-import { InputCalendar } from "../ui/InputCalendar";
 import { formatDate } from "date-fns";
+import DateRangeFilter from "../ui/DateRangeFilter";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Tất cả trạng thái" },
@@ -51,7 +51,7 @@ export function PendingReviewFilter() {
       skip: 0,
       limit: pagination.limit,
       status: filter.status || undefined,
-      createdAt: formatDate(filter.createdAt, "yyyy-MM-dd")
+      dateRange: { from: filter.dateRange.from && formatDate(filter.dateRange.from, "yyyy-MM-dd"), to: filter.dateRange.to && formatDate(filter.dateRange.to, "yyyy-MM-dd") }
     }));
   };
 
@@ -79,11 +79,10 @@ export function PendingReviewFilter() {
           </div>
           <div className="min-w-0 flex flex-col gap-2">
             <Label>Ngày thực hiện</Label>
-            <InputCalendar
-              placeholder="Chọn hạn khảo sát"
-              inputFormat="dd/MM/yyyy"
-              value={filter.createdAt}
-              onChange={(value) => dispatch(changeCreatedAt(value ?? new Date()))}
+            <DateRangeFilter
+              className="h-10!"
+              dateRange={filter.dateRange}
+              onDateChange={(dateRange) => dispatch(changeDateRange(dateRange))}
             />
           </div>
           <Button

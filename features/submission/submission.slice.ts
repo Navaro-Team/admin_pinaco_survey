@@ -3,6 +3,7 @@ import { RequestState } from "@/store/state";
 import { commonCreateAsyncThunk } from "@/store/thunk";
 import { submissionService } from "./submission.service";
 import { createSlice } from "@reduxjs/toolkit";
+import { DateRange } from "react-day-picker";
 
 interface SubmissionState {
   submission: Submission | null;
@@ -16,7 +17,7 @@ interface SubmissionState {
   filter: {
     store: string;
     status: string;
-    createdAt: Date;
+    dateRange: DateRange;
   };
   requestState: RequestState;
 }
@@ -33,7 +34,7 @@ const initialState: SubmissionState = {
   filter: {
     store: "",
     status: "",
-    createdAt: new Date()
+    dateRange: { from: new Date(), to: new Date() }
   },
   requestState: { status: 'idle', type: '' },
 }
@@ -72,8 +73,8 @@ export const submissionSlice = createSlice({
     changeStatus: (state, action) => {
       state.filter.status = action.payload;
     },
-    changeCreatedAt: (state, action) => {
-      state.filter.createdAt = action.payload
+    changeDateRange: (state, action) => {
+      state.filter.dateRange = action.payload
     },
     clearFilter: (state) => {
       state.filter = initialState.filter;
@@ -144,7 +145,7 @@ export const {
   resetPagination,
   changeStore,
   changeStatus,
-  changeCreatedAt,
+  changeDateRange,
   clearFilter,
   clearSubmissionState
 } = submissionSlice.actions;

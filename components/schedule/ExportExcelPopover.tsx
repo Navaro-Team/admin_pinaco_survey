@@ -130,7 +130,7 @@ export function ExportExcelPopover() {
         <div className="space-y-2">
           <Label>Thời gian</Label>
           <DateRangeFilter
-            className="w-full"
+            className="w-full h-10!"
             dateRange={range}
             onDateChange={(range) => setRange({ from: range?.from, to: range?.to })}
           />
