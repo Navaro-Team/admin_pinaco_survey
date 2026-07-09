@@ -34,7 +34,7 @@ const initialState: SubmissionState = {
   filter: {
     store: "",
     status: "",
-    dateRange: { from: new Date(), to: new Date() }
+    dateRange: { from: undefined, to: undefined }
   },
   requestState: { status: 'idle', type: '' },
 }
