@@ -141,6 +141,7 @@ export function HeaderDetailSchedule() {
         <h1 className="text-2xl font-bold">Chi tiết lịch trình</h1>
         <p className="text-base text-muted-foreground">Xem lại thông tin chi tiết và kết quả khảo sát tại điểm bán.</p>
         {task?.resurveyRequest?.reason && <p className="text-base font-bold">Lý do: {task?.resurveyRequest?.reason}</p>}
+        {task?.cancellationReason && <p className="text-base font-bold">Lý do: {task?.cancellationReason}</p>}
       </div>
       <div className="flex flex-row gap-4 items-center">
         {task?.status === Status.RESURVEY_REQUIRED && <>

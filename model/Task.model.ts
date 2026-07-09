@@ -15,7 +15,8 @@ export interface Task {
   createdAt: string,
   completedAt: Date,
   updatedAt: Date,
-  checkInAssets: any[]
+  checkInAssets: any[],
+  cancellationReason: string,
 }
 
 export function parseTask(data: any): Task {
@@ -37,6 +38,7 @@ export function parseTask(data: any): Task {
     completedAt: data.completedAt,
     updatedAt: data.updatedAt,
     checkInAssets: data.checkInAssets,
+    cancellationReason: data.cancellationReason,
   };
 }
 
