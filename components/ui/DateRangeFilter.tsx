@@ -45,7 +45,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="h-12 w-full justify-start text-left font-normal bg-white hover:bg-gray-50"
+            className={cn("h-12 w-full justify-start text-left font-normal bg-white hover:bg-gray-50", className)}
             onClick={() => setOpen(true)}
           >
             <CalendarIcon className="mr-2 w-6 h-6" />

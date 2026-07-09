@@ -18,6 +18,12 @@ export async function GET(
     if (params.get('createdAt')) {
       urlParams.set('createdAt', params.get('createdAt') ?? '');
     }
+    if (params.get('startDate')) {
+      urlParams.set('startDate', params.get('startDate') ?? '');
+    }
+    if (params.get('endDate')) {
+      urlParams.set('endDate', params.get('endDate') ?? '');
+    }
     if (params.get('limit')) {
       urlParams.set('limit', params.get('limit') ?? '20');
     }
