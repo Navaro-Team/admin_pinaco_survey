@@ -19,7 +19,13 @@ export default function PagePendingReview() {
   useEffect(() => {
     const skip = (pagination.page - 1) * pagination.limit;
     dispatch(getPendingSubmissions({
-      skip, limit: pagination.limit, status: filter.status || undefined, dateRange: { from: filter.dateRange.from && formatDate(filter.dateRange.from, "yyyy-MM-dd"), to: filter.dateRange.to && formatDate(filter.dateRange.to, "yyyy-MM-dd") }
+      skip,
+      limit: pagination.limit,
+      status: filter.status || undefined,
+      dateRange: {
+        from: filter.dateRange?.from && formatDate(filter.dateRange.from, "yyyy-MM-dd"),
+        to: filter.dateRange?.to && formatDate(filter.dateRange.to, "yyyy-MM-dd")
+      }
     }));
   }, [dispatch, pagination.page, pagination.limit, filter.status, filter.dateRange]);
 

@@ -51,7 +51,10 @@ export function PendingReviewFilter() {
       skip: 0,
       limit: pagination.limit,
       status: filter.status || undefined,
-      dateRange: { from: filter.dateRange.from && formatDate(filter.dateRange.from, "yyyy-MM-dd"), to: filter.dateRange.to && formatDate(filter.dateRange.to, "yyyy-MM-dd") }
+      dateRange: {
+        from: filter.dateRange?.from && formatDate(filter.dateRange.from, "yyyy-MM-dd"),
+        to: filter.dateRange?.to && formatDate(filter.dateRange.to, "yyyy-MM-dd")
+      }
     }));
   };
 
