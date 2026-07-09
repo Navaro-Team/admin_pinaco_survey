@@ -18,8 +18,10 @@ export default function PagePendingReview() {
 
   useEffect(() => {
     const skip = (pagination.page - 1) * pagination.limit;
-    dispatch(getPendingSubmissions({ skip, limit: pagination.limit, status: filter.status || undefined, createdAt: formatDate(filter.createdAt, "yyyy-MM-dd") }));
-  }, [dispatch, pagination.page, pagination.limit, filter.status, filter.createdAt]);
+    dispatch(getPendingSubmissions({
+      skip, limit: pagination.limit, status: filter.status || undefined, dateRange: { from: filter.dateRange.from && formatDate(filter.dateRange.from, "yyyy-MM-dd"), to: filter.dateRange.to && formatDate(filter.dateRange.to, "yyyy-MM-dd") }
+    }));
+  }, [dispatch, pagination.page, pagination.limit, filter.status, filter.dateRange]);
 
   return (
     <div className="h-[calc(100vh-var(--header-height))] overflow-hidden flex flex-col gap-4 p-4 md:gap-6 md:p-6">
