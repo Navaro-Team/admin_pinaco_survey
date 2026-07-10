@@ -414,6 +414,7 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
     "Check-out",
     "Ngày khảo sát",
     ...questionCols.map((c) => c.question?.instruction || c.header),
+    "Huỷ điểm bán",
   ];
 
   const headerRow2 = [
@@ -431,6 +432,9 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
     "Check-out",
     "Ngày khảo sát",
     ...questionCols.map((c) => c.header),
+    "Người huỷ",
+    "Thời gian",
+    "Lý do",
   ];
 
   const rows: (string | number)[][] = [headerRow1, headerRow2];
@@ -461,6 +465,8 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
       colIdx += 1;
     }
   }
+  const cancellationColStart = colIdx;
+  merges.push({ s: { r: 0, c: cancellationColStart }, e: { r: 0, c: cancellationColStart + 2 } });
 
   let stt = 0;
 
@@ -485,6 +491,10 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
       Math.max(1, ...detailRecordsPerCol.map((records) => records.length || 0)) || 1;
 
     const taskStartRow = rows.length; 
+
+    const cancelledByName = task?.cancelledBy?.name ?? "";
+    const cancellationTime = task?.updatedAt ? formatDDMMYYYY(task?.updatedAt) + " " + formatHHmm(task?.updatedAt) : "";
+    const cancellationReason = task?.cancellationReason ?? "";
 
     for (let i = 0; i < maxDetailRows; i++) {
       const infoCells = [
@@ -511,7 +521,13 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
         return i === 0 ? baseAnswers[idx] : "";
       });
 
-      rows.push([...infoCells, ...answerCells]);
+      const cancellationCells = [
+        i === 0 ? cancelledByName : "",
+        i === 0 ? cancellationTime : "",
+        i === 0 ? cancellationReason : "",
+      ];
+
+      rows.push([...infoCells, ...answerCells, ...cancellationCells]);
     }
     const taskEndRow = rows.length - 1;
 
@@ -524,6 +540,9 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
           !col.isDetail || col.detailField === "totalAmount";
         if (shouldMerge) mergeColIndexes.push(colIdx);
         colIdx += 1;
+      }
+      for (let c = cancellationColStart; c < cancellationColStart + 3; c++) {
+        mergeColIndexes.push(c);
       }
       mergeColIndexes.forEach((c) => {
         merges.push({ s: { r: taskStartRow, c }, e: { r: taskEndRow, c } });
@@ -548,6 +567,9 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
     { wch: 12 },
     { wch: 14 },
     ...colWidths,
+    { wch: 22 },
+    { wch: 18 },
+    { wch: 30 },
   ];
   if (merges.length) {
     ws["!merges"] = merges;
