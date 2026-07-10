@@ -740,9 +740,16 @@ export function exportSurveyToPDF(
           <span class="info-label">Trạng thái:</span>
           <span>${escapeHtml(task?.status || 'N/A')}</span>
         </div>
+        ${task?.resurveyRequest?.reason ? `<div class="info-row">
+          <span class="info-label">Lý do yêu cầu khảo sát lại:</span>
+          <span>${escapeHtml(task?.resurveyRequest?.reason)}</span>
+        </div>`: ''}
+        ${task?.cancellationReason ? `<div class="info-row">
+          <span class="info-label">Lý do ${task?.cancelledBy?.name ?? ""} huỷ khảo sát: </span>
+          <span>${escapeHtml(task?.cancellationReason)}</span>
+        </div>`: ''}
       </div>
   `;
-
   const checkInAssets = task?.checkInAssets || [];
   if (Array.isArray(checkInAssets) && checkInAssets.length > 0) {
     htmlContent += renderCheckInAssetsHTML(checkInAssets);
