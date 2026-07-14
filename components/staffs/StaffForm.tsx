@@ -355,7 +355,7 @@ export function StaffForm() {
                     value={field.value || ""}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
-                    placeholder={isEdit ? "Nhập mật khẩu mới (tối thiểu 6 ký tự)" : "Nhập mật khẩu (tối thiểu 6 ký tự)"}
+                    placeholder={isEdit ? "Nhập mật khẩu mới (tối thiểu 8 ký tự)" : "Nhập mật khẩu (tối thiểu 8 ký tự)"}
                   />
                 )}
               />
