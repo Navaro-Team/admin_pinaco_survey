@@ -56,3 +56,24 @@ export function getTaskStatuses(task: Task): string[] {
 
   return [...new Set(statuses.filter(Boolean))];
 }
+
+export function getCheckInAsset(task: Task | null) {
+  if (!task || !task.checkInAssets?.length) return [];
+
+  const targetTime = new Date(task.updatedAt).getTime();
+  return Object.values(task.checkInAssets.reduce<Record<string, (typeof task.checkInAssets)[number]>>(
+    (acc, item) => {
+      const type = item.meta?.imageType;
+      if (!type) return acc;
+
+      const currentDistance = Math.abs(new Date(item.updatedAt).getTime() - targetTime);
+      const existing = acc[type];
+
+      if (!existing || currentDistance < Math.abs(new Date(existing.updatedAt).getTime() - targetTime)) {
+        acc[type] = item;
+      }
+
+      return acc;
+    }, {})
+  );
+}

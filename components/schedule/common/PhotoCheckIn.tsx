@@ -3,11 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAppSelector } from "@/hooks/redux";
 import { formatLocalDate } from "@/lib/utils";
+import { getCheckInAsset } from "@/model/Task.model";
 import { IconPhoto } from "@tabler/icons-react";
 import Image from "next/image";
 
 const IMAGE_TYPE_LABEL_MAP = {
-  "toan_canh": "Toàn cảnh",
+  "mat_tien": "Mặt tiền địa điểm",
   "xung_quanh": "Khung cảnh xung quanh",
   "vi_tri": "Vị trí",
 } as const;
@@ -15,10 +16,15 @@ const IMAGE_TYPE_LABEL_MAP = {
 export function PhotoCheckIn() {
   const task = useAppSelector((state) => state.task.task);
   const taskSchedule = useAppSelector((state) => state.schedule.task);
-  const checkInAssets = task?.checkInAssets ?? taskSchedule?.checkInAssets ?? [];
-  
+
+  const filterCheckInAssets = () => {
+    if (task && task?.checkInAssets) return getCheckInAsset(task);
+    if (taskSchedule && taskSchedule?.checkInAssets) return getCheckInAsset(taskSchedule);
+    return [];
+  }
+
   return (
-    <Card hidden={checkInAssets.length === 0} className="flex flex-col gap-4!">
+    <Card hidden={filterCheckInAssets().length === 0} className="flex flex-col gap-4!">
       <CardHeader>
         <CardTitle className="flex flex-row items-center gap-2">
           <IconPhoto className="size-6 text-main" />
@@ -28,7 +34,7 @@ export function PhotoCheckIn() {
       <Separator />
       <CardContent className="flex flex-col py-2! gap-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {checkInAssets.map((asset: any, idx: number) => {
+          {filterCheckInAssets().map((asset: any, idx: number) => {
             const source = `${process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "")}${asset.path}`;
             const imageType = asset.meta?.imageType as keyof typeof IMAGE_TYPE_LABEL_MAP | undefined;
             const imageTypeLabel = imageType ? IMAGE_TYPE_LABEL_MAP[imageType] : undefined;
