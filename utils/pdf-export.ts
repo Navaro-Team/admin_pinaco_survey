@@ -1,4 +1,5 @@
 import { sortQuestionsByCode } from '@/lib/questions.utils';
+import { getCheckInAsset } from '@/model/Task.model';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
@@ -750,7 +751,7 @@ export function exportSurveyToPDF(
         </div>`: ''}
       </div>
   `;
-  const checkInAssets = task?.checkInAssets || [];
+  const checkInAssets = getCheckInAsset(task?.checkInAssets);
   if (Array.isArray(checkInAssets) && checkInAssets.length > 0) {
     htmlContent += renderCheckInAssetsHTML(checkInAssets);
   }
