@@ -71,6 +71,11 @@ class TaskService {
     return parseCommonHttpResult(response);
   }
 
+  async reopenTask(payload: { id: string }) {
+    const response = await clientService.patch(`/tasks/${payload.id}/reopen`);
+    return parseCommonHttpResult(response);
+  }
+
 
   async getScheduleStats() {
     const response = await clientService.get(`/tasks/schedule-stats`);
