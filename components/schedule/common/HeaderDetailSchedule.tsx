@@ -8,7 +8,7 @@ import { Status } from "@/components/ui/status-badge";
 import { useToastContext } from "@/context/ToastContext";
 import { clearFilter, getTaskById } from "@/features/schedule/schedule.slice";
 import { approveResurveyRequest, rejectResurveyRequest } from "@/features/survey/survey.slice";
-import { cancelTask, clearTaskState } from "@/features/task/task.slice";
+import { cancelTask, clearTaskState, reopenTask } from "@/features/task/task.slice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { useDialog } from "@/hooks/use-dialog";
 import { exportSurveyToPDF } from "@/utils/pdf-export";
@@ -72,6 +72,11 @@ export function HeaderDetailSchedule() {
       });
   }
 
+  const handleReopenTask = () => {
+    if (!task?._id) return;
+    dispatch(reopenTask({ id: task?._id }))
+  }
+
   const handleCancelTask = () => {
     noteRef.current = "";
     showDialog(
@@ -104,12 +109,14 @@ export function HeaderDetailSchedule() {
   }
 
   useEffect(() => {
-    if (taskState.type === "cancelTask") {
+    if (!taskState.type) return;
+    if (["cancelTask", "reopenTask"].includes(taskState.type)) {
+      const message = taskState.type === "cancelTask" ? "Huỷ" : "Mở lại";
       switch (taskState.status) {
         case 'completed':
           showSuccess({
             title: "Thành công",
-            description: "Huỷ khảo sát thành công",
+            description: `${message} khảo sát thành công`,
             onConfirm() {
               dispatch(clearTaskState());
               router.push("/schedule")
@@ -119,7 +126,7 @@ export function HeaderDetailSchedule() {
         case 'failed':
           showFailed({
             title: "Thất bại",
-            description: "Huỷ khảo sát thất bại.",
+            description: `${message} khảo sát thất bại.`,
             onConfirm() {
               dispatch(clearTaskState())
             },
@@ -144,6 +151,13 @@ export function HeaderDetailSchedule() {
         {task?.cancellationReason ? <p className="text-base font-bold">Lý do {task?.cancelledBy?.name} huỷ khảo sát:  {task?.cancellationReason}</p> : null}
       </div>
       <div className="flex flex-row gap-4 items-center">
+        {task?.status === Status.CANCELLED && <Button
+          disabled={isLoading}
+          onClick={handleReopenTask}
+          variant="outline"
+          className="bg-main text-white hover:bg-main/90 hover:text-white">
+          Mở lại khảo sát
+        </Button>}
         {task?.status === Status.RESURVEY_REQUIRED && <>
           <Button
             disabled={isLoading && isApproved}

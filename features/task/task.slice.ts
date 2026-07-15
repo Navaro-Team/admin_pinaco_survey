@@ -39,6 +39,7 @@ export const createTasks = commonCreateAsyncThunk({ type: "createTasks", action:
 export const createMultipleTasks = commonCreateAsyncThunk({ type: "createMultipleTasks", action: taskService.createMultipleTasks });
 export const exportTasks = commonCreateAsyncThunk({ type: "exportTasks", action: taskService.exportTasks });
 export const cancelTask = commonCreateAsyncThunk({ type: "cancelTask", action: taskService.cancelTask });
+export const reopenTask = commonCreateAsyncThunk({ type: "reopenTask", action: taskService.reopenTask });
 export const getScheduleStats = commonCreateAsyncThunk({ type: "getScheduleStats", action: taskService.getScheduleStats });
 
 export const taskSlice = createSlice({
@@ -154,6 +155,15 @@ export const taskSlice = createSlice({
       })
       .addCase(cancelTask.rejected, (state) => {
         state.requestState = { status: "failed", type: "cancelTask" };
+      })
+      .addCase(reopenTask.pending, (state) => {
+        state.requestState = { status: "loading", type: "reopenTask" };
+      })
+      .addCase(reopenTask.fulfilled, (state) => {
+        state.requestState = { status: "completed", type: "reopenTask" };
+      })
+      .addCase(reopenTask.rejected, (state) => {
+        state.requestState = { status: "failed", type: "reopenTask" };
       })
       .addCase(createTasks.pending, (state) => {
         state.requestState = { status: 'loading', type: 'createTasks' };
