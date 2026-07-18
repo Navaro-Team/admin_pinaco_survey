@@ -110,7 +110,7 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <Link href="/account">
+              <Link href={`/staffs/${user?.id}`}>
                 <DropdownMenuItem>
                   <BadgeCheck />
                   Account

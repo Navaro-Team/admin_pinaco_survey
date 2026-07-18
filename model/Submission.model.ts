@@ -54,3 +54,4 @@ export function parseSubmissions(data: any): Submission[] {
   if (!Array.isArray(data)) return [];
   return data.map(parseSubmission);
 }
+
