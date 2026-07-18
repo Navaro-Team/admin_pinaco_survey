@@ -11,7 +11,9 @@ import { approveResurveyRequest, rejectResurveyRequest } from "@/features/survey
 import { cancelTask, clearTaskState, reopenTask } from "@/features/task/task.slice";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { useDialog } from "@/hooks/use-dialog";
+import { getStatusSupervisorReview } from "@/model/Submission.model";
 import { exportSurveyToPDF } from "@/utils/pdf-export";
+import { formatDate } from "date-fns";
 import { ArrowLeftIcon, CircleCheckBig, CircleX, Download } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -147,6 +149,7 @@ export function HeaderDetailSchedule() {
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">Chi tiết lịch trình</h1>
         <p className="text-base text-muted-foreground">Xem lại thông tin chi tiết và kết quả khảo sát tại điểm bán.</p>
+        {submission?.supervisorReview?.reviewerName ? <p className="text-base font-bold">{submission?.supervisorReview?.reviewerName} đánh giá khảo sát {getStatusSupervisorReview(submission)} yêu cầu vào lúc {formatDate(submission.supervisorReview.reviewedAt, "HH:mm dd/MM/yyyy")}</p> : null}
         {task?.resurveyRequest?.reason ? <p className="text-base font-bold">Lý do yêu cầu khảo sát lại: {task?.resurveyRequest?.reason}</p> : null}
         {task?.cancellationReason ? <p className="text-base font-bold">Lý do {task?.cancelledBy?.name} huỷ khảo sát:  {task?.cancellationReason}</p> : null}
       </div>
