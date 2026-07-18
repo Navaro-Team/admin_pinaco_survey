@@ -218,7 +218,7 @@ export function Table() {
                         <Skeleton className="h-4 w-24" />
                       </TableCell>
                     </TableRow>
-                  ))) : (filteredTasks.length === 0 ? (
+                  ))) : (filteredTasks?.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                         Không có dữ liệu hiển thị

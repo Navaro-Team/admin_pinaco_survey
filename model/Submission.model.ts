@@ -21,6 +21,7 @@ export interface Submission {
   performedBy: string;
   performedByInfo: any;
   answers: any[],
+  supervisorReview: any,
 }
 
 export function parseSubmission(data: any): Submission {
@@ -47,6 +48,7 @@ export function parseSubmission(data: any): Submission {
     answers: data.answers,
     performedBy: data.performedBy,
     performedByInfo: data.performedByInfo,
+    supervisorReview: data.supervisorReview,
   };
 }
 
@@ -55,3 +57,13 @@ export function parseSubmissions(data: any): Submission[] {
   return data.map(parseSubmission);
 }
 
+export function getStatusSupervisorReview(submission: Submission): string | null {
+  switch (submission?.supervisorReview?.status) {
+    case "PASSED":
+      return "đạt"
+    case "FAILED":
+      return "không đạt";
+    default:
+      return null;
+  }
+}
