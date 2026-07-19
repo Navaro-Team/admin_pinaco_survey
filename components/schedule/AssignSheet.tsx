@@ -177,13 +177,13 @@ export function AssignSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-2xl flex flex-col gap-2">
+      <SheetContent className="w-full sm:max-w-2xl flex flex-col gap-2 overflow-hidden">
         <SheetHeader className="pb-0!">
           <SheetTitle>Gán lịch trình</SheetTitle>
           <SheetDescription hidden>Thông tin chi tiết về gán lịch trình</SheetDescription>
         </SheetHeader>
         <Separator />
-        <div className="flex-1 flex flex-col gap-2 px-3">
+        <div className="flex-1 flex flex-col gap-2 px-3 overflow-hidden min-h-0">
           {/* Combobox Chiến dịch */}
           <div className="flex flex-row gap-2">
             <Label htmlFor="campaignId" className="text-sm w-1/4">
@@ -256,48 +256,50 @@ export function AssignSheet({
 
           {/* Danh sách cửa hàng */}
           <Label htmlFor="storeId" className="text-sm">Danh sách cửa hàng <span className="text-red-500">*</span></Label>
-          <Table className="w-full flex-1">
-            <TableCaption hidden>Danh sách cửa hàng.</TableCaption>
-            <TableHeader>
-              <TableRow className="w-xl">
-                <TableHead className="text-center w-10">STT</TableHead>
-                <TableHead className="text-left w-32">Mã điểm bán</TableHead>
-                <TableHead className="text-left flex-1">Tên cửa hàng</TableHead>
-                <TableHead className="text-center w-12"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {localStores.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                    Không có dữ liệu
-                  </TableCell>
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <Table className="w-full">
+              <TableCaption hidden>Danh sách cửa hàng.</TableCaption>
+              <TableHeader className="sticky top-0 bg-background z-10">
+                <TableRow className="w-xl">
+                  <TableHead className="text-center w-10">STT</TableHead>
+                  <TableHead className="text-left w-32">Mã điểm bán</TableHead>
+                  <TableHead className="text-left flex-1">Tên cửa hàng</TableHead>
+                  <TableHead className="text-center w-12"></TableHead>
                 </TableRow>
-              ) : (
-                localStores.map((store, index) => {
-                  return (
-                    <TableRow key={store.id} className="w-xl">
-                      <TableCell className="text-center w-10">{index + 1}</TableCell>
-                      <TableCell className="text-left w-32">{store.code || "-"}</TableCell>
-                      <TableCell className="text-left flex-1 min-w-0">
-                        <div className="flex flex-col min-w-0 max-w-100">
-                          <span>{store.name || "-"}</span>
-                          <span className="truncate">
-                            {getAddress(store)}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center w-12">
-                        <Button variant="outline" size="icon" onClick={() => { dispatch(removeStores(store)) }}>
-                          <Trash2 className="size-4 text-red-500" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {localStores.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                      Không có dữ liệu
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  localStores.map((store, index) => {
+                    return (
+                      <TableRow key={store.id} className="w-xl">
+                        <TableCell className="text-center w-10">{index + 1}</TableCell>
+                        <TableCell className="text-left w-32">{store.code || "-"}</TableCell>
+                        <TableCell className="text-left flex-1 min-w-0">
+                          <div className="flex flex-col min-w-0 max-w-100">
+                            <span>{store.name || "-"}</span>
+                            <span className="truncate">
+                              {getAddress(store)}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center w-12">
+                          <Button variant="outline" size="icon" onClick={() => { dispatch(removeStores(store)) }}>
+                            <Trash2 className="size-4 text-red-500" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
         <Separator />
 
