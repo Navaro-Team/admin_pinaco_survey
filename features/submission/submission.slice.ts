@@ -42,6 +42,7 @@ const initialState: SubmissionState = {
 export const getSubmissionById = commonCreateAsyncThunk({ type: "getSubmissionById", action: submissionService.getSubmissionById });
 export const getPendingSubmissions = commonCreateAsyncThunk({ type: "getPendingSubmissions", action: submissionService.getPendingSubmissions });
 export const reviewSubmission = commonCreateAsyncThunk({ type: "reviewSubmission", action: submissionService.reviewSubmission });
+export const exportSubmission = commonCreateAsyncThunk({ type: "exportSubmission", action: submissionService.exportSubmission });
 
 export const submissionSlice = createSlice({
   name: 'submission',
@@ -133,6 +134,15 @@ export const submissionSlice = createSlice({
       })
       .addCase(reviewSubmission.rejected, (state, action) => {
         state.requestState = { status: 'failed', type: 'reviewSubmission', error: action.error.message };
+      })
+      .addCase(exportSubmission.fulfilled, (state) => {
+        state.requestState = { status: 'completed', type: 'exportSubmission' };
+      })
+      .addCase(exportSubmission.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'exportSubmission' };
+      })
+      .addCase(exportSubmission.rejected, (state, action) => {
+        state.requestState = { status: 'failed', type: 'exportSubmission', error: action.error.message };
       });
   }
 })
