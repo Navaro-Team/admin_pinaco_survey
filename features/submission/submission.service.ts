@@ -22,6 +22,11 @@ class SubmissionService {
     const response = await clientService.post(`/submissions/${payload.id}/review`, payload);
     return parseCommonHttpResult(response);
   }
+
+  async exportSubmission() {
+    const response = await clientService.get(`/submissions/export`);
+    return parseCommonHttpResult(response);
+  }
 }
 
 export const submissionService = new SubmissionService();
