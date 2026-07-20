@@ -1,6 +1,7 @@
 import { sortQuestionsByCode } from '@/lib/questions.utils';
+import { getStatusSupervisorReview } from '@/model/Submission.model';
 import { getCheckInAsset } from '@/model/Task.model';
-import { format } from 'date-fns';
+import { format, formatDate } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 const formatCurrency = (value: number | string): string => {
@@ -741,6 +742,11 @@ export function exportSurveyToPDF(
           <span class="info-label">Trạng thái:</span>
           <span>${escapeHtml(task?.status || 'N/A')}</span>
         </div>
+        ${submission?.supervisorReview?.reviewerName ? `<div class="info-row">
+          <span>${submission?.supervisorReview?.reviewerName}</span>
+          <span class="info-label"> đánh giá khảo sát ${getStatusSupervisorReview(submission)} </span>
+          <span>yêu cầu vào lúc ${formatDate(submission.supervisorReview.reviewedAt, "HH:mm dd/MM/yyyy")}</span>
+        </div>` : ''}
         ${task?.resurveyRequest?.reason ? `<div class="info-row">
           <span class="info-label">Lý do yêu cầu khảo sát lại:</span>
           <span>${escapeHtml(task?.resurveyRequest?.reason)}</span>

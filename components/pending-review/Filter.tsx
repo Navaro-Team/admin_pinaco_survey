@@ -21,13 +21,15 @@ import DateRangeFilter from "../ui/DateRangeFilter";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Tất cả trạng thái" },
-  { value: "SUBMITTED", label: "Đã gửi" },
-  { value: "SUPERSEDED", label: "Đã thay thế" },
+  { value: "SUBMITTED", label: "Đã khảo sát, chờ kiểm tra" },
+  { value: "SUPERSEDED", label: "Đã được thay thế" },
   { value: "DELETED", label: "Đã xóa" },
   { value: "CANCELLED", label: "Đã huỷ" },
-  { value: "RESURVEY_REJECTED", label: "Từ chối khảo sát lại" },
-  { value: "PENDING_REVIEW", label: "Đang chờ duyệt" },
-  { value: "REJECTED_REVIEW", label: "Đã bị từ chối" },
+  { value: "RESURVEY_REJECTED", label: "Yêu cầu khảo sát lại bị từ chối" },
+  { value: "PENDING_REVIEW", label: "Chờ phê duyệt" },
+  { value: "REJECTED_REVIEW", label: "Bị từ chối" },
+  { value: "COMPLETED", label: "Đã hoàn thành" },
+  { value: "FAILED", label: "Không đạt" },
 ];
 
 export function PendingReviewFilter() {
