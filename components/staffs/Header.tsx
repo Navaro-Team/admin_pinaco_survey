@@ -19,7 +19,7 @@ export function Header() {
 
   const handleExportExcel = async () => {
     try {
-      await dispatch(exportUsers({ page: 1, limit: 10000 })).unwrap().then((res) => {
+      await dispatch(exportUsers()).unwrap().then((res) => {
         const payload = res as any;
         const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
         const staffs = parseUsers(data);

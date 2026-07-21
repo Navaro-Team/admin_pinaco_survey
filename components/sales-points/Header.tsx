@@ -21,7 +21,7 @@ export function Header() {
 
   const handleExportExcel = async () => {
     try {
-      await dispatch(exportSalesPoints({ page: 1, limit: 10000 }))
+      await dispatch(exportSalesPoints({}))
         .unwrap()
         .then((res) => {
           const payload = res as any;
