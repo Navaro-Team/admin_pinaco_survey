@@ -30,6 +30,11 @@ class StaffsService {
     return parseCommonHttpResult(response);
   }
 
+  async exportUsers() {
+    const response = await clientService.get('/users/export');
+    return parseCommonHttpResult(response);
+  }
+
   async searchUsers(params?: SearchUsersParams) {
     const queryParams: Record<string, string> = {};
 

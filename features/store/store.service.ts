@@ -29,6 +29,11 @@ class StoreService {
     return parseCommonHttpResult(response);
   }
 
+  async exports() {
+    const response = await clientService.get(`/stores/export`);
+    return parseCommonHttpResult(response);
+  }
+
   async searchStores(params?: SearchStoresParams) {
     const queryParams: Record<string, string> = {};
 
