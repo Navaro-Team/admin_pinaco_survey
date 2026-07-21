@@ -39,7 +39,7 @@ const initialState: SalesPointsState = {
 }
 
 export const getStores = commonCreateAsyncThunk({ type: 'salesPoints/getStores', action: storeService.getStores });
-export const exportSalesPoints = commonCreateAsyncThunk({ type: 'salesPoints/exportSalesPoints', action: storeService.getStores });
+export const exportSalesPoints = commonCreateAsyncThunk({ type: 'salesPoints/exportSalesPoints', action: storeService.exports });
 export const searchStores = commonCreateAsyncThunk({ type: 'salesPoints/searchStores', action: storeService.searchStores });
 export const deleteStore = commonCreateAsyncThunk({ type: 'salesPoints/deleteStore', action: storeService.deleteStore });
 export const getStoreById = commonCreateAsyncThunk({ type: 'salesPoints/getStoreById', action: storeService.getStoreById });
