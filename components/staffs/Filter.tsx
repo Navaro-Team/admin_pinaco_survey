@@ -25,7 +25,7 @@ export function Filter() {
   const handleRefresh = () => {
     handleClearFilter();
     dispatch(getUsers());
-  }
+  };
 
   return (
     <Card>
@@ -34,6 +34,7 @@ export function Filter() {
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Tên hoặc Email</Label>
             <Input
+              isDebounce
               placeholder="Nhập tên hoặc email nhân viên"
               value={search}
               onChange={(e) => dispatch(changeSearch(e.target.value))} />

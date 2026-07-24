@@ -20,6 +20,7 @@ export function Filter() {
           <div className="min-w-0 flex-1 basis-50 flex flex-col gap-2">
             <Label>Cửa hàng</Label>
             <Input
+              isDebounce
               placeholder="Nhập tên cửa hàng"
               value={q}
               onChange={(e) => dispatch(changeSearch(e.target.value))} />
@@ -27,6 +28,7 @@ export function Filter() {
           <div className="min-w-0 flex-1 basis-50 flex flex-col gap-2">
             <Label>Khu vực</Label>
             <Input
+              isDebounce
               placeholder="Nhập khu vực hoặc tỉnh/thành phố"
               value={areaOrProvince}
               onChange={(e) => dispatch(changeAreaOrProvince(e.target.value))} />
