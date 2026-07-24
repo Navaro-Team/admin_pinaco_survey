@@ -21,7 +21,7 @@ export function Filter() {
   const handleRefresh = () => {
     handleClearFilter();
     dispatch(getStores({}));
-  }
+  };
 
   return (
     <Card>
@@ -30,6 +30,7 @@ export function Filter() {
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Tên hoặc Mã điểm bán</Label>
             <Input
+              isDebounce
               placeholder="Nhập tên hoặc mã điểm bán"
               value={search}
               onChange={(e) => dispatch(changeSearch(e.target.value))} />
@@ -37,6 +38,7 @@ export function Filter() {
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Tỉnh/Thành phố</Label>
             <Input
+              isDebounce
               placeholder="Nhập tỉnh/thành phố"
               value={province}
               onChange={(e) => dispatch(changeProvince(e.target.value))} />
@@ -44,6 +46,7 @@ export function Filter() {
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Khu vực</Label>
             <Input
+              isDebounce
               placeholder="Nhập khu vực"
               value={area}
               onChange={(e) => dispatch(changeArea(e.target.value))} />

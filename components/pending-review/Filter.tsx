@@ -39,7 +39,7 @@ export function PendingReviewFilter() {
 
   const handleStoreChange = (value: string) => {
     dispatch(changeStore(value));
-    dispatch(changePage(1)); // Reset to page 1 when store filter changes
+    dispatch(changePage(1));
   };
 
   const handleStatusChange = (value: string) => {
@@ -67,6 +67,7 @@ export function PendingReviewFilter() {
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Tên cửa hàng</Label>
             <Input
+              isDebounce
               placeholder="Nhập tên cửa hàng"
               value={filter.store}
               onChange={(e) => handleStoreChange(e.target.value)}

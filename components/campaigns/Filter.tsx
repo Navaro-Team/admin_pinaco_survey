@@ -23,7 +23,7 @@ export function Filter() {
   const handleRefresh = () => {
     handleClearFilter();
     dispatch(getCampaigns({ search: search, status: status, page: 1, limit: 50 }));
-  }
+  };
 
   return (
     <Card>
@@ -32,6 +32,7 @@ export function Filter() {
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <Label>Tên hoặc Mã chiến dịch</Label>
             <Input
+              isDebounce
               placeholder="Nhập tên hoặc mã chiến dịch"
               value={search}
               onChange={(e) => dispatch(changeCampaignFilterSearch(e.target.value))} />
