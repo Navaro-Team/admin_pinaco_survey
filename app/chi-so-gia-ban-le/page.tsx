@@ -2,9 +2,8 @@
 
 import { useState } from "react"
 import { GlobalFilter, type GlobalFilterState } from "@/components/dashboard/GlobalFilter"
-import { OverviewKPIs } from "@/components/dashboard/OverviewKPIs"
-import { SalesDashboard } from "@/components/dashboard/SalesDashboard"
-import { InventoryDashboard } from "@/components/dashboard/InventoryDashboard"
+import { InternalPriceGap } from "@/components/dashboard/pricing/InternalPriceGap"
+import { CompetitivePricing } from "@/components/dashboard/pricing/CompetitivePricing"
 
 const DEFAULT_FILTER: GlobalFilterState = {
   region: "",
@@ -18,17 +17,13 @@ export default function Page() {
 
   return (
     <div className="flex flex-col gap-3 py-3">
-      {/* Section 1: Bộ lọc toàn cục */}
       <GlobalFilter value={filter} onChange={setFilter} />
 
-      {/* Section 2: Chỉ số tổng quan */}
-      <OverviewKPIs />
-
-      {/* Section 3: Doanh số bán ra */}
-      <SalesDashboard />
-
-      {/* Section 4: Giá trị tồn kho */}
-      <InventoryDashboard />
+      <div className="mx-2 lg:mx-3 flex flex-col gap-3">
+        <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide">Chỉ số giá bán lẻ</h2>
+        <InternalPriceGap />
+        <CompetitivePricing />
+      </div>
     </div>
   )
 }

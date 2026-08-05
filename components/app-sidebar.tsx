@@ -6,7 +6,10 @@ import {
   Users,
   FileText,
   Calendar,
-  Backpack
+  Backpack,
+  GitBranch,
+  BarChart2,
+  Tag,
 } from "lucide-react"
 
 import { NavMain } from '@/components/nav-main'
@@ -32,6 +35,21 @@ const data = {
       title: "Dashboard",
       url: "/dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      title: "Kênh phân phối",
+      url: "/kenh-phan-phoi",
+      icon: GitBranch,
+    },
+    {
+      title: "Thị phần sản lượng",
+      url: "/thi-phan-san-luong",
+      icon: BarChart2,
+    },
+    {
+      title: "Chỉ số giá bán lẻ",
+      url: "/chi-so-gia-ban-le",
+      icon: Tag,
     },
     {
       title: "Quản lý chiến dịch",
