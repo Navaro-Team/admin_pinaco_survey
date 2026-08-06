@@ -256,7 +256,6 @@ export function SalesPointSheet({
       const res = await dispatch(validateFileImportStores(selectedFile)).unwrap();
       const payload = res as any;
       const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
-      console.log('responseData ', responseData)
       const { validCount, invalidCount, totalRows, rows } = responseData;
       if (rows && Array.isArray(rows)) {
         rows.forEach(row => {
