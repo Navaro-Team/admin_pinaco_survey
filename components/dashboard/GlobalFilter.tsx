@@ -3,6 +3,13 @@
 import { RotateCcw } from "lucide-react"
 import { Combobox } from "@/components/ui/combobox"
 import { ComboboxMultiple } from "@/components/ui/combobox-multiple"
+import { useAppDispatch, useAppSelector } from "@/hooks/redux"
+import { SearchableCombobox } from "../ui/searchable-combobox"
+import { User } from "@/model/User.model"
+import { searchUsers } from "@/features/staffs/staffs.slice"
+import { useEffect } from "react"
+import { getAreas } from "@/features/dashboard/dashboard.slice"
+import { BUSINESS_TYPES, PRODUCT_CATEGORIES } from "@/utils/survey-constants"
 
 export type GlobalFilterState = {
   region: string
@@ -16,34 +23,6 @@ type Props = {
   onChange: (value: GlobalFilterState) => void
 }
 
-const REGION_OPTIONS = [
-  { value: "", label: "Tất cả khu vực" },
-  { value: "mien-nam", label: "Miền Nam" },
-  { value: "mien-dong", label: "Miền Đông" },
-  { value: "mien-tay", label: "Miền Tây" },
-]
-
-const STAFF_OPTIONS = [
-  { value: "", label: "Tất cả nhân viên" },
-  { value: "nv-01", label: "Nguyễn Văn A" },
-  { value: "nv-02", label: "Trần Thị B" },
-  { value: "nv-03", label: "Lê Văn C" },
-]
-
-const BUSINESS_TYPE_OPTIONS = [
-  { value: "", label: "Tất cả" },
-  { value: "chuyen-aq-oto", label: "Chuyên AQ ô tô" },
-  { value: "gara-oto", label: "Gara ô tô" },
-  { value: "xe-may", label: "Xe máy" },
-]
-
-const CATEGORY_OPTIONS = [
-  { value: "oto", label: "Ô tô" },
-  { value: "xe-may", label: "Xe máy" },
-  { value: "xe-tai", label: "Xe tải" },
-  { value: "xe-dien", label: "Xe điện" },
-]
-
 const DEFAULT_FILTER: GlobalFilterState = {
   region: "",
   staff: "",
@@ -52,7 +31,37 @@ const DEFAULT_FILTER: GlobalFilterState = {
 }
 
 export function GlobalFilter({ value, onChange }: Props) {
-  const handleReset = () => onChange(DEFAULT_FILTER)
+  const handleReset = () => onChange(DEFAULT_FILTER);
+  const dispatch = useAppDispatch();
+
+  const areas = useAppSelector(state => state.dashboard.areas);
+  const staffs = useAppSelector((state) => state.staffs.staffs);
+  const staffsRequestState = useAppSelector((state) => state.staffs.requestState);
+  const dashboardState = useAppSelector((state) => state.dashboard.requestState);
+
+  const handleSearchStaffs = (searchValue: string) => {
+    const trimmedSearch = searchValue.trim();
+    const params: any = { page: 1 };
+    if (trimmedSearch) {
+      params.q = trimmedSearch;
+    } else {
+      params.limit = 50;
+    }
+    dispatch(searchUsers(params));
+  };
+
+  const handleChangeStaff = (userId: string) => {
+    const selectedStaff = staffs.find((staff: User) => staff?.id === userId);
+    if (selectedStaff) {
+      onChange({ ...value, staff: selectedStaff.id })
+    } else {
+      onChange({ ...value, staff: "" })
+    }
+  };
+
+  useEffect(() => {
+    dispatch(getAreas({}))
+  }, [])
 
   return (
     <div className="bg-white border rounded-xl px-3 py-2.5 mx-2 lg:mx-3">
@@ -60,7 +69,7 @@ export function GlobalFilter({ value, onChange }: Props) {
         <h2 className="text-base font-bold text-blue-700 uppercase tracking-wide">Bộ lọc toàn cục</h2>
         <button
           onClick={handleReset}
-          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
         >
           <RotateCcw className="w-4 h-4" />
           Đặt lại
@@ -72,7 +81,8 @@ export function GlobalFilter({ value, onChange }: Props) {
           <label className="text-sm text-gray-600">Khu vực</label>
           <Combobox
             className="w-full"
-            options={REGION_OPTIONS}
+            disabled={dashboardState.status === "loading" && dashboardState.type === "getAreas"}
+            options={areas.map(area => ({ label: area, value: area }))}
             value={value.region}
             onChange={(v) => onChange({ ...value, region: v })}
             placeholder="Tất cả khu vực"
@@ -81,12 +91,17 @@ export function GlobalFilter({ value, onChange }: Props) {
 
         <div className="flex flex-col gap-1">
           <label className="text-sm text-gray-600">Nhân viên<span className="text-xs"> (Theo khu vực được chọn)</span></label>
-          <Combobox
-            className="w-full"
-            options={STAFF_OPTIONS}
+          <SearchableCombobox
+            options={staffs.map(staff => ({
+              value: staff.id,
+              label: [staff.code, staff.name].filter(Boolean).join(' - '),
+            }))}
             value={value.staff}
-            onChange={(v) => onChange({ ...value, staff: v })}
+            onChange={handleChangeStaff}
             placeholder="Tất cả nhân viên"
+            className="w-full"
+            isLoading={staffsRequestState.status === 'loading' && staffsRequestState.type === 'searchUsers'}
+            onSearch={handleSearchStaffs}
           />
         </div>
 
@@ -94,7 +109,7 @@ export function GlobalFilter({ value, onChange }: Props) {
           <label className="text-sm text-gray-600">Loại hình kinh doanh</label>
           <Combobox
             className="w-full"
-            options={BUSINESS_TYPE_OPTIONS}
+            options={BUSINESS_TYPES.map(bt => ({ label: bt.text, value: bt.code }))}
             value={value.businessType}
             onChange={(v) => onChange({ ...value, businessType: v })}
             placeholder="Tất cả"
@@ -106,7 +121,7 @@ export function GlobalFilter({ value, onChange }: Props) {
           <div className="flex items-center gap-1">
             <ComboboxMultiple
               className="w-full flex-1"
-              options={CATEGORY_OPTIONS}
+              options={PRODUCT_CATEGORIES.map(pc => ({ label: pc.categoryName, value: pc.category }))}
               value={value.categories}
               setValue={(v) =>
                 onChange({
@@ -116,7 +131,6 @@ export function GlobalFilter({ value, onChange }: Props) {
               }
               placeholder="Tất cả"
             />
-            <span className="text-xs text-gray-500 whitespace-nowrap">{value.categories.length} đã chọn</span>
           </div>
         </div>
       </div>

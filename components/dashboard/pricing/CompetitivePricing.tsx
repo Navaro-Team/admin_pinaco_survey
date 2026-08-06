@@ -1,124 +1,175 @@
 "use client"
 
+import { useState, useMemo } from "react"
+import { AlertTriangle } from "lucide-react"
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  Legend, ResponsiveContainer, ReferenceLine,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  Legend, ResponsiveContainer, LabelList,
 } from "recharts"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
+import { BRAND_COLORS, type CompetitiveData } from "@/features/dashboard/dashboard.types"
+import { BRANDS_CARRIED } from "@/utils/survey-constants"
 
-const BRAND_COLORS: Record<string, string> = {
-  PINACO:     "#1565C0",
-  GS:         "#FDD835",
-  Enimac:     "#E91E63",
-  Globe:      "#9C27B0",
-  "Thiên Năng":"#4CAF50",
+function fmtVND(v: number) {
+  return new Intl.NumberFormat("vi-VN").format(v) + " đ"
 }
 
-// Price index per SKU segment (100 = market average)
-const PRICE_INDEX_DATA = [
-  { segment: "4Ah",  PINACO: 102, GS: 98,  Enimac: 94, Globe: 90, "Thiên Năng": 88 },
-  { segment: "7Ah",  PINACO: 105, GS: 100, Enimac: 96, Globe: 92, "Thiên Năng": 90 },
-  { segment: "10Ah", PINACO: 108, GS: 103, Enimac: 98, Globe: 94, "Thiên Năng": 91 },
-  { segment: "14Ah", PINACO: 110, GS: 104, Enimac: 99, Globe: 95, "Thiên Năng": 92 },
-  { segment: "18Ah", PINACO: 112, GS: 106, Enimac: 101,Globe: 97, "Thiên Năng": 93 },
-  { segment: "24Ah", PINACO: 115, GS: 108, Enimac: 103,Globe: 99, "Thiên Năng": 94 },
-]
+const CustomLabel = ({ x, y, width, value }: any) => (
+  <text x={x + width / 2} y={y - 4} fill="#374151" fontSize={10} textAnchor="middle">
+    {fmtVND(value)}
+  </text>
+)
 
-type Position = "Cao hơn" | "Tương đương" | "Thấp hơn"
-
-const COMPETITIVE_TABLE: {
-  brand: string
-  avgPrice: number
-  vsMarket: number
-  vsPinaco: number
-  position: Position
-}[] = [
-  { brand: "PINACO",     avgPrice: 560, vsMarket: 8,   vsPinaco: 0,   position: "Cao hơn"     },
-  { brand: "GS",         avgPrice: 520, vsMarket: 2,   vsPinaco: -7,  position: "Tương đương"  },
-  { brand: "Enimac",     avgPrice: 490, vsMarket: -4,  vsPinaco: -13, position: "Thấp hơn"    },
-  { brand: "Globe",      avgPrice: 460, vsMarket: -10, vsPinaco: -18, position: "Thấp hơn"    },
-  { brand: "Thiên Năng", avgPrice: 440, vsMarket: -14, vsPinaco: -21, position: "Thấp hơn"    },
-]
-
-const POSITION_STYLE: Record<Position, string> = {
-  "Cao hơn":      "text-blue-600 font-semibold",
-  "Tương đương":  "text-yellow-600 font-semibold",
-  "Thấp hơn":     "text-gray-400 font-semibold",
+interface Props {
+  data?: CompetitiveData
+  isLoading?: boolean
 }
 
-const BRANDS = Object.keys(BRAND_COLORS)
+export function CompetitivePricing({ data, isLoading }: Props) {
+  const stores = data?.stores ?? []
+  const comparison = data?.comparison ?? []
+  const alert = data?.alert
 
-export function CompetitivePricing() {
+
+  // Derive unique sku names and competitor brands from data
+  const allSkuNames = useMemo(() => {
+    const set = new Set<string>()
+    for (const s of stores) s.groups.forEach(g => set.add(g.sku_name))
+    return Array.from(set)
+  }, [stores])
+
+  const allCompetitors = useMemo(() => comparison.map(r => r.competitor), [comparison])
+
+  const [selectedStore, setSelectedStore] = useState<string>("")
+  const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>([])
+
+  // Sync defaults when data loads
+  const activeStore = stores.find(s => s.store_id === selectedStore || s.store_name === selectedStore)
+    ?? stores[0]
+  const activeCompetitors = selectedCompetitors.length > 0 ? selectedCompetitors : allCompetitors.slice(0, 2)
+  const activeBrands = ["PINACO", ...activeCompetitors]
+
+  const chartData = useMemo(() => {
+    if (!activeStore) return []
+    return activeStore.groups.map(g => ({
+      name: g.sku_name,
+      ...Object.fromEntries(activeBrands.map(b => [b, g.prices[b] ?? null])),
+    }))
+  }, [activeStore, activeBrands])
+
+  const compRows = comparison.filter(r => activeCompetitors.includes(r.competitor))
+
+  const toggleCompetitor = (brand: string) => {
+    setSelectedCompetitors(prev =>
+      prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
+    )
+  }
+
   return (
-    <div className="bg-white border rounded-xl px-3 py-2.5">
-      <div className="flex items-start justify-between mb-2">
-        <h3 className="text-base font-bold text-blue-700">2. TƯƠNG QUAN CẠNH TRANH</h3>
-        <span className="text-xs text-gray-400 italic">Chỉ số giá = 100 là mức trung bình thị trường</span>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {/* Price index line chart */}
-        <div>
-          <p className="text-xs text-gray-400 mb-1">Chỉ số giá tương đối theo phân khúc Ah</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={PRICE_INDEX_DATA} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="segment" tick={{ fontSize: 11 }} />
-              <YAxis domain={[80, 120]} tick={{ fontSize: 11 }} unit="" />
-              <ReferenceLine y={100} stroke="#9ca3af" strokeDasharray="4 4" label={{ value: "Trung bình", position: "right", fontSize: 10, fill: "#9ca3af" }} />
-              <Tooltip formatter={(v: number) => `${v} điểm`} />
-              <Legend iconType="square" wrapperStyle={{ fontSize: 11 }} />
-              {BRANDS.map((brand) => (
-                <Line
-                  key={brand}
-                  type="monotone"
-                  dataKey={brand}
-                  stroke={BRAND_COLORS[brand]}
-                  strokeWidth={brand === "PINACO" ? 2.5 : 1.5}
-                  dot={{ r: brand === "PINACO" ? 4 : 2 }}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Competitive table */}
-        <div className="overflow-x-auto">
-          <Table className="text-sm">
-            <TableHeader>
-              <TableRow className="bg-blue-50">
-                <TableHead className="font-bold text-gray-700">Thương hiệu</TableHead>
-                <TableHead className="font-bold text-gray-700 text-right">Giá TB (k)</TableHead>
-                <TableHead className="font-bold text-gray-700 text-right">vs Thị trường</TableHead>
-                <TableHead className="font-bold text-gray-700 text-right">vs PINACO</TableHead>
-                <TableHead className="font-bold text-gray-700">Vị thế</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {COMPETITIVE_TABLE.map((row) => (
-                <TableRow key={row.brand}>
-                  <TableCell className="font-medium text-gray-700 flex items-center gap-1.5">
-                    <span
-                      className="w-2.5 h-2.5 rounded-sm shrink-0"
-                      style={{ backgroundColor: BRAND_COLORS[row.brand] ?? "#9ca3af" }}
-                    />
-                    {row.brand}
-                  </TableCell>
-                  <TableCell className="text-right">{row.avgPrice}</TableCell>
-                  <TableCell className={cn("text-right", row.vsMarket > 0 ? "text-blue-600" : row.vsMarket < 0 ? "text-red-500" : "text-gray-500")}>
-                    {row.vsMarket > 0 ? "+" : ""}{row.vsMarket}%
-                  </TableCell>
-                  <TableCell className={cn("text-right", row.vsPinaco === 0 ? "text-gray-400" : "text-red-500")}>
-                    {row.vsPinaco === 0 ? "—" : `${row.vsPinaco}%`}
-                  </TableCell>
-                  <TableCell className={cn("text-xs", POSITION_STYLE[row.position])}>{row.position}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+    <div className={`bg-white border rounded-xl px-3 py-2.5 ${isLoading ? "opacity-60" : ""}`}>
+      {/* Header + filters */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+        <h3 className="text-base font-bold text-blue-700 shrink-0">2. TƯƠNG QUAN GIÁ CẠNH TRANH</h3>
+        <div className="flex flex-wrap gap-2 sm:ml-3">
+          {/* Store filter */}
+          <div className="flex flex-col gap-0.5">
+            <label className="text-[10px] text-gray-400 font-medium">Cửa hàng</label>
+            <select
+              value={activeStore?.store_name ?? ""}
+              onChange={(e) => setSelectedStore(e.target.value)}
+              className="text-xs border rounded px-2 py-1 text-gray-700 min-w-40"
+            >
+              {stores.length === 0
+                ? <option value="">Chưa có dữ liệu</option>
+                : stores.map(s => <option key={s.store_id} value={s.store_name}>{s.store_name}</option>)
+              }
+            </select>
+          </div>
+          {/* Competitor filter */}
+          {allCompetitors.length > 0 && (
+            <div className="flex flex-col gap-0.5">
+              <label className="text-[10px] text-gray-400 font-medium">Thương hiệu đối thủ</label>
+              <div className="flex gap-1 flex-wrap">
+                {allCompetitors.map(brand => (
+                  <button
+                    key={brand}
+                    onClick={() => toggleCompetitor(brand)}
+                    className={`text-xs px-2 py-0.5 rounded border transition-colors ${activeCompetitors.includes(brand)
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-500 border-gray-300"
+                      }`}
+                  >
+                    {BRANDS_CARRIED.find(b => b.brandCode === brand)?.brandName ?? brand}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {stores.length === 0 ? (
+        <div className="flex items-center justify-center h-70 text-gray-400 text-sm">Chưa có dữ liệu</div>
+      ) : (
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Grouped bar chart */}
+          <div className="flex-1 min-w-0">
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={chartData} margin={{ top: 24, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 10 }} />
+                <Tooltip formatter={(v: number) => fmtVND(v)} />
+                <Legend iconType="square" wrapperStyle={{ fontSize: 11 }} />
+                {activeBrands.map(brand => (
+                  <Bar key={brand} dataKey={brand} fill={BRAND_COLORS[brand] ?? "#9ca3af"} radius={[3, 3, 0, 0]}>
+                    <LabelList content={<CustomLabel />} />
+                  </Bar>
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Right panel: comparison table + alert */}
+          <div className="w-full lg:w-72 shrink-0 flex flex-col gap-3">
+            <table className="w-full text-sm border rounded-lg overflow-hidden">
+              <thead>
+                <tr className="bg-blue-50">
+                  <th className="text-left font-bold text-gray-700 px-3 py-2">Đối thủ</th>
+                  <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">Số CH</th>
+                  <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO cao hơn</th>
+                  <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO bằng</th>
+                  <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO thấp hơn</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {compRows.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center text-gray-400 text-xs py-4">Chọn ít nhất 1 đối thủ</td>
+                  </tr>
+                ) : compRows.map(row => (
+                  <tr key={row.competitor} className="hover:bg-gray-50">
+                    <td className="px-3 py-2 font-medium text-gray-700">{row.competitor}</td>
+                    <td className="px-2 py-2 text-center text-gray-600">{row.store_count}</td>
+                    <td className="px-2 py-2 text-center font-semibold text-blue-600">{row.higher_pct}%</td>
+                    <td className="px-2 py-2 text-center font-semibold text-gray-400">{row.same_pct}%</td>
+                    <td className="px-2 py-2 text-center font-semibold text-red-500">{row.lower_pct}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {alert && (
+              <div className="border-2 border-red-400 rounded-xl bg-red-50 px-3 py-3 flex gap-2 items-start">
+                <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-bold text-red-600 mb-0.5">Lệch biên độ giá cạnh tranh</p>
+                  <p className="text-xs text-red-500">{alert}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

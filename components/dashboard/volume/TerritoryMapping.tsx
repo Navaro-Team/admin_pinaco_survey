@@ -1,99 +1,111 @@
 "use client"
 
-import {
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  ResponsiveContainer, Legend, Tooltip,
-} from "recharts"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-const RADAR_DATA = [
-  { subject: "Mật độ CH",  PINACO: 82, GS: 65, Enimac: 48 },
-  { subject: "SOW",        PINACO: 87, GS: 60, Enimac: 40 },
-  { subject: "Sản lượng",  PINACO: 78, GS: 55, Enimac: 35 },
-  { subject: "Tồn kho",    PINACO: 72, GS: 58, Enimac: 42 },
-  { subject: "Giá TB",     PINACO: 65, GS: 70, Enimac: 55 },
-  { subject: "Tăng trưởng",PINACO: 70, GS: 52, Enimac: 38 },
-]
+type Zone = "green" | "yellow" | "red"
 
-type Priority = "Ưu tiên" | "Theo dõi" | "Bão hòa"
-
-const TERRITORY_TABLE: {
-  territory: string
-  district: string
-  volumeShare: number
-  growth: number
-  priority: Priority
-}[] = [
-  { territory: "Miền Nam – Tràng Bàng",     district: "Tây Ninh",  volumeShare: 34, growth: 8,   priority: "Ưu tiên"   },
-  { territory: "Miền Nam – Dĩ An",           district: "Bình Dương",volumeShare: 29, growth: 5,   priority: "Theo dõi"  },
-  { territory: "Miền Đông – Thuận An",       district: "Bình Dương",volumeShare: 32, growth: 12,  priority: "Ưu tiên"   },
-  { territory: "Miền Đông – Gò Dầu",         district: "Tây Ninh",  volumeShare: 21, growth: -2,  priority: "Theo dõi"  },
-  { territory: "Miền Tây – Hòa Thành",       district: "Tây Ninh",  volumeShare: 18, growth: -5,  priority: "Bão hòa"   },
-  { territory: "Miền Tây – Dương Minh Châu", district: "Tây Ninh",  volumeShare: 15, growth: -8,  priority: "Bão hòa"   },
-]
-
-const PRIORITY_STYLE: Record<Priority, string> = {
-  "Ưu tiên":  "bg-green-100 text-green-700 border border-green-300",
-  "Theo dõi": "bg-yellow-50 text-yellow-700 border border-yellow-300",
-  "Bão hòa":  "bg-gray-100 text-gray-500 border border-gray-300",
+type TerritoryRow = {
+  rank: number
+  area_id: string
+  area_name: string
+  sample_count: number
+  pinaco_mean: number       // /10 bình
+  zone: Zone
+  main_competitor: string   // "GS — 1,5/10" hoặc "Yamato & Thiên Năng — 5,5/10"
 }
 
-export function TerritoryMapping() {
+type VolumeSummary = {
+  avg_pinaco_per_10: number
+  avg_pinaco_pct: number
+}
+
+const ZONE_CONFIG: Record<Zone, { label: string; badgeClass: string; textClass: string; zoneLabel: string; rowClass: string }> = {
+  green: { label: "Vùng Xanh", zoneLabel: "Vùng Xanh — Thống lĩnh", badgeClass: "bg-green-600 text-white", textClass: "text-green-700", rowClass: "bg-green-50" },
+  yellow: { label: "Vùng Vàng", zoneLabel: "Vùng Vàng — Cạnh tranh", badgeClass: "bg-orange-400 text-white", textClass: "text-orange-600", rowClass: "bg-orange-50" },
+  red: { label: "Vùng Đỏ", zoneLabel: "Vùng Đỏ — Báo động", badgeClass: "bg-red-500 text-white", textClass: "text-red-600", rowClass: "bg-red-50" },
+}
+
+const LEGEND = [
+  { zone: "green" as Zone, rule: "≥ 6/10" },
+  { zone: "yellow" as Zone, rule: "từ 4 đến < 6/10" },
+  { zone: "red" as Zone, rule: "< 4/10" },
+]
+
+interface Props {
+  data?: TerritoryRow[]
+  summary?: VolumeSummary
+  isLoading?: boolean
+}
+
+export function TerritoryMapping({ data, summary, isLoading }: Props) {
+  const rows = data ?? []
+  const kpi = summary ?? { avg_pinaco_per_10: 0, avg_pinaco_pct: 0 }
+
   return (
-    <div className="bg-white border rounded-xl px-3 py-2.5">
-      <h3 className="text-base font-bold text-blue-700 mb-2">2. TERRITORY MAPPING</h3>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        {/* Radar chart */}
-        <div>
-          <p className="text-xs text-gray-400 mb-1">Năng lực cạnh tranh theo lãnh thổ (điểm chuẩn hóa 0–100)</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <RadarChart data={RADAR_DATA}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9 }} />
-              <Radar name="PINACO" dataKey="PINACO" stroke="#1565C0" fill="#1565C0" fillOpacity={0.25} />
-              <Radar name="GS"     dataKey="GS"     stroke="#FDD835" fill="#FDD835" fillOpacity={0.2}  />
-              <Radar name="Enimac" dataKey="Enimac" stroke="#E91E63" fill="#E91E63" fillOpacity={0.15} />
-              <Tooltip />
-              <Legend iconType="square" wrapperStyle={{ fontSize: 11 }} />
-            </RadarChart>
-          </ResponsiveContainer>
+    <div className={`bg-white border rounded-xl px-3 py-2.5 ${isLoading ? "opacity-60" : ""}`}>
+      {/* Header row: title + KPI */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
+        <h3 className="text-base font-bold text-blue-700">2. ĐỊNH VỊ LÃNH THỔ — TERRITORY MAPPING</h3>
+        <div className="text-right shrink-0">
+          <p className="text-xs text-blue-600 font-medium">Thị phần sản lượng PINACO trung bình</p>
+          <div className="flex items-baseline gap-3 justify-end">
+            <span className="text-2xl font-bold text-blue-700">{kpi.avg_pinaco_per_10.toFixed(1)}/10 bình</span>
+            <span className="text-lg font-bold text-blue-500">{kpi.avg_pinaco_pct}%</span>
+          </div>
         </div>
+      </div>
 
-        {/* Territory table */}
-        <div className="overflow-x-auto">
-          <Table className="text-sm">
-            <TableHeader>
-              <TableRow className="bg-blue-50">
-                <TableHead className="font-bold text-gray-700">Lãnh thổ</TableHead>
-                <TableHead className="font-bold text-gray-700 text-right">Vol. Share</TableHead>
-                <TableHead className="font-bold text-gray-700 text-right">Tăng trưởng</TableHead>
-                <TableHead className="font-bold text-gray-700">Ưu tiên</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {TERRITORY_TABLE.map((row) => (
-                <TableRow key={row.territory}>
-                  <TableCell>
-                    <p className="font-medium text-gray-700 text-xs">{row.territory}</p>
-                    <p className="text-xs text-gray-400">{row.district}</p>
-                  </TableCell>
-                  <TableCell className="text-right font-semibold text-blue-600">{row.volumeShare}%</TableCell>
-                  <TableCell className={cn("text-right font-semibold", row.growth >= 0 ? "text-green-600" : "text-red-500")}>
-                    {row.growth > 0 ? "+" : ""}{row.growth}%
-                  </TableCell>
-                  <TableCell>
-                    <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", PRIORITY_STYLE[row.priority])}>
-                      {row.priority}
+      {/* Legend */}
+      <div className="flex flex-wrap gap-4 mb-3">
+        {LEGEND.map(({ zone, rule }) => {
+          const cfg = ZONE_CONFIG[zone]
+          return (
+            <div key={zone} className="flex items-center gap-1.5 text-xs text-gray-600">
+              <span className="w-3.5 h-3.5 rounded-sm shrink-0" style={{ backgroundColor: zone === "green" ? "#16a34a" : zone === "yellow" ? "#f59e0b" : "#ef4444" }} />
+              <span className="font-semibold">{cfg.label}:</span> {rule}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-160 border-collapse">
+          <thead>
+            <tr className="bg-blue-50">
+              <th className="text-center font-bold text-gray-700 px-3 py-2 w-16 border border-blue-100 rounded-tl-lg">Xếp hạng</th>
+              <th className="text-left font-bold text-gray-700 px-3 py-2 border border-blue-100">Khu vực</th>
+              <th className="text-center font-bold text-gray-700 px-3 py-2 w-24 border border-blue-100">Số mẫu (N)</th>
+              <th className="text-center font-bold text-gray-700 px-3 py-2 w-36 border border-blue-100">PINACO (/10 bình)</th>
+              <th className="text-center font-bold text-gray-700 px-3 py-2 border border-blue-100">Phân loại lãnh thổ</th>
+              <th className="text-left font-bold text-gray-700 px-3 py-2 border border-blue-100 rounded-tr-lg">Đối thủ chính</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center text-gray-400 text-sm py-8 border border-gray-200">Chưa có dữ liệu</td>
+              </tr>
+            )}
+            {rows.map((row) => {
+              const cfg = ZONE_CONFIG[row.zone]
+              return (
+                <tr key={row.area_id} className={cn("transition-colors", cfg.rowClass)}>
+                  <td className="px-3 py-2.5 text-center font-semibold text-gray-500 border border-gray-200">{row.rank}</td>
+                  <td className="px-3 py-2.5 font-semibold text-gray-700 border border-gray-200">{row.area_name}</td>
+                  <td className="px-3 py-2.5 text-center text-gray-600 border border-gray-200">{row.sample_count}</td>
+                  <td className="px-3 py-2.5 text-center border border-gray-200">
+                    <span className={cn("inline-block min-w-12 px-3 py-1 rounded-md text-sm font-bold", cfg.badgeClass)}>
+                      {row.pinaco_mean.toFixed(1)}
                     </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                  </td>
+                  <td className={cn("px-3 py-2.5 font-medium border border-gray-200 text-center", cfg.textClass)}>{cfg.zoneLabel}</td>
+                  <td className="px-3 py-2.5 text-gray-600 border border-gray-200">{row.main_competitor}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   )
