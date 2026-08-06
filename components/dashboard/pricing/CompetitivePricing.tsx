@@ -29,14 +29,6 @@ export function CompetitivePricing({ data, isLoading }: Props) {
   const comparison = data?.comparison ?? []
   const alert = data?.alert
 
-
-  // Derive unique sku names and competitor brands from data
-  const allSkuNames = useMemo(() => {
-    const set = new Set<string>()
-    for (const s of stores) s.groups.forEach(g => set.add(g.sku_name))
-    return Array.from(set)
-  }, [stores])
-
   const allCompetitors = useMemo(() => comparison.map(r => r.competitor), [comparison])
 
   const [selectedStore, setSelectedStore] = useState<string>("")

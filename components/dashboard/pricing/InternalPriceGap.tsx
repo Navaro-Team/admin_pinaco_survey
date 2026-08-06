@@ -6,8 +6,6 @@ import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { getPricingTable } from "@/features/dashboard/dashboard.slice"
 import type { GlobalFilterState } from "@/components/dashboard/GlobalFilter"
 
-type PriceStatus = "normal" | "suspicious"
-
 type SkuBoxData = {
   sku_code?: string
   sku_name: string
@@ -129,7 +127,7 @@ export function InternalPriceGap({ boxData, filter, isLoading: parentLoading }: 
             Phân phối giá bán lẻ PINACO theo SKU (trong Khu vực)
           </p>
           {box.length === 0
-            ? <div className="flex items-center justify-center h-[300px] text-gray-400 text-sm">Chưa có dữ liệu</div>
+            ? <div className="flex items-center justify-center h-75 text-gray-400 text-sm">Chưa có dữ liệu</div>
             : <BoxPlot data={box} />
           }
         </div>
@@ -150,7 +148,7 @@ export function InternalPriceGap({ boxData, filter, isLoading: parentLoading }: 
       </div>
 
       <div className={`overflow-x-auto ${isTableLoading && rows.length === 0 ? "opacity-60" : ""}`}>
-        <table className="w-full text-sm min-w-[800px]">
+        <table className="w-full text-sm min-w-200">
           <thead>
             <tr className="bg-blue-50">
               <th className="text-left font-bold text-gray-700 px-3 py-2 rounded-tl-lg">Khu vực</th>
