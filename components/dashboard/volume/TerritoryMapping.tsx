@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { SkeletonTable } from "@/components/dashboard/common/Skeleton"
 
 type Zone = "green" | "yellow" | "red"
 
@@ -38,6 +39,7 @@ interface Props {
 }
 
 export function TerritoryMapping({ data, summary, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonTable rows={4} cols={5} />
   const rows = data ?? []
   const kpi = summary ?? { avg_pinaco_per_10: 0, avg_pinaco_pct: 0 }
 

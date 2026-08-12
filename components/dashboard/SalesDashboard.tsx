@@ -20,10 +20,8 @@ export function SalesDashboard({ data, filter, isLoading }: SalesDashboardProps)
 
       <AbsoluteSalesTable data={data?.absolute} isLoading={isLoading} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <SowByDistrict data={data?.sow_by_region} isLoading={isLoading} />
-        <CategorySow data={data?.category_sow} isLoading={isLoading} />
-      </div>
+      <SowByDistrict data={data?.sow_by_region} isLoading={isLoading} />
+      <CategorySow data={data?.category_sow} isLoading={isLoading} />
 
       <BusinessOutcome filter={filter} />
     </div>

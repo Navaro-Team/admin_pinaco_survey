@@ -10,6 +10,8 @@ import {
   GitBranch,
   BarChart2,
   Tag,
+  Star,
+  ShieldCheck,
 } from "lucide-react"
 
 import { NavMain } from '@/components/nav-main'
@@ -50,6 +52,16 @@ const data = {
       title: "Chỉ số giá bán lẻ",
       url: "/chi-so-gia-ban-le",
       icon: Tag,
+    },
+    {
+      title: "Đánh giá dịch vụ",
+      url: "/danh-gia-dich-vu",
+      icon: Star,
+    },
+    {
+      title: "Kiểm duyệt / QC",
+      url: "/kiem-duyet",
+      icon: ShieldCheck,
     },
     {
       title: "Quản lý chiến dịch",

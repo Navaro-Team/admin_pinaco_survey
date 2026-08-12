@@ -48,7 +48,7 @@ export interface DealerOutcome {
 export interface SalesData {
   absolute: RegionBrandRow[]
   sow_by_region: RegionBrandPct[]
-  category_sow: BrandPct[]
+  category_sow: Record<string, BrandPct[]>
   business_outcome: DealerOutcome[]
 }
 
@@ -195,6 +195,45 @@ export interface PricingData {
   competitive: CompetitiveData
 }
 
+// ─── QC Dashboard ─────────────────────────────────────────────────────────────
+
+export interface QCDashboardData {
+  total_completed: number
+  total_reviewed: number
+  total_passed: number
+  total_failed: number
+  total_concluded: number
+  location_mismatch_count: number
+  review_rate_pct: number
+  pass_rate_pct: number
+  fail_rate_pct: number
+}
+
+// ─── Service Evaluation ───────────────────────────────────────────────────────
+
+export interface ServiceKpiSummary {
+  promotion_rating: number
+  warranty_rating: number
+  delivery_rating: number
+  competitor_rating: number
+}
+
+export interface ServiceCriterionRow {
+  code: string
+  criteria_name: string
+  sample_count: number
+  min: number
+  mean: number
+  max: number
+  mode: number
+}
+
+export interface ServiceEvalData {
+  kpi_summary: ServiceKpiSummary
+  satisfaction_by_criteria: Record<string, number>
+  service_grid: ServiceCriterionRow[]
+}
+
 export interface PaginatedResponse<T> {
   rows: T[]
   pagination: {
@@ -219,10 +258,14 @@ export const BRAND_COLORS: Record<string, string> = {
   // uppercase keys — dùng cho pricing (keys từ DB)
   PINACO:     "#1565C0",
   GS:         "#F97316",
-  Enimac:     "#4CAF50",
-  Globe:      "#9C27B0",
+  ENIMAC:     "#4CAF50",
+  GLOBE:      "#9C27B0",
+  THIEN_NANG: "#FDD835",
+  YAMATO:     "#FF7043",
+  XUPAI:      "#42A5F5",
+  CUU_HOI:    "#26C6DA",
   NGOAI_NHAP: "#795548",
-  OTHER:      "#9E9E9E",
+  OTHER:      "#78716c",
 }
 
 export const BRAND_KEYS = [

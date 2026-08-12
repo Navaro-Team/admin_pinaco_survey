@@ -1,6 +1,7 @@
 "use client"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { SkeletonTable } from "@/components/dashboard/common/Skeleton"
 
 type StatEntry = { mean: number; mode: number; min: number; max: number }
 
@@ -47,6 +48,7 @@ interface Props {
 }
 
 export function AbsoluteVolumeTable({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonTable rows={4} cols={5} />
   const rows = data ?? []
 
   return (

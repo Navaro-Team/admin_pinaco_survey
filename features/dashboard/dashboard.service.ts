@@ -70,6 +70,7 @@ class DashboardService {
     staff: string
     businessType: string
     categories: string[]
+    segment?: string
     page: number
     limit?: number
   }) {
@@ -78,10 +79,25 @@ class DashboardService {
     if (payload.staff) params.staff = payload.staff;
     if (payload.businessType) params.business_type = payload.businessType;
     if (payload.categories?.length) params.categories = payload.categories.join(",");
+    if (payload.segment) params.segment = payload.segment;
     params.page = String(payload.page);
     params.limit = String(payload.limit ?? 20);
 
     const response = await clientService.get("/dashboard/business-outcome", params);
+    return parseCommonHttpResult(response);
+  }
+
+  async getServiceEval(payload: {
+    region: string
+    staff: string
+    businessType: string
+  }) {
+    const params: Record<string, string> = {};
+    if (payload.region) params.region = payload.region;
+    if (payload.staff) params.staff = payload.staff;
+    if (payload.businessType) params.business_type = payload.businessType;
+
+    const response = await clientService.get("/dashboard/service-eval", params);
     return parseCommonHttpResult(response);
   }
 
@@ -100,6 +116,20 @@ class DashboardService {
     params.limit = String(payload.limit ?? 20);
 
     const response = await clientService.get("/dashboard/pricing-table", params);
+    return parseCommonHttpResult(response);
+  }
+
+  async getQCDashboard(payload: {
+    region: string
+    staff: string
+    businessType: string
+  }) {
+    const params: Record<string, string> = {};
+    if (payload.region) params.region = payload.region;
+    if (payload.staff) params.staff = payload.staff;
+    if (payload.businessType) params.business_type = payload.businessType;
+
+    const response = await clientService.get("/dashboard/qc", params);
     return parseCommonHttpResult(response);
   }
 

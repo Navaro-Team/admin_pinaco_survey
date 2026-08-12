@@ -6,7 +6,7 @@ import { ComboboxMultiple } from "@/components/ui/combobox-multiple"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { SearchableCombobox } from "../ui/searchable-combobox"
 import { User } from "@/model/User.model"
-import { searchUsers } from "@/features/staffs/staffs.slice"
+import { searchUsers, getEmployeesByArea } from "@/features/staffs/staffs.slice"
 import { useEffect } from "react"
 import { getAreas } from "@/features/dashboard/dashboard.slice"
 import { BUSINESS_TYPES, PRODUCT_CATEGORIES } from "@/utils/survey-constants"
@@ -36,10 +36,21 @@ export function GlobalFilter({ value, onChange }: Props) {
 
   const areas = useAppSelector(state => state.dashboard.areas);
   const staffs = useAppSelector((state) => state.staffs.staffs);
+  const employees = useAppSelector((state) => state.staffs.employees);
   const staffsRequestState = useAppSelector((state) => state.staffs.requestState);
   const dashboardState = useAppSelector((state) => state.dashboard.requestState);
 
+  const hasRegion = !!value.region;
+  const staffOptions = hasRegion
+    ? employees.map(e => ({ value: e.id, label: [e.code, e.name].filter(Boolean).join(' - ') }))
+    : staffs.map((s: User) => ({ value: s.id, label: [s.code, s.name].filter(Boolean).join(' - ') }));
+
+  const isStaffLoading =
+    (staffsRequestState.status === 'loading' && staffsRequestState.type === 'searchUsers') ||
+    (staffsRequestState.status === 'loading' && staffsRequestState.type === 'getEmployeesByArea');
+
   const handleSearchStaffs = (searchValue: string) => {
+    if (hasRegion) return;
     const trimmedSearch = searchValue.trim();
     const params: any = { page: 1 };
     if (trimmedSearch) {
@@ -51,13 +62,23 @@ export function GlobalFilter({ value, onChange }: Props) {
   };
 
   const handleChangeStaff = (userId: string) => {
-    const selectedStaff = staffs.find((staff: User) => staff?.id === userId);
+    const pool = hasRegion ? employees : staffs;
+    const selectedStaff = pool.find((s: User) => s?.id === userId);
     if (selectedStaff) {
-      onChange({ ...value, staff: selectedStaff.id })
+      onChange({ ...value, staff: selectedStaff.id });
     } else {
-      onChange({ ...value, staff: "" })
+      onChange({ ...value, staff: "" });
     }
   };
+
+  // Load danh sách nhân viên khi region thay đổi
+  useEffect(() => {
+    if (value.region) {
+      dispatch(getEmployeesByArea(value.region) as any);
+      // reset staff nếu không còn trong danh sách khu vực mới
+      onChange({ ...value, staff: "" });
+    }
+  }, [value.region]);
 
   useEffect(() => {
     dispatch(getAreas({}))
@@ -90,17 +111,20 @@ export function GlobalFilter({ value, onChange }: Props) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-gray-600">Nhân viên<span className="text-xs"> (Theo khu vực được chọn)</span></label>
+          <label className="text-sm text-gray-600">
+            Nhân viên
+            {hasRegion
+              ? <span className="text-xs text-blue-500"> (theo khu vực)</span>
+              : <span className="text-xs text-gray-400"> (tìm kiếm)</span>
+            }
+          </label>
           <SearchableCombobox
-            options={staffs.map(staff => ({
-              value: staff.id,
-              label: [staff.code, staff.name].filter(Boolean).join(' - '),
-            }))}
+            options={staffOptions}
             value={value.staff}
             onChange={handleChangeStaff}
             placeholder="Tất cả nhân viên"
             className="w-full"
-            isLoading={staffsRequestState.status === 'loading' && staffsRequestState.type === 'searchUsers'}
+            isLoading={isStaffLoading}
             onSearch={handleSearchStaffs}
           />
         </div>

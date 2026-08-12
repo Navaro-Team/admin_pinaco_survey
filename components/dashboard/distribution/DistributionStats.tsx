@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { SkeletonTable } from "@/components/dashboard/common/Skeleton"
 
 type RouteType = "le" | "hon_hop" | "si"
 
@@ -39,6 +40,7 @@ interface Props {
 }
 
 export function DistributionStats({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonTable rows={4} cols={5} />
   const rows = data ?? []
 
   return (

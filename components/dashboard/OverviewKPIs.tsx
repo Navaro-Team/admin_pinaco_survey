@@ -2,6 +2,7 @@
 
 import { Circle } from "lucide-react"
 import type { KpiSummary } from "@/features/dashboard/dashboard.types"
+import { SkeletonBlock } from "@/components/dashboard/common/Skeleton"
 
 interface OverviewKPIsProps {
   data?: KpiSummary
@@ -13,6 +14,25 @@ function formatNumber(n: number): string {
 }
 
 export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
+  if (isLoading && !data) {
+    return (
+      <div className="bg-white border rounded-xl px-3 py-2.5 mx-2 lg:mx-3">
+        <div className="flex items-center justify-between mb-3">
+          <SkeletonBlock className="h-5 w-40" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="border rounded-lg p-2 flex flex-col items-center gap-2">
+              <SkeletonBlock className="h-3.5 w-3/4" />
+              <SkeletonBlock className="h-8 w-1/2" />
+              <SkeletonBlock className="h-3 w-2/3" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   const kpis = data
     ? [
         {
@@ -26,17 +46,17 @@ export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
           unit: "VNĐ / tháng",
         },
         {
-          label: "Overall SOW PINACO",
+          label: "Tỷ trọng doanh thu",
           value: `${data.overall_sow_pct}%`,
           unit: "Tỷ trọng doanh thu",
         },
         {
-          label: "Overall Inventory Share PINACO",
+          label: "Thị phần tồn kho",
           value: `${data.overall_inventory_share_pct}%`,
           unit: "Tỷ trọng tồn kho",
         },
         {
-          label: "Overall Volume Share PINACO",
+          label: "Tỷ trọng sản lượng bán ra",
           value: `${data.overall_volume_share_pct}%`,
           unit: "Mean sản lượng PINACO / 10 bình",
         },
@@ -44,9 +64,9 @@ export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
     : [
         { label: "Cửa hàng khảo sát hợp lệ", value: "—", unit: "cửa hàng đã Q/C" },
         { label: "Quy mô thị trường tuyệt đối", value: "—", unit: "VNĐ / tháng" },
-        { label: "Overall SOW PINACO", value: "—", unit: "Tỷ trọng doanh thu" },
-        { label: "Overall Inventory Share PINACO", value: "—", unit: "Tỷ trọng tồn kho" },
-        { label: "Overall Volume Share PINACO", value: "—", unit: "Mean sản lượng PINACO / 10 bình" },
+        { label: "Tỷ trọng doanh thu", value: "—", unit: "Tỷ trọng doanh thu" },
+        { label: "Thị phần tồn kho", value: "—", unit: "Tỷ trọng tồn kho" },
+        { label: "Tỷ trọng sản lượng bán ra", value: "—", unit: "Mean sản lượng PINACO / 10 bình" },
       ]
 
   return (
