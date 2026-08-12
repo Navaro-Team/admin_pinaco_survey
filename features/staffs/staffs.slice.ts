@@ -7,6 +7,7 @@ import { ACTION } from "@/lib/types";
 
 interface StaffsState {
   staffs: User[];
+  employees: User[];
   staff: User | null;
   manager: User | null;
   action: ACTION;
@@ -21,6 +22,7 @@ interface StaffsState {
 const initialState: StaffsState = {
   staffs: [],
   staff: null,
+  employees: [],
   manager: null,
   action: "INS",
   filter: {
@@ -31,6 +33,7 @@ const initialState: StaffsState = {
   requestState: { status: 'idle', type: '' },
 }
 
+export const getEmployeesByArea = commonCreateAsyncThunk({ type: 'staffs/getEmployeesByArea', action: staffsService.getEmployeesByArea });
 export const getUsers = commonCreateAsyncThunk({ type: 'staffs/getUsers', action: staffsService.getUsers });
 export const exportUsers = commonCreateAsyncThunk({ type: 'staffs/exportUsers', action: staffsService.getUsers });
 export const searchUsers = commonCreateAsyncThunk({ type: 'staffs/searchUsers', action: staffsService.searchUsers });
@@ -78,6 +81,28 @@ export const staffsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(getEmployeesByArea.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'getEmployeesByArea' };
+      })
+      .addCase(getEmployeesByArea.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const data: { id: string; name: string; code: string }[] = payload?.data?.data?.data ?? [];
+        state.employees = data.map(u => ({
+          id: u.id,
+          name: u.name,
+          code: u.code ?? '',
+          roles: [],
+          status: 'active',
+          isEmailVerified: false,
+          isPhoneVerified: false,
+          authMethod: 'phone' as const,
+        }));
+        state.requestState = { status: 'completed', type: 'getEmployeesByArea' };
+      })
+      .addCase(getEmployeesByArea.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: 'failed', type: 'getEmployeesByArea', error: payload?.message };
+      })
       .addCase(getUsers.fulfilled, (state, action) => {
         const payload = action.payload as any;
         const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;

@@ -35,6 +35,11 @@ class StaffsService {
     return parseCommonHttpResult(response);
   }
 
+  async getEmployeesByArea(area: string) {
+    const response = await clientService.get('/dashboard/staff-by-area', { area });
+    return parseCommonHttpResult(response);
+  }
+
   async searchUsers(params?: SearchUsersParams) {
     const queryParams: Record<string, string> = {};
 
