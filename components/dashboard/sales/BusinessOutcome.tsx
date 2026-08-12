@@ -1,12 +1,14 @@
 "use client"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Combobox } from "@/components/ui/combobox"
 import { Info, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DealerSegment } from "@/features/dashboard/dashboard.types"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { getBusinessOutcome } from "@/features/dashboard/dashboard.slice"
 import type { GlobalFilterState } from "@/components/dashboard/GlobalFilter"
+import { useState } from "react"
 
 const SEGMENT_LABEL: Record<DealerSegment, string> = {
   loyal: "Trung thành",
@@ -24,8 +26,16 @@ interface Props {
   filter: GlobalFilterState
 }
 
+const SEGMENT_OPTIONS = [
+  { value: "", label: "Tất cả phân nhóm" },
+  { value: "loyal", label: "Trung thành" },
+  { value: "potential", label: "Tiềm năng" },
+  { value: "dominated", label: "Bị chiếm lĩnh" },
+]
+
 export function BusinessOutcome({ filter }: Props) {
   const dispatch = useAppDispatch()
+  const [segment, setSegment] = useState("")
   const paged = useAppSelector(state => state.dashboard.businessOutcome)
   const requestState = useAppSelector(state => state.dashboard.requestState)
   const isLoading = requestState.status === "loading" && requestState.type === "getBusinessOutcome"
@@ -35,14 +45,28 @@ export function BusinessOutcome({ filter }: Props) {
   const nextPage = (paged?.pagination.page ?? 0) + 1
 
   const handleLoadMore = () => {
-    dispatch(getBusinessOutcome({ ...filter, page: nextPage, limit: 20 }))
+    dispatch(getBusinessOutcome({ ...filter, segment, page: nextPage, limit: 20 }))
+  }
+
+  const handleSegmentChange = (val: string) => {
+    setSegment(val)
+    dispatch(getBusinessOutcome({ ...filter, segment: val, page: 1, limit: 20 }))
   }
 
   const topPriority = rows.filter((d) => d.segment === "dominated").sort((a, b) => b.total_revenue_million - a.total_revenue_million)[0]
 
   return (
     <div className="bg-white border rounded-xl px-3 py-2.5">
-      <h3 className="text-base font-bold text-blue-700 mb-2">4. BUSINESS OUTCOME — PHÂN NHÓM ĐẠI LÝ</h3>
+      <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+        <h3 className="text-base font-bold text-blue-700">4. BUSINESS OUTCOME — PHÂN NHÓM ĐẠI LÝ</h3>
+        <Combobox
+          options={SEGMENT_OPTIONS}
+          value={segment}
+          onChange={handleSegmentChange}
+          placeholder="Tất cả phân nhóm"
+          className="w-48"
+        />
+      </div>
       <div className={`overflow-x-auto ${isLoading && rows.length === 0 ? "opacity-60" : ""}`}>
         <Table className="text-sm min-w-175">
           <TableHeader>

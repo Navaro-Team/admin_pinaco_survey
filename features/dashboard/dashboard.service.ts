@@ -70,6 +70,7 @@ class DashboardService {
     staff: string
     businessType: string
     categories: string[]
+    segment?: string
     page: number
     limit?: number
   }) {
@@ -78,6 +79,7 @@ class DashboardService {
     if (payload.staff) params.staff = payload.staff;
     if (payload.businessType) params.business_type = payload.businessType;
     if (payload.categories?.length) params.categories = payload.categories.join(",");
+    if (payload.segment) params.segment = payload.segment;
     params.page = String(payload.page);
     params.limit = String(payload.limit ?? 20);
 

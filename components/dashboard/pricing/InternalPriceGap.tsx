@@ -23,10 +23,31 @@ function fmtVND(v: number) {
 }
 
 // ── Pure SVG Box Plot ──────────────────────────────────────────────────────────
-const MT = 30, MB = 52, ML = 88, MR = 16
+const MT = 30, MB = 52, ML = 96, MR = 16
 const H = 300
-const TICKS = [0, 1000000, 2000000, 3000000, 4000000, 5000000]
-const Y_MAX = 4500000
+
+function niceAxis(rawMax: number, tickCount = 6) {
+  if (rawMax <= 0) rawMax = 1_000_000
+  const magnitude = Math.pow(10, Math.floor(Math.log10(rawMax / tickCount)))
+  const niceSteps = [1, 2, 2.5, 5, 10]
+  let step = magnitude
+  for (const s of niceSteps) {
+    const candidate = magnitude * s
+    if (candidate * tickCount >= rawMax) { step = candidate; break }
+  }
+  const yMax = step * tickCount
+  const ticks = Array.from({ length: tickCount + 1 }, (_, i) => i * step)
+  return { yMax, ticks, step }
+}
+
+function fmtTick(v: number, step: number): string {
+  if (v === 0) return "0"
+  if (step >= 1_000_000_000 || v >= 1_000_000_000)
+    return `${(v / 1_000_000_000).toFixed(v % 1_000_000_000 === 0 ? 0 : 1)} tỷ`
+  if (step >= 1_000_000 || v >= 1_000_000)
+    return `${(v / 1_000_000).toFixed(v % 1_000_000 === 0 ? 0 : 1)} tr`
+  return new Intl.NumberFormat("vi-VN").format(v)
+}
 
 function BoxPlot({ data }: { data: SkuBoxData[] }) {
   const VB_W = 560
@@ -34,7 +55,10 @@ function BoxPlot({ data }: { data: SkuBoxData[] }) {
   const chartH = H - MT - MB
   const chartW = VB_W - ML - MR
 
-  const toY = (v: number) => chartH - (v / Y_MAX) * chartH
+  const rawMax = Math.max(...data.flatMap(d => [d.max, d.outlier ?? 0]), 1)
+  const { yMax, ticks, step } = niceAxis(rawMax)
+
+  const toY = (v: number) => chartH - (v / yMax) * chartH
 
   return (
     <svg
@@ -45,13 +69,13 @@ function BoxPlot({ data }: { data: SkuBoxData[] }) {
     >
       <text x={10} y={MT - 10} fontSize={11} fill="#6b7280">Giá bán (VNĐ)</text>
 
-      {TICKS.map((v) => {
+      {ticks.map((v) => {
         const py = MT + toY(v)
         return (
           <g key={v}>
             <line x1={ML} x2={ML + chartW} y1={py} y2={py} stroke="#e5e7eb" strokeWidth={1} />
             <text x={ML - 6} y={py + 4} fontSize={10} fill="#9ca3af" textAnchor="end">
-              {v === 0 ? "0" : `${(v / 1000000).toFixed(0)}.000.000`}
+              {fmtTick(v, step)}
             </text>
           </g>
         )

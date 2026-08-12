@@ -20,10 +20,8 @@ export function InventoryDashboard({ data, filter, isLoading }: InventoryDashboa
 
       <AbsoluteInventoryTable data={data?.absolute} isLoading={isLoading} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <InventoryShareByDistrict data={data?.share_by_region} isLoading={isLoading} />
-        <CategoryInventoryShare data={data?.category_share} isLoading={isLoading} />
-      </div>
+      <InventoryShareByDistrict data={data?.share_by_region} isLoading={isLoading} />
+      <CategoryInventoryShare data={data?.category_share} isLoading={isLoading} />
 
       <InventoryHealth filter={filter} />
     </div>

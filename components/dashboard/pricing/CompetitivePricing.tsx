@@ -36,19 +36,29 @@ export function CompetitivePricing({ data, isLoading }: Props) {
   const [selectedStore, setSelectedStore] = useState<string>("")
   const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>([])
 
-  // Sync defaults when data loads
-  const activeStore = stores.find(s => s.store_id === selectedStore || s.store_name === selectedStore)
-    ?? stores[0]
+  const ALL_STORES = ""
+  const activeStore = selectedStore === ALL_STORES
+    ? null
+    : (stores.find(s => s.store_id === selectedStore || s.store_name === selectedStore) ?? stores[0])
   const activeCompetitors = selectedCompetitors.length > 0 ? selectedCompetitors : allCompetitors.slice(0, 2)
   const activeBrands = ["PINACO", ...activeCompetitors]
 
   const chartData = useMemo(() => {
-    if (!activeStore) return []
-    return activeStore.groups.map(g => ({
-      name: g.sku_name,
-      ...Object.fromEntries(activeBrands.map(b => [b, g.prices[b] ?? null])),
-    }))
-  }, [activeStore, activeBrands])
+    if (stores.length === 0) return []
+    const sourceStores = activeStore ? [activeStore] : stores
+    // Collect all SKU names across selected stores
+    const skuNames = [...new Set(sourceStores.flatMap(s => s.groups.map(g => g.sku_name)))]
+    return skuNames.map(sku => {
+      const entry: Record<string, any> = { name: sku }
+      for (const brand of activeBrands) {
+        const vals = sourceStores
+          .flatMap(s => s.groups.filter(g => g.sku_name === sku).map(g => g.prices[brand]))
+          .filter((v): v is number => v != null && v > 0)
+        entry[brand] = vals.length > 0 ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : null
+      }
+      return entry
+    })
+  }, [activeStore, stores, activeBrands])
 
   const compRows = comparison.filter(r => activeCompetitors.includes(r.competitor))
 
@@ -74,7 +84,10 @@ export function CompetitivePricing({ data, isLoading }: Props) {
             >
               {stores.length === 0
                 ? <option value="">Chưa có dữ liệu</option>
-                : stores.map(s => <option key={s.store_id} value={s.store_name}>{s.store_name}</option>)
+                : <>
+                    <option value="">Tất cả cửa hàng</option>
+                    {stores.map(s => <option key={s.store_id} value={s.store_name}>{s.store_name}</option>)}
+                  </>
               }
             </select>
           </div>
@@ -104,16 +117,16 @@ export function CompetitivePricing({ data, isLoading }: Props) {
       {stores.length === 0 ? (
         <div className="flex items-center justify-center h-70 text-gray-400 text-sm">Chưa có dữ liệu</div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col gap-4">
           {/* Grouped bar chart */}
-          <div className="flex-1 min-w-0">
+          <div className="w-full">
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={chartData} margin={{ top: 24, right: 8, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 10 }} />
-                <Tooltip formatter={(v: number) => fmtVND(v)} />
-                <Legend iconType="square" wrapperStyle={{ fontSize: 11 }} />
+                <Tooltip formatter={(v: number, name: string) => [fmtVND(v), BRANDS_CARRIED.find(b => b.brandCode === name)?.brandName ?? name]} />
+                <Legend iconType="square" wrapperStyle={{ fontSize: 11 }} formatter={(name) => BRANDS_CARRIED.find(b => b.brandCode === name)?.brandName ?? name} />
                 {activeBrands.map(brand => (
                   <Bar key={brand} dataKey={brand} fill={BRAND_COLORS[brand] ?? "#9ca3af"} radius={[3, 3, 0, 0]}>
                     <LabelList content={<CustomLabel />} />
@@ -123,34 +136,41 @@ export function CompetitivePricing({ data, isLoading }: Props) {
             </ResponsiveContainer>
           </div>
 
-          {/* Right panel: comparison table + alert */}
-          <div className="w-full lg:w-72 shrink-0 flex flex-col gap-3">
-            <table className="w-full text-sm border rounded-lg overflow-hidden">
-              <thead>
-                <tr className="bg-blue-50">
-                  <th className="text-left font-bold text-gray-700 px-3 py-2">Đối thủ</th>
-                  <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">Số CH</th>
-                  <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO cao hơn</th>
-                  <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO bằng</th>
-                  <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO thấp hơn</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {compRows.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="text-center text-gray-400 text-xs py-4">Chọn ít nhất 1 đối thủ</td>
+          {/* Comparison table + alert */}
+          <div className="flex flex-col gap-3">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border rounded-lg overflow-hidden">
+                <thead>
+                  <tr className="bg-blue-50">
+                    <th className="text-left font-bold text-gray-700 px-3 py-2">Đối thủ</th>
+                    <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">Số CH</th>
+                    <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO cao hơn</th>
+                    <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO bằng</th>
+                    <th className="text-center font-bold text-gray-700 px-2 py-2 text-xs">PINACO thấp hơn</th>
                   </tr>
-                ) : compRows.map(row => (
-                  <tr key={row.competitor} className="hover:bg-gray-50">
-                    <td className="px-3 py-2 font-medium text-gray-700">{row.competitor}</td>
-                    <td className="px-2 py-2 text-center text-gray-600">{row.store_count}</td>
-                    <td className="px-2 py-2 text-center font-semibold text-blue-600">{row.higher_pct}%</td>
-                    <td className="px-2 py-2 text-center font-semibold text-gray-400">{row.same_pct}%</td>
-                    <td className="px-2 py-2 text-center font-semibold text-red-500">{row.lower_pct}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {compRows.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="text-center text-gray-400 text-xs py-4">Chọn ít nhất 1 đối thủ</td>
+                    </tr>
+                  ) : compRows.map(row => (
+                    <tr key={row.competitor} className="hover:bg-gray-50">
+                      <td className="px-3 py-2 font-medium text-gray-700">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: BRAND_COLORS[row.competitor] ?? "#9ca3af" }} />
+                          {BRANDS_CARRIED.find(b => b.brandCode === row.competitor)?.brandName ?? row.competitor}
+                        </div>
+                      </td>
+                      <td className="px-2 py-2 text-center text-gray-600">{row.store_count}</td>
+                      <td className="px-2 py-2 text-center font-semibold text-blue-600">{row.higher_pct}%</td>
+                      <td className="px-2 py-2 text-center font-semibold text-gray-400">{row.same_pct}%</td>
+                      <td className="px-2 py-2 text-center font-semibold text-red-500">{row.lower_pct}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             {alert && (
               <div className="border-2 border-red-400 rounded-xl bg-red-50 px-3 py-3 flex gap-2 items-start">

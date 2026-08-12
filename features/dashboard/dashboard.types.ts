@@ -48,7 +48,7 @@ export interface DealerOutcome {
 export interface SalesData {
   absolute: RegionBrandRow[]
   sow_by_region: RegionBrandPct[]
-  category_sow: BrandPct[]
+  category_sow: Record<string, BrandPct[]>
   business_outcome: DealerOutcome[]
 }
 
@@ -258,10 +258,14 @@ export const BRAND_COLORS: Record<string, string> = {
   // uppercase keys — dùng cho pricing (keys từ DB)
   PINACO:     "#1565C0",
   GS:         "#F97316",
-  Enimac:     "#4CAF50",
-  Globe:      "#9C27B0",
+  ENIMAC:     "#4CAF50",
+  GLOBE:      "#9C27B0",
+  THIEN_NANG: "#FDD835",
+  YAMATO:     "#FF7043",
+  XUPAI:      "#42A5F5",
+  CUU_HOI:    "#26C6DA",
   NGOAI_NHAP: "#795548",
-  OTHER:      "#9E9E9E",
+  OTHER:      "#78716c",
 }
 
 export const BRAND_KEYS = [

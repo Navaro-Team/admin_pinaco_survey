@@ -46,17 +46,17 @@ export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
           unit: "VNĐ / tháng",
         },
         {
-          label: "Overall SOW PINACO",
+          label: "Tỷ trọng doanh thu",
           value: `${data.overall_sow_pct}%`,
           unit: "Tỷ trọng doanh thu",
         },
         {
-          label: "Overall Inventory Share PINACO",
+          label: "Thị phần tồn kho",
           value: `${data.overall_inventory_share_pct}%`,
           unit: "Tỷ trọng tồn kho",
         },
         {
-          label: "Overall Volume Share PINACO",
+          label: "Tỷ trọng sản lượng bán ra",
           value: `${data.overall_volume_share_pct}%`,
           unit: "Mean sản lượng PINACO / 10 bình",
         },
@@ -64,9 +64,9 @@ export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
     : [
         { label: "Cửa hàng khảo sát hợp lệ", value: "—", unit: "cửa hàng đã Q/C" },
         { label: "Quy mô thị trường tuyệt đối", value: "—", unit: "VNĐ / tháng" },
-        { label: "Overall SOW PINACO", value: "—", unit: "Tỷ trọng doanh thu" },
-        { label: "Overall Inventory Share PINACO", value: "—", unit: "Tỷ trọng tồn kho" },
-        { label: "Overall Volume Share PINACO", value: "—", unit: "Mean sản lượng PINACO / 10 bình" },
+        { label: "Tỷ trọng doanh thu", value: "—", unit: "Tỷ trọng doanh thu" },
+        { label: "Thị phần tồn kho", value: "—", unit: "Tỷ trọng tồn kho" },
+        { label: "Tỷ trọng sản lượng bán ra", value: "—", unit: "Mean sản lượng PINACO / 10 bình" },
       ]
 
   return (

@@ -1,8 +1,10 @@
 "use client"
 
+import { useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { BRAND_COLORS, type BrandPct } from "@/features/dashboard/dashboard.types"
 import { SkeletonChart } from "@/components/dashboard/common/Skeleton"
+import { CATEGORY_NAME_MAP } from "@/utils/survey-constants"
 
 const BRAND_LABELS: Record<string, string> = {
   pinaco: "PINACO", gs: "GS", enimac: "Enimac", globe: "Globe",
@@ -10,13 +12,19 @@ const BRAND_LABELS: Record<string, string> = {
 }
 
 interface Props {
-  data?: BrandPct[]
+  data?: Record<string, BrandPct[]>
   isLoading?: boolean
 }
 
 export function CategorySow({ data, isLoading }: Props) {
   if (isLoading && !data) return <SkeletonChart height={260} />
-  const chartData = (data ?? []).map((b) => {
+  const source = data ?? {}
+  const categoryKeys = Object.keys(source)
+  const [selected, setSelected] = useState(categoryKeys[0] ?? "")
+
+  const activeKey = categoryKeys.includes(selected) ? selected : categoryKeys[0]
+  const items = activeKey ? (source[activeKey] ?? []) : []
+  const chartData = items.map((b) => {
     const key = b.brand.toLowerCase()
     return {
       name: BRAND_LABELS[key] ?? b.brand,
@@ -28,8 +36,20 @@ export function CategorySow({ data, isLoading }: Props) {
   return (
     <div className={`bg-white border rounded-xl px-3 py-2.5 flex flex-col ${isLoading ? "opacity-60" : ""}`}>
       <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
-        <h3 className="text-base font-bold text-blue-700 mb-0.5">3. CATEGORY SOW — TRẬN ĐỊA CỤC BỘ</h3>
-        <span className="text-sm text-gray-500">Ngành hàng: Tất cả</span>
+        <h3 className="text-base font-bold text-blue-700 mb-0.5">3. Thị phần doanh số theo ngành hàng</h3>
+        {categoryKeys.length > 1 ? (
+          <select
+            value={activeKey}
+            onChange={(e) => setSelected(e.target.value)}
+            className="text-sm border rounded px-2 py-0.5 text-gray-600"
+          >
+            {categoryKeys.map((k) => (
+              <option key={k} value={k}>{k === "all" ? "Tất cả" : CATEGORY_NAME_MAP[k] ?? k}</option>
+            ))}
+          </select>
+        ) : (
+          <span className="text-sm text-gray-500">Ngành hàng: Tất cả</span>
+        )}
       </div>
 
       {chartData.length === 0 ? (
@@ -49,8 +69,9 @@ export function CategorySow({ data, isLoading }: Props) {
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-2xl font-bold text-blue-700">100%</span>
-                <span className="text-xs text-gray-500 text-center leading-tight">Doanh số ngành</span>
+                <span className="text-sm font-semibold text-blue-700 text-center leading-tight px-4">
+                  {activeKey === "all" ? "Tất cả" : CATEGORY_NAME_MAP[activeKey] ?? activeKey}
+                </span>
               </div>
             </div>
 
