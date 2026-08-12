@@ -31,7 +31,6 @@ function DonutChart({ segments, centerLabel, legend }: DonutProps) {
         <circle cx={CX} cy={CY} r={R} fill="none" stroke="#f3f4f6" strokeWidth={STROKE} />
 
         {segments.map((seg, i) => {
-          const dash = (seg.pct / 100) * CIRCUMFERENCE
           const rotation = -90 + (offset / 100) * 360
           offset += seg.pct
           return (

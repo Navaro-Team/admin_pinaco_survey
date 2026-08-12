@@ -127,16 +127,17 @@ interface Props {
 }
 
 export function InternalPriceGap({ boxData, filter, isLoading: parentLoading }: Props) {
+  const dispatch = useAppDispatch()
+  const paged = useAppSelector(state => state.dashboard.pricingTable)
+  const requestState = useAppSelector(state => state.dashboard.requestState)
+  const isTableLoading = requestState.status === "loading" && requestState.type === "getPricingTable"
+
   if (parentLoading && !boxData) return (
     <div className="flex flex-col gap-3">
       <SkeletonChart height={280} />
       <SkeletonTable rows={5} cols={5} />
     </div>
   )
-  const dispatch = useAppDispatch()
-  const paged = useAppSelector(state => state.dashboard.pricingTable)
-  const requestState = useAppSelector(state => state.dashboard.requestState)
-  const isTableLoading = requestState.status === "loading" && requestState.type === "getPricingTable"
 
   const box = boxData ?? []
   const rows = paged?.rows ?? []

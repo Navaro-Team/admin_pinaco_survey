@@ -26,22 +26,20 @@ interface Props {
 }
 
 export function CompetitivePricing({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonChart height={360} />
+  const [selectedStore, setSelectedStore] = useState<string>("")
+  const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>([])
+
   const stores = data?.stores ?? []
   const comparison = data?.comparison ?? []
   const alert = data?.alert
 
   const allCompetitors = useMemo(() => comparison.map(r => r.competitor), [comparison])
 
-  const [selectedStore, setSelectedStore] = useState<string>("")
-  const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>([])
-
-  const ALL_STORES = ""
-  const activeStore = selectedStore === ALL_STORES
+  const activeStore = selectedStore === ""
     ? null
     : (stores.find(s => s.store_id === selectedStore || s.store_name === selectedStore) ?? stores[0])
   const activeCompetitors = selectedCompetitors.length > 0 ? selectedCompetitors : allCompetitors.slice(0, 2)
-  const activeBrands = ["PINACO", ...activeCompetitors]
+  const activeBrands = useMemo(() => ["PINACO", ...activeCompetitors], [activeCompetitors])
 
   const chartData = useMemo(() => {
     if (stores.length === 0) return []
@@ -61,6 +59,8 @@ export function CompetitivePricing({ data, isLoading }: Props) {
   }, [activeStore, stores, activeBrands])
 
   const compRows = comparison.filter(r => activeCompetitors.includes(r.competitor))
+
+  if (isLoading && !data) return <SkeletonChart height={360} />
 
   const toggleCompetitor = (brand: string) => {
     setSelectedCompetitors(prev =>
