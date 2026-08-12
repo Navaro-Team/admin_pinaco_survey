@@ -16,10 +16,10 @@ interface Props {
 }
 
 export function CategoryInventoryShare({ data, isLoading }: Props) {
+  const [selected, setSelected] = useState("")
   if (isLoading && !data) return <SkeletonChart height={260} />
   const source = data ?? {}
   const categoryKeys = Object.keys(source)
-  const [selected, setSelected] = useState(categoryKeys[0] ?? "")
 
   const activeKey = categoryKeys.includes(selected) ? selected : categoryKeys[0]
   const items = activeKey ? (source[activeKey] ?? []) : []
