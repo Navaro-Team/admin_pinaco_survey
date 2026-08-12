@@ -2,6 +2,7 @@
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { BRAND_COLORS, type BrandPct } from "@/features/dashboard/dashboard.types"
+import { SkeletonChart } from "@/components/dashboard/common/Skeleton"
 
 const BRAND_LABELS: Record<string, string> = {
   pinaco: "PINACO", gs: "GS", enimac: "Enimac", globe: "Globe",
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function CategorySow({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonChart height={260} />
   const chartData = (data ?? []).map((b) => {
     const key = b.brand.toLowerCase()
     return {

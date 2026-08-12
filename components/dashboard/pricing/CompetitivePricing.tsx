@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { AlertTriangle } from "lucide-react"
+import { SkeletonChart } from "@/components/dashboard/common/Skeleton"
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer, LabelList,
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export function CompetitivePricing({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonChart height={360} />
   const stores = data?.stores ?? []
   const comparison = data?.comparison ?? []
   const alert = data?.alert

@@ -6,6 +6,8 @@ import {
 } from "recharts"
 import { Info } from "lucide-react"
 
+import { SkeletonChart } from "@/components/dashboard/common/Skeleton"
+
 type RouteType = "le" | "hon_hop" | "si"
 
 type AreaSegment = {
@@ -63,6 +65,7 @@ interface Props {
 }
 
 export function RouteSegmentation({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonChart height={300} />
   const rows = data ?? []
   const CustomTooltip = makeCustomTooltip(rows)
   const chartData = rows.map((r) => ({

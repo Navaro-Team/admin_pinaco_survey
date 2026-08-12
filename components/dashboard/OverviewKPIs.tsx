@@ -2,6 +2,7 @@
 
 import { Circle } from "lucide-react"
 import type { KpiSummary } from "@/features/dashboard/dashboard.types"
+import { SkeletonBlock } from "@/components/dashboard/common/Skeleton"
 
 interface OverviewKPIsProps {
   data?: KpiSummary
@@ -13,6 +14,25 @@ function formatNumber(n: number): string {
 }
 
 export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
+  if (isLoading && !data) {
+    return (
+      <div className="bg-white border rounded-xl px-3 py-2.5 mx-2 lg:mx-3">
+        <div className="flex items-center justify-between mb-3">
+          <SkeletonBlock className="h-5 w-40" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="border rounded-lg p-2 flex flex-col items-center gap-2">
+              <SkeletonBlock className="h-3.5 w-3/4" />
+              <SkeletonBlock className="h-8 w-1/2" />
+              <SkeletonBlock className="h-3 w-2/3" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   const kpis = data
     ? [
         {

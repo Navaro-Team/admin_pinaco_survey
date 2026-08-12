@@ -1,5 +1,7 @@
 "use client"
 
+import { SkeletonRadar } from "@/components/dashboard/common/Skeleton"
+
 // 6 axes for the radar (exclude comparison criteria)
 const RADAR_AXES = [
   { key: "PINACO_PROMOTION_CLARITY", label: "CTKM dễ hiểu", max: 5 },
@@ -39,6 +41,7 @@ interface Props {
 }
 
 export function ServiceRadarChart({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonRadar />
   const values = RADAR_AXES.map(a => Math.min(data?.[a.key] ?? 0, a.max))
 
   return (

@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from "recharts"
 import { BRAND_COLORS, BRAND_KEYS, type RegionBrandPct } from "@/features/dashboard/dashboard.types"
+import { SkeletonChart } from "@/components/dashboard/common/Skeleton"
 
 const BRAND_LABELS: Record<string, string> = {
   pinaco: "PINACO", gs: "GS", enimac: "Enimac", globe: "Globe",
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function InventoryShareByDistrict({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonChart height={330} />
   const chartData = (data ?? []).map((row) => {
     const item: Record<string, any> = { name: row.region_name }
     row.brands.forEach((b) => { item[b.brand.toLowerCase()] = b.pct })

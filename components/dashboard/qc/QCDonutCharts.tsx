@@ -1,6 +1,7 @@
 "use client"
 
 import type { QCDashboardData } from "@/features/dashboard/dashboard.types"
+import { SkeletonDonut } from "@/components/dashboard/common/Skeleton"
 
 // ─── SVG donut helper ─────────────────────────────────────────────────────────
 
@@ -77,6 +78,12 @@ interface Props {
 }
 
 export function QCDonutCharts({ data, isLoading }: Props) {
+  if (isLoading && !data) return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <SkeletonDonut />
+      <SkeletonDonut />
+    </div>
+  )
   const passPct = data?.pass_rate_pct ?? 0
   const failPct = data?.fail_rate_pct ?? 0
   const reviewPct = data?.review_rate_pct ?? 0

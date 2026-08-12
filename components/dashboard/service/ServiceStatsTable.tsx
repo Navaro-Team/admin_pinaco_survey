@@ -1,6 +1,7 @@
 "use client"
 
 import type { ServiceCriterionRow } from "@/features/dashboard/dashboard.types"
+import { SkeletonTable } from "@/components/dashboard/common/Skeleton"
 import { cn } from "@/lib/utils"
 
 // Tiêu chí comparison — max 3
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export function ServiceStatsTable({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonTable rows={9} cols={6} />
   const rows = data ?? []
 
   return (

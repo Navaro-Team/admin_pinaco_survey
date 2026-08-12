@@ -1,6 +1,7 @@
 "use client"
 
 import type { ServiceKpiSummary } from "@/features/dashboard/dashboard.types"
+import { SkeletonKPIRow } from "@/components/dashboard/common/Skeleton"
 
 interface KpiCardProps {
   label: string
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export function ServiceKPIs({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonKPIRow cols={4} />
   const kpis = [
     {
       label: "Đánh giá CTKM",

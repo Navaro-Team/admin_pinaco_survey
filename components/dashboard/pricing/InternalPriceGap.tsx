@@ -1,6 +1,7 @@
 "use client"
 
 import { AlertTriangle, Loader2 } from "lucide-react"
+import { SkeletonChart, SkeletonTable } from "@/components/dashboard/common/Skeleton"
 import { cn } from "@/lib/utils"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { getPricingTable } from "@/features/dashboard/dashboard.slice"
@@ -102,6 +103,12 @@ interface Props {
 }
 
 export function InternalPriceGap({ boxData, filter, isLoading: parentLoading }: Props) {
+  if (parentLoading && !boxData) return (
+    <div className="flex flex-col gap-3">
+      <SkeletonChart height={280} />
+      <SkeletonTable rows={5} cols={5} />
+    </div>
+  )
   const dispatch = useAppDispatch()
   const paged = useAppSelector(state => state.dashboard.pricingTable)
   const requestState = useAppSelector(state => state.dashboard.requestState)

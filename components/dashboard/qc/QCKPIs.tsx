@@ -1,6 +1,7 @@
 "use client"
 
 import type { QCDashboardData } from "@/features/dashboard/dashboard.types"
+import { SkeletonKPIRow } from "@/components/dashboard/common/Skeleton"
 
 interface Props {
   data?: QCDashboardData | null
@@ -25,6 +26,7 @@ function KPICard({ label, value, sub, subColor }: KPICardProps) {
 }
 
 export function QCKPIs({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonKPIRow cols={4} />
   const total = data?.total_completed ?? 0
   const reviewed = data?.total_reviewed ?? 0
   const passed = data?.total_passed ?? 0

@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { BRAND_COLORS, type BrandPct } from "@/features/dashboard/dashboard.types"
+import { SkeletonChart } from "@/components/dashboard/common/Skeleton"
 import { CATEGORY_NAME_MAP } from "@/utils/survey-constants"
 
 const BRAND_LABELS: Record<string, string> = {
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function CategoryInventoryShare({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonChart height={260} />
   const source = data ?? {}
   const categoryKeys = Object.keys(source)
   const [selected, setSelected] = useState(categoryKeys[0] ?? "")

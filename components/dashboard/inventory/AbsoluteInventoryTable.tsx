@@ -2,6 +2,7 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { RegionBrandRow, StatEntry } from "@/features/dashboard/dashboard.types"
+import { SkeletonTable } from "@/components/dashboard/common/Skeleton"
 
 const BRAND_COLS = [
   { key: "pinaco",     label: "PINACO"     },
@@ -34,6 +35,7 @@ interface Props {
 }
 
 export function AbsoluteInventoryTable({ data, isLoading }: Props) {
+  if (isLoading && !data) return <SkeletonTable rows={4} cols={6} />
   return (
     <div className={`bg-white border rounded-xl px-3 py-2.5 ${isLoading ? "opacity-60" : ""}`}>
       <div className="flex items-start justify-between mb-2">
