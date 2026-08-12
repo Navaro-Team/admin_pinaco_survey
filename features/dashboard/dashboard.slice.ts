@@ -2,7 +2,7 @@ import { RequestState } from "@/store/state";
 import { commonCreateAsyncThunk } from "@/store/thunk";
 import { createSlice } from "@reduxjs/toolkit";
 import { dashboardService } from "./dashboard.service";
-import { AreaSkuPriceRow, DashboardOverviewData, DealerOutcome, DistributionData, PaginatedResponse, PricingData, StoreHealth, VolumeData } from "./dashboard.types";
+import { AreaSkuPriceRow, DashboardOverviewData, DealerOutcome, DistributionData, PaginatedResponse, PricingData, QCDashboardData, ServiceEvalData, StoreHealth, VolumeData } from "./dashboard.types";
 
 interface DashboardState {
   areas: string[];
@@ -13,6 +13,8 @@ interface DashboardState {
   businessOutcome: PaginatedResponse<DealerOutcome> | null;
   inventoryHealth: PaginatedResponse<StoreHealth> | null;
   pricingTable: PaginatedResponse<AreaSkuPriceRow> | null;
+  serviceEval: ServiceEvalData | null;
+  qcDashboard: QCDashboardData | null;
   requestState: RequestState;
 }
 
@@ -25,6 +27,8 @@ const initialState: DashboardState = {
   businessOutcome: null,
   inventoryHealth: null,
   pricingTable: null,
+  serviceEval: null,
+  qcDashboard: null,
   requestState: { status: "idle", type: "" },
 }
 
@@ -36,6 +40,8 @@ export const getDashboardDistribution = commonCreateAsyncThunk({ type: "getDashb
 export const getBusinessOutcome = commonCreateAsyncThunk({ type: "getBusinessOutcome", action: dashboardService.getBusinessOutcome });
 export const getInventoryHealth = commonCreateAsyncThunk({ type: "getInventoryHealth", action: dashboardService.getInventoryHealth });
 export const getPricingTable = commonCreateAsyncThunk({ type: "getPricingTable", action: dashboardService.getPricingTable });
+export const getServiceEval = commonCreateAsyncThunk({ type: "getServiceEval", action: dashboardService.getServiceEval });
+export const getQCDashboard = commonCreateAsyncThunk({ type: "getQCDashboard", action: dashboardService.getQCDashboard });
 
 export const dashboardSlice = createSlice({
   name: "dashboard",
@@ -161,6 +167,28 @@ export const dashboardSlice = createSlice({
       })
       .addCase(getPricingTable.rejected, (state, action) => {
         state.requestState = { status: "failed", type: "getPricingTable", error: action.error.message };
+      })
+      .addCase(getServiceEval.pending, (state) => {
+        state.requestState = { status: "loading", type: "getServiceEval" };
+      })
+      .addCase(getServiceEval.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        state.serviceEval = payload.data?.data?.data ?? null;
+        state.requestState = { status: "completed", type: "getServiceEval" };
+      })
+      .addCase(getServiceEval.rejected, (state, action) => {
+        state.requestState = { status: "failed", type: "getServiceEval", error: action.error.message };
+      })
+      .addCase(getQCDashboard.pending, (state) => {
+        state.requestState = { status: "loading", type: "getQCDashboard" };
+      })
+      .addCase(getQCDashboard.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        state.qcDashboard = payload.data?.data?.data ?? null;
+        state.requestState = { status: "completed", type: "getQCDashboard" };
+      })
+      .addCase(getQCDashboard.rejected, (state, action) => {
+        state.requestState = { status: "failed", type: "getQCDashboard", error: action.error.message };
       })
   },
 });

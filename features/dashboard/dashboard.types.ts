@@ -195,6 +195,45 @@ export interface PricingData {
   competitive: CompetitiveData
 }
 
+// ─── QC Dashboard ─────────────────────────────────────────────────────────────
+
+export interface QCDashboardData {
+  total_completed: number
+  total_reviewed: number
+  total_passed: number
+  total_failed: number
+  total_concluded: number
+  location_mismatch_count: number
+  review_rate_pct: number
+  pass_rate_pct: number
+  fail_rate_pct: number
+}
+
+// ─── Service Evaluation ───────────────────────────────────────────────────────
+
+export interface ServiceKpiSummary {
+  promotion_rating: number
+  warranty_rating: number
+  delivery_rating: number
+  competitor_rating: number
+}
+
+export interface ServiceCriterionRow {
+  code: string
+  criteria_name: string
+  sample_count: number
+  min: number
+  mean: number
+  max: number
+  mode: number
+}
+
+export interface ServiceEvalData {
+  kpi_summary: ServiceKpiSummary
+  satisfaction_by_criteria: Record<string, number>
+  service_grid: ServiceCriterionRow[]
+}
+
 export interface PaginatedResponse<T> {
   rows: T[]
   pagination: {
