@@ -57,7 +57,7 @@ export function AbsoluteVolumeTable({ data, isLoading }: Props) {
         <h3 className="text-base font-bold text-blue-700">1. BỨC TRANH SẢN LƯỢNG TUYỆT ĐỐI — TRÊN HỆ QUY CHIẾU 10 BÌNH</h3>
       </div>
       <div className="overflow-x-auto">
-        <Table className="text-sm min-w-[1000px]">
+        <Table className="text-sm min-w-250">
           <TableHeader>
             <TableRow className="bg-blue-50">
               <TableHead className="font-bold text-gray-700">Khu vực</TableHead>

@@ -17,17 +17,18 @@ export default function PagePendingReview() {
   const filter = useAppSelector((state) => state.submission.filter);
 
   useEffect(() => {
-    const skip = (pagination.page - 1) * pagination.limit;
     dispatch(getPendingSubmissions({
-      skip,
+      page: pagination.page,
       limit: pagination.limit,
+      q: filter.store || undefined,
+      area: filter.area || undefined,
       status: filter.status || undefined,
       dateRange: {
-        from: filter.dateRange?.from && formatDate(filter.dateRange.from, "yyyy-MM-dd"),
-        to: filter.dateRange?.to && formatDate(filter.dateRange.to, "yyyy-MM-dd")
-      }
+        from: filter.dateRange?.from ? formatDate(filter.dateRange.from, "yyyy-MM-dd") : undefined,
+        to: filter.dateRange?.to ? formatDate(filter.dateRange.to, "yyyy-MM-dd") : undefined,
+      },
     }));
-  }, [dispatch, pagination.page, pagination.limit, filter.status, filter.dateRange]);
+  }, [dispatch, pagination.page, pagination.limit, filter.store, filter.area, filter.status, filter.dateRange]);
 
   return (
     <div className="h-[calc(100vh-var(--header-height))] overflow-hidden flex flex-col gap-4 p-4 md:gap-6 md:p-6">

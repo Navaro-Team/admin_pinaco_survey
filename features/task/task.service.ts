@@ -8,7 +8,7 @@ export interface GetTasksParams {
   assigneeId?: string;
   campaignId?: string;
   q?: string;
-  areaOrProvince?: string;
+  area?: string;
 }
 
 class TaskService {
@@ -20,7 +20,7 @@ class TaskService {
     if (params?.status) queryParams.status = params.status;
     if (params?.q) queryParams.q = params.q;
     if (params?.assigneeId) queryParams.assigneeId = params.assigneeId;
-    if (params?.areaOrProvince) queryParams.areaOrProvince = params.areaOrProvince;
+    if (params?.area) queryParams.area = params.area;
     if (params?.campaignId) queryParams.campaignId = params.campaignId;
 
     const response = await clientService.get('/tasks', queryParams);
