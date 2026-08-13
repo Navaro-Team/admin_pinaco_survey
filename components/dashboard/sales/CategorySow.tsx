@@ -18,7 +18,7 @@ interface Props {
 
 export function CategorySow({ data, isLoading }: Props) {
   const [selected, setSelected] = useState("")
-  if (isLoading && !data) return <SkeletonChart height={260} />
+  if (isLoading) return <SkeletonChart height={260} />
   const source = data ?? {}
   const categoryKeys = Object.keys(source)
 

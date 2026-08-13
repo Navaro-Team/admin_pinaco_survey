@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function SowByDistrict({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonChart height={330} />
+  if (isLoading) return <SkeletonChart height={330} />
   const chartData = (data ?? []).map((row) => {
     const item: Record<string, any> = { name: row.region_name }
     row.brands.forEach((b) => { item[b.brand.toLowerCase()] = b.pct })
