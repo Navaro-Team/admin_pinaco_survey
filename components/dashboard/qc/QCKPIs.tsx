@@ -26,7 +26,7 @@ function KPICard({ label, value, sub, subColor }: KPICardProps) {
 }
 
 export function QCKPIs({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonKPIRow cols={4} />
+  if (isLoading) return <SkeletonKPIRow cols={4} />
   const total = data?.total_completed ?? 0
   const reviewed = data?.total_reviewed ?? 0
   const passed = data?.total_passed ?? 0

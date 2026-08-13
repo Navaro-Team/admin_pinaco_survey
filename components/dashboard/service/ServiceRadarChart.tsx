@@ -41,7 +41,7 @@ interface Props {
 }
 
 export function ServiceRadarChart({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonRadar />
+  if (isLoading) return <SkeletonRadar />
   const values = RADAR_AXES.map(a => Math.min(data?.[a.key] ?? 0, a.max))
 
   return (

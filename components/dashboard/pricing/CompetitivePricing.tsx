@@ -60,7 +60,7 @@ export function CompetitivePricing({ data, isLoading }: Props) {
 
   const compRows = comparison.filter(r => activeCompetitors.includes(r.competitor))
 
-  if (isLoading && !data) return <SkeletonChart height={360} />
+  if (isLoading) return <SkeletonChart height={360} />
 
   const toggleCompetitor = (brand: string) => {
     setSelectedCompetitors(prev =>

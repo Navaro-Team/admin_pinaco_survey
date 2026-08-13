@@ -48,7 +48,7 @@ interface Props {
 }
 
 export function AbsoluteVolumeTable({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonTable rows={4} cols={5} />
+  if (isLoading) return <SkeletonTable rows={4} cols={5} />
   const rows = data ?? []
 
   return (

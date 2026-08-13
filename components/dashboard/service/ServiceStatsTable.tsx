@@ -25,7 +25,7 @@ interface Props {
 }
 
 export function ServiceStatsTable({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonTable rows={9} cols={6} />
+  if (isLoading) return <SkeletonTable rows={9} cols={6} />
   const rows = data ?? []
 
   return (
