@@ -16,6 +16,7 @@ interface SubmissionState {
   };
   filter: {
     store: string;
+    area: string;
     status: string;
     dateRange: DateRange;
   };
@@ -33,6 +34,7 @@ const initialState: SubmissionState = {
   },
   filter: {
     store: "",
+    area: "",
     status: "",
     dateRange: { from: undefined, to: undefined }
   },
@@ -71,6 +73,9 @@ export const submissionSlice = createSlice({
     changeStore: (state, action) => {
       state.filter.store = action.payload;
     },
+    changeArea: (state, action) => {
+      state.filter.area = action.payload;
+    },
     changeStatus: (state, action) => {
       state.filter.status = action.payload;
     },
@@ -105,11 +110,20 @@ export const submissionSlice = createSlice({
       .addCase(getPendingSubmissions.fulfilled, (state, action) => {
         const payload = action.payload as any;
         const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
-        const submissionsArray = Array.isArray(responseData) ? responseData : (responseData?.submissions || []);
-        const newSubmissions = parseSubmissions(submissionsArray);
-        state.submissions = newSubmissions;
-        state.pagination.total = responseData?.total ?? 0;
-        state.pagination.hasMore = state.pagination.page < Math.ceil(state.pagination.total / state.pagination.limit);
+        const paginationMeta = responseData?.pagination;
+        const submissionsArray = Array.isArray(responseData)
+          ? responseData
+          : (responseData?.submissions || responseData?.data || []);
+        state.submissions = parseSubmissions(submissionsArray);
+        if (paginationMeta) {
+          state.pagination.page = paginationMeta.page ?? state.pagination.page;
+          state.pagination.limit = paginationMeta.limit ?? state.pagination.limit;
+          state.pagination.total = paginationMeta.total ?? 0;
+          state.pagination.hasMore = paginationMeta.hasMore ?? false;
+        } else {
+          state.pagination.total = responseData?.total ?? 0;
+          state.pagination.hasMore = state.pagination.page < Math.ceil(state.pagination.total / state.pagination.limit);
+        }
         state.requestState = { status: 'completed', type: 'getPendingSubmissions', data: state.pagination.page === 1 };
       })
       .addCase(getPendingSubmissions.pending, (state) => {
@@ -154,6 +168,7 @@ export const {
   changeLimit,
   resetPagination,
   changeStore,
+  changeArea,
   changeStatus,
   changeDateRange,
   clearFilter,
