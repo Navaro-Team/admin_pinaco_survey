@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
     if (params.get('campaignId')) {
       urlParams.set('campaignId', params.get('campaignId') ?? '');
     }
-    if (params.get('areaOrProvince')) {
-      urlParams.set('areaOrProvince', params.get('areaOrProvince') ?? '');
+    if (params.get('area')) {
+      urlParams.set('area', params.get('area') ?? '');
     }
 
     const queryString = urlParams.toString();

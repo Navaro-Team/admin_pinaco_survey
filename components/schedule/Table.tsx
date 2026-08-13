@@ -42,7 +42,7 @@ export function Table() {
     limit: 10,
     q: filter.q?.trim() || undefined,
     assigneeId: filter.assigneeId?.trim() || undefined,
-    areaOrProvince: filter.areaOrProvince?.trim() || undefined,
+    area: filter.areaOrProvince?.trim() || undefined,
     status: filter.status || undefined,
     campaignId: filter.campaignId || undefined,
   });

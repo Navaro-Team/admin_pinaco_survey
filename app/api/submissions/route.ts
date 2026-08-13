@@ -24,11 +24,17 @@ export async function GET(
     if (params.get('endDate')) {
       urlParams.set('endDate', params.get('endDate') ?? '');
     }
-    if (params.get('limit')) {
-      urlParams.set('limit', params.get('limit') ?? '20');
+    if (params.get('page')) {
+      urlParams.set('page', params.get('page') ?? '1');
     }
-    if (params.get('skip')) {
-      urlParams.set('skip', params.get('skip') ?? '0');
+    if (params.get('limit')) {
+      urlParams.set('limit', params.get('limit') ?? '50');
+    }
+    if (params.get('q')) {
+      urlParams.set('q', params.get('q') ?? '');
+    }
+    if (params.get('area')) {
+      urlParams.set('area', params.get('area') ?? '');
     }
 
     const response = await serverService.get(`/submissions?${urlParams.toString()}`);
