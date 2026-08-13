@@ -40,7 +40,7 @@ interface Props {
 }
 
 export function DistributionStats({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonTable rows={4} cols={5} />
+  if (isLoading) return <SkeletonTable rows={4} cols={5} />
   const rows = data ?? []
 
   return (
@@ -48,7 +48,7 @@ export function DistributionStats({ data, isLoading }: Props) {
       <h3 className="text-base font-bold text-blue-700 mb-3">1. THỐNG KÊ KÊNH PHÂN PHỐI</h3>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-sm min-w-[600px]">
+        <table className="w-full text-sm min-w-150">
           <thead>
             <tr className="bg-blue-50">
               <th className="text-left font-bold text-gray-700 px-3 py-2 rounded-tl-lg">Khu vực</th>

@@ -77,7 +77,7 @@ interface Props {
 }
 
 export function QCDonutCharts({ data, isLoading }: Props) {
-  if (isLoading && !data) return (
+  if (isLoading) return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
       <SkeletonDonut />
       <SkeletonDonut />

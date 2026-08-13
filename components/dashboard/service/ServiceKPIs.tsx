@@ -33,7 +33,7 @@ interface Props {
 }
 
 export function ServiceKPIs({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonKPIRow cols={4} />
+  if (isLoading) return <SkeletonKPIRow cols={4} />
   const kpis = [
     {
       label: "Đánh giá CTKM",

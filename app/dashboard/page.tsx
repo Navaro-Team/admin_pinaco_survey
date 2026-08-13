@@ -20,7 +20,7 @@ export default function Page() {
   const [filter, setFilter] = useState<GlobalFilterState>(DEFAULT_FILTER);
   const data = useAppSelector(state => state.dashboard.dashboardOverview);
   const requestState = useAppSelector(state => state.dashboard.requestState);
-  const isLoading = requestState.status === "loading" && requestState.type === "getDashboardOverview";
+  const isLoading = requestState.status === "loading";
   const error = requestState.status === "failed" ? requestState.error : undefined;
 
   useEffect(() => {

@@ -65,7 +65,7 @@ interface Props {
 }
 
 export function RouteSegmentation({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonChart height={300} />
+  if (isLoading) return <SkeletonChart height={300} />
   const rows = data ?? []
   const CustomTooltip = makeCustomTooltip(rows)
   const chartData = rows.map((r) => ({

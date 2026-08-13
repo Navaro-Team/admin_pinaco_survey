@@ -35,7 +35,7 @@ interface Props {
 }
 
 export function AbsoluteSalesTable({ data, isLoading }: Props) {
-  if (isLoading && !data) return <SkeletonTable rows={4} cols={6} />
+  if (isLoading) return <SkeletonTable rows={4} cols={6} />
   return (
     <div className={`bg-white border rounded-xl px-3 py-2.5 ${isLoading ? "opacity-60" : ""}`}>
       <div className="flex items-start justify-between mb-2">
@@ -43,7 +43,7 @@ export function AbsoluteSalesTable({ data, isLoading }: Props) {
         <span className="text-xs text-gray-400 italic">Triệu VNĐ / cửa hàng / tháng</span>
       </div>
       <div className="overflow-x-auto">
-        <Table className="text-sm min-w-[900px]">
+        <Table className="text-sm min-w-225">
           <TableHeader>
             <TableRow className="bg-blue-50">
               <TableHead className="font-bold text-gray-700">Khu vực</TableHead>

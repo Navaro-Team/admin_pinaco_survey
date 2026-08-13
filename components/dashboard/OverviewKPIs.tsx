@@ -14,7 +14,7 @@ function formatNumber(n: number): string {
 }
 
 export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
-  if (isLoading && !data) {
+  if (isLoading) {
     return (
       <div className="bg-white border rounded-xl px-3 py-2.5 mx-2 lg:mx-3">
         <div className="flex items-center justify-between mb-3">
