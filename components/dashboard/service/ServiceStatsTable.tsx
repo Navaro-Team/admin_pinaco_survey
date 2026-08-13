@@ -33,7 +33,7 @@ export function ServiceStatsTable({ data, isLoading }: Props) {
       <h3 className="text-base font-bold text-blue-700 mb-0.5">Bảng thống kê dịch vụ</h3>
       <p className="text-xs text-gray-400 mb-2">Thấp nhất · Trung bình · Cao nhất · Phổ biến nhất</p>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm min-w-[640px]">
+        <table className="w-full text-sm min-w-160">
           <thead>
             <tr className="bg-blue-50">
               <th className="text-left font-bold text-gray-700 px-3 py-2 rounded-tl-lg">Tiêu chí</th>
