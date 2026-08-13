@@ -1,0 +1,97 @@
+"use client"
+
+import { useState } from "react"
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import { BRAND_COLORS, type BrandPct } from "@/features/dashboard/dashboard.types"
+import { SkeletonChart } from "@/components/dashboard/common/Skeleton"
+import { CATEGORY_NAME_MAP } from "@/utils/survey-constants"
+
+const BRAND_LABELS: Record<string, string> = {
+  pinaco: "PINACO", gs: "GS", enimac: "Enimac", globe: "Globe",
+  thien_nang: "Thiên Năng", yamato: "Yamato", xupai: "Xupai", cuu_hoi: "Cứu Hội", khac: "Khác",
+}
+interface Props {
+  data?: Record<string, BrandPct[]>
+  isLoading?: boolean
+}
+
+export function CategoryInventoryShare({ data, isLoading }: Props) {
+  const [selected, setSelected] = useState("")
+  if (isLoading && !data) return <SkeletonChart height={260} />
+  const source = data ?? {}
+  const categoryKeys = Object.keys(source)
+
+  const activeKey = categoryKeys.includes(selected) ? selected : categoryKeys[0]
+  const items = activeKey ? (source[activeKey] ?? []) : []
+  const chartData = items.map((b) => {
+    const key = b.brand.toLowerCase()
+    return {
+      name: BRAND_LABELS[key] ?? b.brand,
+      value: b.pct,
+      color: BRAND_COLORS[key] ?? "#9E9E9E",
+    }
+  })
+
+  return (
+    <div className={`bg-white border rounded-xl px-3 py-2.5 flex flex-col ${isLoading ? "opacity-60" : ""}`}>
+      <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
+        <h3 className="text-base font-bold text-blue-700">3. CATEGORY INVENTORY SHARE</h3>
+        {categoryKeys.length > 1 ? (
+          <select
+            value={activeKey}
+            onChange={(e) => setSelected(e.target.value)}
+            className="text-sm border rounded px-2 py-0.5 text-gray-600"
+          >
+            {categoryKeys.map((k) => (
+              <option key={k} value={k}>{k === "all" ? "Tất cả" : CATEGORY_NAME_MAP[k] ?? k}</option>
+            ))}
+          </select>
+        ) : (
+          <span className="text-sm text-gray-500">Ngành hàng: Tất cả</span>
+        )}
+      </div>
+
+      {chartData.length === 0 ? (
+        <div className="flex items-center justify-center h-56 text-gray-400 text-sm">Chưa có dữ liệu</div>
+      ) : (
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="flex flex-col lg:flex-row items-center gap-3">
+            <div className="relative w-56 h-56 shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={chartData} cx="50%" cy="50%" innerRadius={62} outerRadius={104} dataKey="value" paddingAngle={1}>
+                    {chartData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v: number) => `${v}%`} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-sm font-semibold text-blue-700 text-center leading-tight px-4">{activeKey === "all" ? "Tất cả" : CATEGORY_NAME_MAP[activeKey] ?? activeKey}</span>
+              </div>
+            </div>
+
+            <div className="flex-1 w-full">
+              <div className="border rounded-lg overflow-hidden divide-y">
+                {chartData.map((item) => (
+                  <div key={item.name} className="flex items-center justify-between px-2 py-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: item.color }} />
+                      <span className="text-sm text-gray-700">{item.name}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700">{item.value}%</span>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between px-2 py-1.5 bg-gray-50">
+                  <span className="text-sm font-semibold text-gray-700">Tổng</span>
+                  <span className="text-sm font-semibold text-gray-700">100%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

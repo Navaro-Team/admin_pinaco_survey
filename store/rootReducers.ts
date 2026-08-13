@@ -1,5 +1,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import appReducer from '../features/app/app.slice';
+import dashboardReducer from '../features/dashboard/dashboard.slice';
 import authReducer from '../features/auth/auth.slice';
 import scheduleReducer from '../features/schedule/schedule.slice';
 import questionsReducer from '../features/questions/questions.slice';
@@ -14,6 +15,7 @@ import roleReducer from '@/features/role/role.slice';
 
 const rootReducer = combineReducers({
   app: appReducer,
+  dashboard: dashboardReducer,
   auth: authReducer,
   schedule: scheduleReducer,
   questions: questionsReducer,
