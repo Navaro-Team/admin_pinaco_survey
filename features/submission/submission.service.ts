@@ -7,10 +7,19 @@ class SubmissionService {
     return parseCommonHttpResult(response);
   }
 
-  async getPendingSubmissions(params?: { limit?: number; skip?: number; status?: string, dateRange?: { from?: string, to?: string } }) {
+  async getPendingSubmissions(params?: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    area?: string;
+    status?: string;
+    dateRange?: { from?: string; to?: string };
+  }) {
     const queryParams: Record<string, string> = {};
-    if (params?.skip) queryParams.skip = params.skip.toString();
+    if (params?.page) queryParams.page = params.page.toString();
     if (params?.limit) queryParams.limit = params.limit.toString();
+    if (params?.q) queryParams.q = params.q;
+    if (params?.area) queryParams.area = params.area;
     if (params?.status) queryParams.status = params.status;
     if (params?.dateRange?.from) queryParams.startDate = params.dateRange.from;
     if (params?.dateRange?.to) queryParams.endDate = params.dateRange.to;

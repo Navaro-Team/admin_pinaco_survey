@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
 import { Eye } from "lucide-react";
 
@@ -18,20 +17,10 @@ export function PendingReviewTable() {
   const dispatch = useAppDispatch();
   const submissions = useAppSelector((state) => state.submission.submissions);
   const pagination = useAppSelector((state) => state.submission.pagination);
-  const filter = useAppSelector((state) => state.submission.filter);
   const requestState = useAppSelector((state) => state.submission.requestState);
 
   const isLoading =
     requestState.status === "loading" && requestState.type === "getPendingSubmissions";
-
-  // Filter submissions by store name (client-side)
-  const filteredSubmissions = useMemo(() => {
-    if (!filter.store) return submissions;
-    const storeLower = filter.store.toLowerCase();
-    return submissions.filter((s) =>
-      s.store?.name?.toLowerCase().includes(storeLower)
-    );
-  }, [submissions, filter.store]);
 
   const handleLoadMore = () => {
     dispatch(changePage(pagination.page + 1));
@@ -92,7 +81,7 @@ export function PendingReviewTable() {
                       </TableCell>
                     </TableRow>
                   ))
-                ) : filteredSubmissions.length === 0 ? (
+                ) : submissions.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={6}
@@ -102,7 +91,7 @@ export function PendingReviewTable() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredSubmissions.map((submission, index) => {
+                  submissions.map((submission, index) => {
                     const actualIndex = (pagination.page - 1) * pagination.limit + index + 1;
 
                     return (

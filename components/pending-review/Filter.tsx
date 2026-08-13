@@ -1,22 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import {
-  getPendingSubmissions,
   resetPagination,
   changeStore,
+  changeArea,
   changeStatus,
   clearFilter,
   changePage,
   changeDateRange
 } from "@/features/submission/submission.slice";
+import { getAreas } from "@/features/dashboard/dashboard.slice";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { RefreshCcw } from "lucide-react";
-import { formatDate } from "date-fns";
 import DateRangeFilter from "../ui/DateRangeFilter";
 
 const STATUS_OPTIONS = [
@@ -35,29 +36,31 @@ const STATUS_OPTIONS = [
 export function PendingReviewFilter() {
   const dispatch = useAppDispatch();
   const filter = useAppSelector((state) => state.submission.filter);
-  const pagination = useAppSelector((state) => state.submission.pagination);
+  const areas = useAppSelector((state) => state.dashboard.areas);
+  const dashboardState = useAppSelector((state) => state.dashboard.requestState);
+
+  useEffect(() => {
+    dispatch(getAreas({}));
+  }, [dispatch]);
 
   const handleStoreChange = (value: string) => {
     dispatch(changeStore(value));
     dispatch(changePage(1));
   };
 
+  const handleAreaChange = (value: string) => {
+    dispatch(changeArea(value));
+    dispatch(changePage(1));
+  };
+
   const handleStatusChange = (value: string) => {
     dispatch(changeStatus(value));
+    dispatch(changePage(1));
   };
 
   const handleRefresh = () => {
     dispatch(clearFilter());
     dispatch(resetPagination());
-    dispatch(getPendingSubmissions({
-      skip: 0,
-      limit: pagination.limit,
-      status: filter.status || undefined,
-      dateRange: {
-        from: filter.dateRange?.from && formatDate(filter.dateRange.from, "yyyy-MM-dd"),
-        to: filter.dateRange?.to && formatDate(filter.dateRange.to, "yyyy-MM-dd")
-      }
-    }));
   };
 
   return (
@@ -71,6 +74,17 @@ export function PendingReviewFilter() {
               placeholder="Nhập tên cửa hàng"
               value={filter.store}
               onChange={(e) => handleStoreChange(e.target.value)}
+            />
+          </div>
+          <div className="flex-1 min-w-0 flex flex-col gap-2">
+            <Label>Khu vực</Label>
+            <Combobox
+              className="w-full"
+              disabled={dashboardState.status === "loading" && dashboardState.type === "getAreas"}
+              options={areas.map((area) => ({ label: area, value: area }))}
+              value={filter.area}
+              placeholder="Tất cả khu vực"
+              onChange={handleAreaChange}
             />
           </div>
           <div className="flex-1 min-w-0 flex flex-col gap-2">
@@ -88,7 +102,10 @@ export function PendingReviewFilter() {
             <DateRangeFilter
               className="h-10!"
               dateRange={filter.dateRange}
-              onDateChange={(dateRange) => dispatch(changeDateRange(dateRange))}
+              onDateChange={(dateRange) => {
+                dispatch(changeDateRange(dateRange));
+                dispatch(changePage(1));
+              }}
             />
           </div>
           <Button

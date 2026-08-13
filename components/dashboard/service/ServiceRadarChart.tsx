@@ -12,10 +12,10 @@ const RADAR_AXES = [
   { key: "PINACO_DISTRIBUTOR_DELIVERY_SATISFACTION", label: "Hài lòng vận chuyển", max: 5 },
 ]
 
-const CX = 240, CY = 220, R = 130
+const CX = 300, CY = 230, R = 130
 const N = RADAR_AXES.length
 const LEVELS = 5
-const LABEL_OFFSET = 44
+const LABEL_OFFSET = 46
 
 function polarToXY(angle: number, radius: number) {
   return {
@@ -49,7 +49,7 @@ export function ServiceRadarChart({ data, isLoading }: Props) {
       <h3 className="text-base font-bold text-blue-700 mb-0.5">Điểm hài lòng theo tiêu chí</h3>
       <p className="text-xs text-gray-400 mb-2">Biểu đồ radar — thang điểm 1–5</p>
       <div className="flex justify-center">
-        <svg viewBox="0 0 480 490" width="100%" style={{ maxWidth: 480 }}>
+        <svg viewBox="0 0 600 530" width="100%" style={{ maxWidth: 600 }}>
           {/* Grid levels */}
           {Array.from({ length: LEVELS }, (_, lvl) => {
             const r = (R * (lvl + 1)) / LEVELS
@@ -96,21 +96,28 @@ export function ServiceRadarChart({ data, isLoading }: Props) {
               : null
           })}
 
-          {/* Axis labels */}
+          {/* Axis labels — split into max 2 lines if label has a space */}
           {RADAR_AXES.map((axis, i) => {
             const angle = (2 * Math.PI * i) / N
             const p = polarToXY(angle, R + LABEL_OFFSET)
             const anchor = p.x < CX - 10 ? "end" : p.x > CX + 10 ? "start" : "middle"
+            const words = axis.label.split(" ")
+            const mid = Math.ceil(words.length / 2)
+            const line1 = words.slice(0, mid).join(" ")
+            const line2 = words.slice(mid).join(" ")
+            const lineH = 15
+            const yBase = line2 ? p.y - lineH / 2 : p.y
             return (
-              <text key={i} x={p.x} y={p.y} fontSize={13} fill="#374151" textAnchor={anchor} dominantBaseline="middle">
-                {axis.label}
+              <text key={i} x={p.x} fontSize={12} fill="#374151" textAnchor={anchor}>
+                <tspan x={p.x} y={yBase} dominantBaseline="middle">{line1}</tspan>
+                {line2 && <tspan x={p.x} y={yBase + lineH} dominantBaseline="middle">{line2}</tspan>}
               </text>
             )
           })}
 
-          {/* Legend — bottom right */}
-          <rect x={336} y={466} width={14} height={12} fill="rgba(37,99,235,0.15)" stroke="#1d4ed8" strokeWidth={1.5} />
-          <text x={354} y={472} fontSize={12} fill="#374151" dominantBaseline="middle">Điểm trung bình</text>
+          {/* Legend — centered bottom */}
+          <rect x={253} y={506} width={14} height={12} fill="rgba(37,99,235,0.15)" stroke="#1d4ed8" strokeWidth={1.5} />
+          <text x={271} y={512} fontSize={12} fill="#374151" dominantBaseline="middle">Điểm trung bình</text>
         </svg>
       </div>
     </div>
