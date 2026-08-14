@@ -124,9 +124,10 @@ interface Props {
   boxData?: SkuBoxData[]
   filter: GlobalFilterState
   isLoading?: boolean
+  groupBy?: 'region' | 'province'
 }
 
-export function InternalPriceGap({ boxData, filter, isLoading: parentLoading }: Props) {
+export function InternalPriceGap({ boxData, filter, isLoading: parentLoading, groupBy = 'region' }: Props) {
   const dispatch = useAppDispatch()
   const paged = useAppSelector(state => state.dashboard.pricingTable)
   const requestState = useAppSelector(state => state.dashboard.requestState)
@@ -183,7 +184,7 @@ export function InternalPriceGap({ boxData, filter, isLoading: parentLoading }: 
         <table className="w-full text-sm min-w-200">
           <thead>
             <tr className="bg-blue-50">
-              <th className="text-left font-bold text-gray-700 px-3 py-2 rounded-tl-lg">Khu vực</th>
+              <th className="text-left font-bold text-gray-700 px-3 py-2 rounded-tl-lg">{groupBy === 'province' ? 'Tỉnh thành' : 'Khu vực'}</th>
               <th className="text-left font-bold text-gray-700 px-3 py-2">SKU PINACO</th>
               <th className="text-center font-bold text-gray-700 px-3 py-2">Số cửa hàng</th>
               <th className="text-right font-bold text-gray-700 px-3 py-2">Giá Min</th>

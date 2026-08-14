@@ -35,7 +35,7 @@ export default function Page() {
 
       <div className="mx-2 lg:mx-3 flex flex-col gap-3">
         <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide">Kênh phân phối</h2>
-        <DistributionStats data={distribution?.channel_stats} isLoading={isLoading} />
+        <DistributionStats data={distribution?.channel_stats} isLoading={isLoading} groupBy={filter.region ? 'province' : 'region'} />
         <RouteSegmentation data={distribution?.route_segmentation} isLoading={isLoading} />
       </div>
     </div>

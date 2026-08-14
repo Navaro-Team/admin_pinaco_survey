@@ -14,10 +14,18 @@ Query params: xem [Bộ lọc toàn cục](./01-dashboard-overview.md#query-para
 
 ```typescript
 {
-  internal_price_gap: AreaSkuPriceRow[]
+  group_by: 'region' | 'province'    // 'province' khi filter có region
+  internal_price_gap: InternalPriceGapData
   competitive: CompetitiveData
 }
 ```
+
+> **Province drill-down:** Khi filter `region` được chọn:
+> - `group_by` = `'province'`
+> - `area_name` trong `internal_price_gap.table` chứa **tên tỉnh thành** (`store.province`)
+> - FE (`InternalPriceGap`) đổi label cột header từ "Khu vực" → "Tỉnh thành"
+>
+> Endpoint phân trang `GET /api/v1/dashboard/pricing-table` cũng trả `group_by` trong `PaginatedResponse`.
 
 ---
 
@@ -44,7 +52,7 @@ type SkuBoxData = {
 }
 
 type AreaSkuPriceRow = {
-  area_name: string        // "Trảng Bàng" | "Gò Dầu" | ...  (store.area)
+  area_name: string        // khu vực (store.area) hoặc tỉnh thành (store.province) tuỳ group_by
   sku_name: string         // "PTX5L" | "N50" | ...
   store_count: number      // Số cửa hàng ghi nhận SKU này trong khu vực
   price_min: number        // VNĐ
@@ -202,7 +210,7 @@ type CompetitorRow = {
 | Nhóm SKU tương đương | BE map `sku_key` → `group_name` (VD: `XEMAY_AGM_5AH` → `"AGM 5Ah"`) — cần định nghĩa mapping |
 | Nhận biết SKU PINACO | Brand key trong PRICE_CHECK chứa `"PINACO"` (case-insensitive) |
 | Đơn vị giá | VNĐ nguyên (không chia nghìn) |
-| Nhóm theo khu vực (Section 1) | `store.area` — cần backfill migration |
+| Nhóm theo khu vực / tỉnh | `store.area` (mặc định) hoặc `store.province` khi filter `region` được chọn — đã backfill |
 | Dedup | 1 submission / store (lấy mới nhất) |
 | Submission hợp lệ | Loại trừ `DELETED`, `SUPERSEDED`, `CANCELLED` |
 | Bỏ: price_index line chart, BrandPriceSummary | Không có trong UI — đã loại khỏi response |

@@ -12,12 +12,14 @@ class DashboardService {
     staff: string
     businessType: string
     categories: string[]
+    brand?: string
   }) {
     const params: Record<string, string> = {};
     if (payload.region) params.region = payload.region;
     if (payload.staff) params.staff = payload.staff;
     if (payload.businessType) params.business_type = payload.businessType;
     if (payload.categories?.length) params.categories = payload.categories.join(",");
+    if (payload.brand) params.brand = payload.brand;
 
     const response = await clientService.get("/dashboard", params);
     return parseCommonHttpResult(response);
