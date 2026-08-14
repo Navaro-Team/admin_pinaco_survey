@@ -1,5 +1,6 @@
 export interface KpiSummary {
   valid_store_count: number
+  focal_brand: string
   market_size_billion_vnd: number
   overall_sow_pct: number
   overall_inventory_share_pct: number
@@ -76,6 +77,7 @@ export interface InventoryData {
 
 export interface DashboardOverviewData {
   kpis: KpiSummary
+  group_by: 'region' | 'province'
   sales: SalesData
   inventory: InventoryData
 }
@@ -235,6 +237,7 @@ export interface ServiceEvalData {
 }
 
 export interface PaginatedResponse<T> {
+  group_by?: 'region' | 'province'
   rows: T[]
   pagination: {
     total: number

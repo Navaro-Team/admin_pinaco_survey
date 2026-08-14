@@ -32,9 +32,10 @@ function StatCell({ entry }: { entry: StatEntry | undefined }) {
 interface Props {
   data?: RegionBrandRow[]
   isLoading?: boolean
+  groupBy?: 'region' | 'province'
 }
 
-export function AbsoluteInventoryTable({ data, isLoading }: Props) {
+export function AbsoluteInventoryTable({ data, isLoading, groupBy = 'region' }: Props) {
   if (isLoading) return <SkeletonTable rows={4} cols={6} />
   return (
     <div className={`bg-white border rounded-xl px-3 py-2.5 ${isLoading ? "opacity-60" : ""}`}>
@@ -46,7 +47,7 @@ export function AbsoluteInventoryTable({ data, isLoading }: Props) {
         <Table className="text-sm min-w-[1000px]">
           <TableHeader>
             <TableRow className="bg-blue-50">
-              <TableHead className="font-bold text-gray-700">Khu vực</TableHead>
+              <TableHead className="font-bold text-gray-700">{groupBy === 'province' ? 'Tỉnh thành' : 'Khu vực'}</TableHead>
               <TableHead className="font-bold text-gray-700 text-center">Số mẫu (N)</TableHead>
               <TableHead className="font-bold text-gray-700">Tổng tồn kho / cửa hàng</TableHead>
               {BRAND_COLS.map((c) => (

@@ -3,22 +3,32 @@
 import { Circle } from "lucide-react"
 import type { KpiSummary } from "@/features/dashboard/dashboard.types"
 import { SkeletonBlock } from "@/components/dashboard/common/Skeleton"
+import { BRANDS_CARRIED } from "@/utils/survey-constants"
+
+const BRAND_OPTIONS = BRANDS_CARRIED.map(b => ({
+  value: b.brandCode.toLowerCase(),
+  label: b.brandName,
+}))
 
 interface OverviewKPIsProps {
   data?: KpiSummary
   isLoading?: boolean
+  brand?: string
+  onBrandChange?: (brand: string) => void
 }
 
 function formatNumber(n: number): string {
   return new Intl.NumberFormat("vi-VN").format(n)
 }
 
-export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
+export function OverviewKPIs({ data, isLoading, brand = "pinaco", onBrandChange }: OverviewKPIsProps) {
+  const brandLabel = BRAND_OPTIONS.find(b => b.value === brand)?.label ?? brand.toUpperCase()
   if (isLoading) {
     return (
       <div className="bg-white border rounded-xl px-3 py-2.5 mx-2 lg:mx-3">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <SkeletonBlock className="h-5 w-40" />
+          <SkeletonBlock className="h-7 w-40" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -48,17 +58,17 @@ export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
         {
           label: "Tỷ trọng doanh thu",
           value: `${data.overall_sow_pct}%`,
-          unit: "Tỷ trọng doanh thu",
+          unit: `SOW ${brandLabel}`,
         },
         {
           label: "Thị phần tồn kho",
           value: `${data.overall_inventory_share_pct}%`,
-          unit: "Tỷ trọng tồn kho",
+          unit: `Tồn kho ${brandLabel}`,
         },
         {
           label: "Tỷ trọng sản lượng bán ra",
           value: `${data.overall_volume_share_pct}%`,
-          unit: "Mean sản lượng PINACO / 10 bình",
+          unit: `Sản lượng ${brandLabel} / 10 bình`,
         },
       ]
     : [
@@ -66,17 +76,31 @@ export function OverviewKPIs({ data, isLoading }: OverviewKPIsProps) {
         { label: "Quy mô thị trường tuyệt đối", value: "—", unit: "VNĐ / tháng" },
         { label: "Tỷ trọng doanh thu", value: "—", unit: "Tỷ trọng doanh thu" },
         { label: "Thị phần tồn kho", value: "—", unit: "Tỷ trọng tồn kho" },
-        { label: "Tỷ trọng sản lượng bán ra", value: "—", unit: "Mean sản lượng PINACO / 10 bình" },
+        { label: "Tỷ trọng sản lượng bán ra", value: "—", unit: "Tỷ trọng sản lượng bán ra" },
       ]
 
   return (
     <div className="bg-white border rounded-xl px-3 py-2.5 mx-2 lg:mx-3">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide">Chỉ số tổng quan</h2>
-        <span className="flex items-center gap-1 text-xs text-blue-600">
-          <Circle className="w-2.5 h-2.5 fill-blue-500 text-blue-500" />
-          Cập nhật theo bộ lọc toàn cục
-        </span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <label className="text-xs text-gray-500 font-medium whitespace-nowrap">Thương hiệu</label>
+            <select
+              value={brand}
+              onChange={(e) => onBrandChange?.(e.target.value)}
+              className="text-xs border rounded px-2 py-1 text-gray-700 bg-white"
+            >
+              {BRAND_OPTIONS.map(b => (
+                <option key={b.value} value={b.value}>{b.label}</option>
+              ))}
+            </select>
+          </div>
+          <span className="flex items-center gap-1 text-xs text-blue-600">
+            <Circle className="w-2.5 h-2.5 fill-blue-500 text-blue-500" />
+            Cập nhật theo bộ lọc toàn cục
+          </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">

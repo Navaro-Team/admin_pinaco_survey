@@ -12,9 +12,10 @@ const BRAND_LABELS: Record<string, string> = {
 interface Props {
   data?: RegionBrandPct[]
   isLoading?: boolean
+  groupBy?: 'region' | 'province'
 }
 
-export function InventoryShareByDistrict({ data, isLoading }: Props) {
+export function InventoryShareByDistrict({ data, isLoading, groupBy = 'region' }: Props) {
   if (isLoading) return <SkeletonChart height={330} />
   const chartData = (data ?? []).map((row) => {
     const item: Record<string, any> = { name: row.region_name }
@@ -24,7 +25,7 @@ export function InventoryShareByDistrict({ data, isLoading }: Props) {
 
   return (
     <div className={`bg-white border rounded-xl px-3 py-2.5 ${isLoading ? "opacity-60" : ""}`}>
-      <h3 className="text-base font-bold text-blue-700 mb-2">2. INVENTORY SHARE — TỶ TRỌNG TỒN KHO</h3>
+      <h3 className="text-base font-bold text-blue-700 mb-2">{groupBy === 'province' ? '2. INVENTORY SHARE — THEO TỈNH THÀNH' : '2. INVENTORY SHARE — TỶ TRỌNG TỒN KHO'}</h3>
       {chartData.length === 0 ? (
         <div className="flex items-center justify-center h-[330px] text-gray-400 text-sm">Chưa có dữ liệu</div>
       ) : (

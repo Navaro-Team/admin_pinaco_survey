@@ -46,6 +46,7 @@ export default function Page() {
           boxData={pricing?.internal_price_gap?.box_data}
           filter={filter}
           isLoading={isLoading}
+          groupBy={filter.region ? 'province' : 'region'}
         />
         <CompetitivePricing
           data={pricing?.competitive}

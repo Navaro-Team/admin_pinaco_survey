@@ -11,16 +11,17 @@ interface SalesDashboardProps {
   data?: SalesData
   filter: GlobalFilterState
   isLoading?: boolean
+  groupBy?: 'region' | 'province'
 }
 
-export function SalesDashboard({ data, filter, isLoading }: SalesDashboardProps) {
+export function SalesDashboard({ data, filter, isLoading, groupBy = 'region' }: SalesDashboardProps) {
   return (
     <div className="mx-2 lg:mx-3 flex flex-col gap-3">
       <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide">Doanh số bán ra</h2>
 
-      <AbsoluteSalesTable data={data?.absolute} isLoading={isLoading} />
+      <AbsoluteSalesTable data={data?.absolute} isLoading={isLoading} groupBy={groupBy} />
 
-      <SowByDistrict data={data?.sow_by_region} isLoading={isLoading} />
+      <SowByDistrict data={data?.sow_by_region} isLoading={isLoading} groupBy={groupBy} />
       <CategorySow data={data?.category_sow} isLoading={isLoading} />
 
       <BusinessOutcome filter={filter} />

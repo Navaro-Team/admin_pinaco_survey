@@ -35,7 +35,7 @@ export default function Page() {
 
       <div className="mx-2 lg:mx-3 flex flex-col gap-3">
         <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide">Thị phần sản lượng</h2>
-        <AbsoluteVolumeTable data={volume?.absolute} isLoading={isLoading} />
+        <AbsoluteVolumeTable data={volume?.absolute} isLoading={isLoading} groupBy={filter.region ? 'province' : 'region'} />
         <TerritoryMapping data={volume?.territory} summary={volume?.summary} isLoading={isLoading} />
       </div>
     </div>

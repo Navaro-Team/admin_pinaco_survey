@@ -20,6 +20,8 @@ Query params: xem [Bộ lọc toàn cục](./01-dashboard-overview.md#query-para
 }
 ```
 
+> **Province drill-down:** Khi filter `region` được chọn, `area_name` trong `absolute` chứa **tên tỉnh thành** (`store.province`) thay vì tên khu vực (`store.area`). FE đổi label cột header từ "Khu vực" → "Tỉnh thành".
+
 ---
 
 ## Summary KPI
@@ -192,7 +194,7 @@ type TerritoryRow = {
 |------|---------|
 | Nguồn sản lượng | Answer code `VELOCITY_CHECK` — `values[].amount` per brand |
 | Quy chiếu 10 bình | `brand_per_10 = (brand_amount / totalAmount) × 10` |
-| Nhóm theo khu vực | `store.area` trong submission snapshot — cần backfill migration trước |
+| Nhóm theo khu vực / tỉnh | `store.area` (mặc định) hoặc `store.province` khi filter `region` được chọn — `store.province` đã backfill |
 | Submission hợp lệ | Loại trừ `DELETED`, `SUPERSEDED`, `CANCELLED` |
 | Dedup | 1 submission / store (lấy mới nhất) |
 | `avg_pinaco_pct` | `= avg_pinaco_per_10 × 10` (vì hệ quy chiếu 10 bình) |
