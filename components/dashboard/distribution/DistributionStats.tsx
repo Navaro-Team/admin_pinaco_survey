@@ -37,9 +37,10 @@ function ProgressBar({ pct, color }: { pct: number; color: string }) {
 interface Props {
   data?: AreaRow[]
   isLoading?: boolean
+  groupBy?: 'region' | 'province'
 }
 
-export function DistributionStats({ data, isLoading }: Props) {
+export function DistributionStats({ data, isLoading, groupBy = 'region' }: Props) {
   if (isLoading) return <SkeletonTable rows={4} cols={5} />
   const rows = data ?? []
 
@@ -51,7 +52,7 @@ export function DistributionStats({ data, isLoading }: Props) {
         <table className="w-full text-sm min-w-150">
           <thead>
             <tr className="bg-blue-50">
-              <th className="text-left font-bold text-gray-700 px-3 py-2 rounded-tl-lg">Khu vực</th>
+              <th className="text-left font-bold text-gray-700 px-3 py-2 rounded-tl-lg">{groupBy === 'province' ? 'Tỉnh thành' : 'Khu vực'}</th>
               <th className="text-center font-bold text-gray-700 px-3 py-2 w-24">Số mẫu (N)</th>
               <th className="font-bold text-gray-700 px-3 py-2">Bán lẻ trung bình</th>
               <th className="font-bold text-gray-700 px-3 py-2">Bán sỉ trung bình</th>

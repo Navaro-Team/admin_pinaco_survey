@@ -19,13 +19,15 @@ Query params: xem [Bộ lọc toàn cục](./01-dashboard-overview.md#query-para
 }
 ```
 
+> **Province drill-down:** Khi filter `region` được chọn, `area_name` trong cả hai mảng chứa **tên tỉnh thành** (`store.province`) thay vì tên khu vực (`store.area`). FE đổi label cột header từ "Khu vực" → "Tỉnh thành".
+
 ---
 
 ## Section 1 — Thống kê kênh phân phối
 
 ### AreaChannelRow
 
-Mỗi row là **một khu vực** (lấy từ `store.area`).
+Mỗi row là **một khu vực** (lấy từ `store.area`) hoặc **một tỉnh thành** (`store.province`) nếu filter region được chọn.
 
 ```typescript
 type RouteType = "le" | "hon_hop" | "si"
@@ -186,7 +188,7 @@ type AreaRouteSegment = {
 | Điểm | Ghi chú |
 |------|---------|
 | Nguồn `retail_pct` | Answer code `SALES_PROPORTION` — field `retail` hoặc `banLe` (0–100) |
-| Nhóm theo khu vực | `store.area` trong submission snapshot — cần backfill migration trước |
+| Nhóm theo khu vực / tỉnh | `store.area` (mặc định) hoặc `store.province` khi filter `region` được chọn — `store.province` đã backfill |
 | Submission hợp lệ | Loại trừ status `DELETED`, `SUPERSEDED`, `CANCELLED` |
 | Dedup | 1 submission / store (lấy mới nhất) |
 | Bộ lọc toàn cục | region, staff, business_type, categories áp dụng bình thường |

@@ -45,9 +45,10 @@ function StatCell({ entry }: { entry: StatEntry }) {
 interface Props {
   data?: AreaRow[]
   isLoading?: boolean
+  groupBy?: 'region' | 'province'
 }
 
-export function AbsoluteVolumeTable({ data, isLoading }: Props) {
+export function AbsoluteVolumeTable({ data, isLoading, groupBy = 'region' }: Props) {
   if (isLoading) return <SkeletonTable rows={4} cols={5} />
   const rows = data ?? []
 
@@ -60,7 +61,7 @@ export function AbsoluteVolumeTable({ data, isLoading }: Props) {
         <Table className="text-sm min-w-250">
           <TableHeader>
             <TableRow className="bg-blue-50">
-              <TableHead className="font-bold text-gray-700">Khu vực</TableHead>
+              <TableHead className="font-bold text-gray-700">{groupBy === 'province' ? 'Tỉnh thành' : 'Khu vực'}</TableHead>
               <TableHead className="font-bold text-gray-700 text-center">Số mẫu (N)</TableHead>
               {BRAND_COLS.map((c) => (
                 <TableHead key={c.key} className="font-bold text-gray-700">{c.label}</TableHead>
