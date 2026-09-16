@@ -34,6 +34,8 @@ export function AiConfigForm() {
       modelName: "",
       apiKey: "",
       isActive: true,
+      rpmLimit: 5,
+      rpdLimit: 20,
     },
   });
 
@@ -43,15 +45,26 @@ export function AiConfigForm() {
         modelName: config.modelName || "",
         apiKey: "",
         isActive: config.isActive,
+        rpmLimit: config.rpmLimit || 5,
+        rpdLimit: config.rpdLimit || 20,
       });
     }
   }, [config, reset]);
 
   const onSubmit = async (data: AiConfigFormData) => {
-    const submitData: { provider: string; modelName: string; apiKey?: string; isActive: boolean } = {
+    const submitData: {
+      provider: string;
+      modelName: string;
+      apiKey?: string;
+      isActive: boolean;
+      rpmLimit: number;
+      rpdLimit: number;
+    } = {
       provider: "gemini",
       modelName: data.modelName.trim(),
       isActive: data.isActive,
+      rpmLimit: data.rpmLimit,
+      rpdLimit: data.rpdLimit,
     };
 
     if (data.apiKey && data.apiKey.trim() !== "") {
@@ -133,7 +146,7 @@ export function AiConfigForm() {
                     value={field.value || ""}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
-                    placeholder="Ví dụ: gemini-2.5-flash"
+                    placeholder="Ví dụ: gemini-3.6-flash"
                   />
                 )}
               />
@@ -160,6 +173,51 @@ export function AiConfigForm() {
                   />
                 )}
               />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">
+                Giới hạn request/phút (RPM) <span className="text-red-500">*</span>
+              </Label>
+              <Controller
+                control={control}
+                name="rpmLimit"
+                render={({ field }) => (
+                  <Input
+                    type="number"
+                    min={1}
+                    className={`bg-gray-100 text-black opacity-100 ${errors.rpmLimit ? "border-destructive" : ""}`}
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                    onBlur={field.onBlur}
+                    placeholder="5"
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label className="text-sm text-gray-500">
+                Giới hạn request/ngày (RPD) <span className="text-red-500">*</span>
+              </Label>
+              <Controller
+                control={control}
+                name="rpdLimit"
+                render={({ field }) => (
+                  <Input
+                    type="number"
+                    min={1}
+                    className={`bg-gray-100 text-black opacity-100 ${errors.rpdLimit ? "border-destructive" : ""}`}
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                    onBlur={field.onBlur}
+                    placeholder="20"
+                  />
+                )}
+              />
+              <p className="text-xs text-gray-400">
+                Bộ máy phân loại nền sẽ tự động tạm dừng khi hết quota trong ngày và tự tiếp tục sau khi quota được làm mới.
+              </p>
             </div>
 
             <div className="flex items-center gap-2 md:col-span-2">
