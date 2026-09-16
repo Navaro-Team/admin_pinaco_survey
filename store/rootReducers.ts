@@ -12,6 +12,7 @@ import surveyReducer from '../features/survey/survey.slice';
 import submissionReducer from '../features/submission/submission.slice';
 import { campaignsReducer } from '@/features/campaigns/campaigns.slice';
 import roleReducer from '@/features/role/role.slice';
+import aiConfigReducer from '@/features/ai-config/ai-config.slice';
 
 const rootReducer = combineReducers({
   app: appReducer,
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   submission: submissionReducer,
   campaigns: campaignsReducer,
   role: roleReducer,
+  aiConfig: aiConfigReducer,
 });
 
 export default rootReducer;

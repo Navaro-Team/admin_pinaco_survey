@@ -12,6 +12,7 @@ import {
   Tag,
   Star,
   ShieldCheck,
+  Bot,
 } from "lucide-react"
 
 import { NavMain } from '@/components/nav-main'
@@ -92,6 +93,11 @@ const data = {
       title: "Danh sách điểm bán",
       url: "/sales-points",
       icon: FileText,
+    },
+    {
+      title: "Cấu hình AI",
+      url: "/ai-config",
+      icon: Bot,
     }
   ]
 }
