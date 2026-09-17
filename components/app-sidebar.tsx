@@ -61,6 +61,11 @@ const data = {
       icon: Star,
     },
     {
+      title: "Báo cáo câu hỏi mở - Câu 16",
+      url: "/report-open-question-16",
+      icon: MessageSquareText,
+    },
+    {
       title: "Kiểm duyệt / QC",
       url: "/kiem-duyet",
       icon: ShieldCheck,
@@ -80,11 +85,7 @@ const data = {
       url: "/pending-review",
       icon: FileText,
     },
-    {
-      title: "Báo cáo câu hỏi mở - Câu 16",
-      url: "/report-open-question-16",
-      icon: MessageSquareText,
-    },
+    
     // {
     //   title: "Danh sách câu hỏi",
     //   url: "/questions",
