@@ -12,6 +12,8 @@ import {
   Tag,
   Star,
   ShieldCheck,
+  Bot,
+  MessageSquareText,
 } from "lucide-react"
 
 import { NavMain } from '@/components/nav-main'
@@ -59,6 +61,11 @@ const data = {
       icon: Star,
     },
     {
+      title: "Báo cáo câu hỏi mở - Câu 16",
+      url: "/report-open-question-16",
+      icon: MessageSquareText,
+    },
+    {
       title: "Kiểm duyệt / QC",
       url: "/kiem-duyet",
       icon: ShieldCheck,
@@ -78,6 +85,7 @@ const data = {
       url: "/pending-review",
       icon: FileText,
     },
+    
     // {
     //   title: "Danh sách câu hỏi",
     //   url: "/questions",
@@ -92,6 +100,11 @@ const data = {
       title: "Danh sách điểm bán",
       url: "/sales-points",
       icon: FileText,
+    },
+    {
+      title: "Cấu hình AI",
+      url: "/ai-config",
+      icon: Bot,
     }
   ]
 }
