@@ -13,6 +13,7 @@ import submissionReducer from '../features/submission/submission.slice';
 import { campaignsReducer } from '@/features/campaigns/campaigns.slice';
 import roleReducer from '@/features/role/role.slice';
 import aiConfigReducer from '@/features/ai-config/ai-config.slice';
+import openQuestion16Reducer from '@/features/openQuestion16/openQuestion16.slice';
 
 const rootReducer = combineReducers({
   app: appReducer,
@@ -29,6 +30,7 @@ const rootReducer = combineReducers({
   campaigns: campaignsReducer,
   role: roleReducer,
   aiConfig: aiConfigReducer,
+  openQuestion16: openQuestion16Reducer,
 });
 
 export default rootReducer;
