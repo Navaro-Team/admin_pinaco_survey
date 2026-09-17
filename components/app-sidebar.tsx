@@ -13,6 +13,7 @@ import {
   Star,
   ShieldCheck,
   Bot,
+  MessageSquareText,
 } from "lucide-react"
 
 import { NavMain } from '@/components/nav-main'
@@ -78,6 +79,11 @@ const data = {
       title: "Danh sách câu trả lời",
       url: "/pending-review",
       icon: FileText,
+    },
+    {
+      title: "Báo cáo câu hỏi mở - Câu 16",
+      url: "/report-open-question-16",
+      icon: MessageSquareText,
     },
     // {
     //   title: "Danh sách câu hỏi",
