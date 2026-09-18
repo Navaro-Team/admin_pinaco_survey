@@ -45,6 +45,8 @@ export const getSubmissionById = commonCreateAsyncThunk({ type: "getSubmissionBy
 export const getPendingSubmissions = commonCreateAsyncThunk({ type: "getPendingSubmissions", action: submissionService.getPendingSubmissions });
 export const reviewSubmission = commonCreateAsyncThunk({ type: "reviewSubmission", action: submissionService.reviewSubmission });
 export const exportSubmission = commonCreateAsyncThunk({ type: "exportSubmission", action: submissionService.exportSubmission });
+export const deleteSubmission = commonCreateAsyncThunk({ type: "deleteSubmission", action: submissionService.deleteSubmission });
+export const restoreSubmission = commonCreateAsyncThunk({ type: "restoreSubmission", action: submissionService.restoreSubmission });
 
 export const submissionSlice = createSlice({
   name: 'submission',
@@ -157,6 +159,50 @@ export const submissionSlice = createSlice({
       })
       .addCase(exportSubmission.rejected, (state, action) => {
         state.requestState = { status: 'failed', type: 'exportSubmission', error: action.error.message };
+      })
+      .addCase(deleteSubmission.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+
+        if (state.submission) {
+          state.submission = {
+            ...state.submission,
+            status: responseData?.status || "DELETED",
+            isDeleted: responseData?.isDeleted ?? true,
+            deletedAt: responseData?.deletedAt ?? state.submission.deletedAt,
+            deletedBy: responseData?.deletedBy ?? state.submission.deletedBy,
+            deletedByInfo: responseData?.deletedByInfo ?? state.submission.deletedByInfo,
+          } as Submission;
+        }
+        state.requestState = { status: 'completed', type: 'deleteSubmission' };
+      })
+      .addCase(deleteSubmission.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'deleteSubmission' };
+      })
+      .addCase(deleteSubmission.rejected, (state, action) => {
+        state.requestState = { status: 'failed', type: 'deleteSubmission', error: action.error.message };
+      })
+      .addCase(restoreSubmission.fulfilled, (state, action) => {
+        const payload = action.payload as any;
+        const responseData = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+
+        if (state.submission) {
+          state.submission = {
+            ...state.submission,
+            status: responseData?.status || state.submission.status,
+            isDeleted: responseData?.isDeleted ?? false,
+            deletedAt: responseData?.deletedAt ?? null,
+            deletedBy: responseData?.deletedBy ?? null,
+            deletedByInfo: responseData?.deletedByInfo ?? null,
+          } as Submission;
+        }
+        state.requestState = { status: 'completed', type: 'restoreSubmission' };
+      })
+      .addCase(restoreSubmission.pending, (state) => {
+        state.requestState = { status: 'loading', type: 'restoreSubmission' };
+      })
+      .addCase(restoreSubmission.rejected, (state, action) => {
+        state.requestState = { status: 'failed', type: 'restoreSubmission', error: action.error.message };
       });
   }
 })

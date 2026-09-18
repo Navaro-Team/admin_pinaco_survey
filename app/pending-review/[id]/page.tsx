@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { clearSubmissionState, getSubmissionById, reviewSubmission } from "@/features/submission/submission.slice";
+import { clearSubmissionState, deleteSubmission, getSubmissionById, restoreSubmission, reviewSubmission } from "@/features/submission/submission.slice";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CircleCheckBig, X } from "lucide-react";
+import { ArrowLeft, CircleCheckBig, RotateCcw, Trash2, X } from "lucide-react";
 import { getTaskBySubmissionAndSurvey } from "@/features/task/task.slice";
 import { getSurveyById } from "@/features/survey/survey.slice";
 import { StoreInfo } from "@/components/schedule/common/StoreInfo";
@@ -72,6 +72,36 @@ export default function PendingReviewDetailPage() {
     });
   };
 
+  const handleDelete = () => {
+    showInfo({
+      title: "Xóa khảo sát",
+      description: "Bạn có chắc chắn muốn xóa khảo sát này không? Khảo sát sẽ được chuyển sang trạng thái đã xóa.",
+      confirmText: "Xóa",
+      cancelText: "Hủy",
+      onConfirm: () => {
+        dispatch(deleteSubmission(submission?._id || ''));
+      },
+      onCancel: () => {
+        console.log("Hủy");
+      }
+    });
+  };
+
+  const handleRestore = () => {
+    showInfo({
+      title: "Khôi phục khảo sát",
+      description: "Bạn có chắc chắn muốn khôi phục khảo sát này không?",
+      confirmText: "Khôi phục",
+      cancelText: "Hủy",
+      onConfirm: () => {
+        dispatch(restoreSubmission(submission?._id || ''));
+      },
+      onCancel: () => {
+        console.log("Hủy");
+      }
+    });
+  };
+
   const handleBack = () => {
     router.push("/pending-review");
   };
@@ -114,6 +144,59 @@ export default function PendingReviewDetailPage() {
             description: "Vui lòng chờ trong giây lát...",
           }); break;
       }
+    } else if (requestState.type === 'deleteSubmission') {
+      switch (requestState.status) {
+        case 'completed':
+          showSuccess({
+            title: "Xóa khảo sát",
+            description: "Xóa khảo sát thành công",
+            onConfirm() {
+              dispatch(clearSubmissionState());
+              router.push("/pending-review");
+            },
+          });
+          break;
+        case 'failed':
+          showFailed({
+            title: "Xóa khảo sát",
+            description: "Xóa khảo sát thất bại",
+            onConfirm() {
+              dispatch(clearSubmissionState());
+            },
+          });
+          break;
+        case 'loading':
+          showLoading({
+            title: "Đang xử lý",
+            description: "Vui lòng chờ trong giây lát...",
+          }); break;
+      }
+    } else if (requestState.type === 'restoreSubmission') {
+      switch (requestState.status) {
+        case 'completed':
+          showSuccess({
+            title: "Khôi phục khảo sát",
+            description: "Khôi phục khảo sát thành công",
+            onConfirm() {
+              dispatch(clearSubmissionState());
+            },
+          });
+          break;
+        case 'failed':
+          showFailed({
+            title: "Khôi phục khảo sát",
+            description: "Khôi phục khảo sát thất bại",
+            onConfirm() {
+              dispatch(clearSubmissionState());
+            },
+          });
+          break;
+        case 'loading':
+          showLoading({
+            title: "Đang xử lý",
+            description: "Vui lòng chờ trong giây lát...",
+          }); break;
+      }
     }
   }, [requestState]);
 
@@ -138,6 +221,14 @@ export default function PendingReviewDetailPage() {
           <Button variant="default" hidden={submission?.status !== SubmissionStatus.PENDING_REVIEW} className="bg-red-500 text-white hover:bg-red-500/90 hover:text-white" onClick={handleReject}>
             <X />
             Từ chối
+          </Button>
+          <Button variant="destructive" hidden={submission?.status === SubmissionStatus.DELETED} onClick={handleDelete}>
+            <Trash2 className="size-4" />
+            Xóa
+          </Button>
+          <Button variant="outline" hidden={submission?.status !== SubmissionStatus.DELETED} className="border-main text-main hover:bg-main/10 hover:text-main" onClick={handleRestore}>
+            <RotateCcw className="size-4" />
+            Khôi phục
           </Button>
         </div>
       </div>
