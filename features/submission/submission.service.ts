@@ -36,6 +36,16 @@ class SubmissionService {
     const response = await clientService.get(`/submissions/export`);
     return parseCommonHttpResult(response);
   }
+
+  async deleteSubmission(id: string) {
+    const response = await clientService.delete(`/submissions/${id}`, {});
+    return parseCommonHttpResult(response);
+  }
+
+  async restoreSubmission(id: string) {
+    const response = await clientService.post(`/submissions/${id}/restore`, {});
+    return parseCommonHttpResult(response);
+  }
 }
 
 export const submissionService = new SubmissionService();
