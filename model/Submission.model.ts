@@ -22,6 +22,10 @@ export interface Submission {
   performedByInfo: any;
   answers: any[],
   supervisorReview: any,
+  isDeleted: boolean;
+  deletedAt: string | null;
+  deletedBy: string | null;
+  deletedByInfo: any;
 }
 
 export function parseSubmission(data: any): Submission {
@@ -49,6 +53,10 @@ export function parseSubmission(data: any): Submission {
     performedBy: data.performedBy,
     performedByInfo: data.performedByInfo,
     supervisorReview: data.supervisorReview,
+    isDeleted: data.isDeleted,
+    deletedAt: data.deletedAt,
+    deletedBy: data.deletedBy,
+    deletedByInfo: data.deletedByInfo,
   };
 }
 
