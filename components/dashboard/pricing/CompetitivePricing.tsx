@@ -29,8 +29,8 @@ export function CompetitivePricing({ data, isLoading }: Props) {
   const [selectedStore, setSelectedStore] = useState<string>("")
   const [selectedCompetitors, setSelectedCompetitors] = useState<string[]>([])
 
-  const stores = data?.stores ?? []
-  const comparison = data?.comparison ?? []
+  const stores = useMemo(() => data?.stores ?? [], [data?.stores])
+  const comparison = useMemo(() => data?.comparison ?? [], [data?.comparison])
   const alert = data?.alert
 
   const allCompetitors = useMemo(() => comparison.map(r => r.competitor), [comparison])

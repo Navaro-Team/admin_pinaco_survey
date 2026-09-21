@@ -142,6 +142,7 @@ export function HeaderDetailSchedule() {
           break;
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskState])
 
   return (

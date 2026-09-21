@@ -53,7 +53,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
     }
 
     return initialValues;
-  }, [store, isEdit]);
+  }, [store]);
 
   const {
     control,
@@ -87,6 +87,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
     } else if (!isEdit) {
       reset(initialValues);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store, isEdit, reset]);
 
   const onSubmit = async (data: SalesPointFormData) => {
@@ -161,6 +162,7 @@ export function SalesPointForm({ isEdit }: SalesPointFormProps) {
     if (store?.salesEmployeeCode) {
       handleSearchStaffs(store.salesEmployeeCode);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store?.id])
 
   return (
