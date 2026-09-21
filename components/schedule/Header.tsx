@@ -73,6 +73,7 @@ export function Header() {
           break;
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskState]);
 
   useEffect(() => {
@@ -85,6 +86,7 @@ export function Header() {
     if (!openScheduleSheet || openAssignSheet) {
       clearState();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openScheduleSheet, openAssignSheet]);
 
   return (

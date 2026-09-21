@@ -100,6 +100,7 @@ export function TableQuestion() {
           break;
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestState]);
 
   return (

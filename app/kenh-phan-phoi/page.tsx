@@ -27,7 +27,7 @@ export default function Page() {
       staff: filter.staff,
       businessType: filter.businessType,
     }) as any)
-  }, [filter.region, filter.staff, filter.businessType])
+  }, [dispatch, filter.region, filter.staff, filter.businessType])
 
   return (
     <div className="flex flex-col gap-3 py-3">

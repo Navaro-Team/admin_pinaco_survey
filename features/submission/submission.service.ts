@@ -32,8 +32,26 @@ class SubmissionService {
     return parseCommonHttpResult(response);
   }
 
-  async exportSubmission() {
-    const response = await clientService.get(`/submissions/export`);
+  async exportSubmission(params?: {
+    region?: string;
+    staff?: string;
+    business_type?: string;
+    q?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    reviewed?: boolean;
+  }) {
+    const queryParams: Record<string, string> = {};
+    if (params?.region) queryParams.region = params.region;
+    if (params?.staff) queryParams.staff = params.staff;
+    if (params?.business_type) queryParams.business_type = params.business_type;
+    if (params?.q) queryParams.q = params.q;
+    if (params?.status) queryParams.status = params.status;
+    if (params?.startDate) queryParams.startDate = params.startDate;
+    if (params?.endDate) queryParams.endDate = params.endDate;
+    if (params?.reviewed) queryParams.reviewed = "true";
+    const response = await clientService.get(`/submissions/export`, queryParams);
     return parseCommonHttpResult(response);
   }
 

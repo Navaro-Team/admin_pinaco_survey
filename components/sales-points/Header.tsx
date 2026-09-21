@@ -5,8 +5,8 @@ import { Button } from "../ui/button";
 import { Download, Plus, Upload } from "lucide-react";
 import Link from "next/link";
 import { SalesPointSheet } from "./SalesPointSheet";
-import { Spinner } from "../ui/spinner";
-import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { useAppDispatch } from "@/hooks/redux";
+import { useExportExcel } from "@/hooks/use-export-excel";
 import { exportSalesPoints } from "@/features/sales-points/sales-points.slice";
 import { parseStores } from "@/model/Store.model";
 import { useDialog } from "@/hooks/use-dialog";
@@ -16,37 +16,20 @@ export function Header() {
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
   const { showFailed } = useDialog();
   const dispatch = useAppDispatch();
-  const requestState = useAppSelector((state) => state.salesPoints.requestState);
-  const isExporting = requestState.status === 'loading' && requestState.type === 'exportSalesPoints';
+  const runExport = useExportExcel();
 
-  const handleExportExcel = async () => {
-    try {
-      await dispatch(exportSalesPoints({}))
-        .unwrap()
-        .then((res) => {
-          const payload = res as any;
-          const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
-          const stores = parseStores(Array.isArray(data) ? data : data?.data);
-          if (stores.length === 0) {
-            showFailed({
-              title: "Thất bại",
-              description: "Không có dữ liệu điểm bán để xuất Excel.",
-            });
-            return;
-          }
+  const handleExportExcel = () =>
+    runExport(async () => {
+      const res = await dispatch(exportSalesPoints({})).unwrap();
+      const payload = res as any;
+      const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+      const stores = parseStores(Array.isArray(data) ? data : data?.data);
+      if (stores.length === 0) {
+        return "Không có dữ liệu điểm bán để xuất Excel.";
+      }
 
-          exportStoresToExcel(stores);
-        }).catch((e: any) => {
-          throw e;
-        })
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-      showFailed({
-        title: "Thất bại",
-        description: "Không thể xuất dữ liệu điểm bán.",
-      });
-    }
-  }
+      exportStoresToExcel(stores);
+    }, "Không thể xuất dữ liệu điểm bán.");
 
   const handleDownloadTemplate = async () => {
     try {
@@ -79,9 +62,9 @@ export function Header() {
               Tạo
             </Button>
           </Link>
-          <Button variant="outline" onClick={handleExportExcel} disabled={isExporting}>
+          <Button variant="outline" onClick={handleExportExcel}>
             <Download className="size-4" />
-            {isExporting ? <Spinner className="size-4 animate-spin" /> : 'Xuất Excel'}
+            Xuất Excel
           </Button>
           <Button variant="outline" onClick={handleDownloadTemplate}>
             <Download className="size-4" />

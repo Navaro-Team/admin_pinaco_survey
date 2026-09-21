@@ -86,6 +86,7 @@ export default function Manager() {
       }
     }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [managerRequestState, dispatch, id]);
 
   return (

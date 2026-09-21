@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { GlobalFilter, type GlobalFilterState } from "@/components/dashboard/GlobalFilter"
 import { QCKPIs } from "@/components/dashboard/qc/QCKPIs"
 import { QCDonutCharts } from "@/components/dashboard/qc/QCDonutCharts"
+import { ExportSubmissionButton } from "@/components/pending-review/ExportSubmissionButton"
 import { useAppDispatch, useAppSelector } from "@/hooks/redux"
 import { getQCDashboard } from "@/features/dashboard/dashboard.slice"
 
@@ -27,14 +28,17 @@ export default function Page() {
       staff: filter.staff,
       businessType: filter.businessType,
     }) as any)
-  }, [filter.region, filter.staff, filter.businessType])
+  }, [dispatch, filter.region, filter.staff, filter.businessType])
 
   return (
     <div className="flex flex-col gap-3 py-3">
       <GlobalFilter value={filter} onChange={setFilter} />
 
       <div className="mx-2 lg:mx-3 flex flex-col gap-3">
-        <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide">Kiểm duyệt / QC</h2>
+        <div className="flex flex-row justify-between items-center">
+          <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide">Kiểm duyệt / QC</h2>
+          <ExportSubmissionButton filter={filter} reviewedOnly filenamePrefix="ket-qua-kiem-duyet" />
+        </div>
 
         <QCKPIs data={data} isLoading={isLoading} />
 

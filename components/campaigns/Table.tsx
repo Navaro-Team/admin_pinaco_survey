@@ -97,6 +97,7 @@ export function Table() {
           break;
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestState]);
 
   useEffect(() => {
@@ -109,7 +110,7 @@ export function Table() {
     if (!isSheetOpen) {
       dispatch(changeCampaign(null));
     }
-  }, [isSheetOpen, setIsSheetOpen]);
+  }, [dispatch, isSheetOpen, setIsSheetOpen]);
 
   return (
     <Card className="@container/table-card flex flex-col min-h-0 pb-0! gap-2! w-full">

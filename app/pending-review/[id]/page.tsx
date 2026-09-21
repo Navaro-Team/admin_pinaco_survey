@@ -40,6 +40,7 @@ export default function PendingReviewDetailPage() {
       dispatch(getTaskBySubmissionAndSurvey({ submissionId: submission._id, surveyId: submission.surveyId }));
       dispatch(getSurveyById(submission.surveyId));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submission?.surveyId, dispatch]);
 
   const handleApprove = () => {
@@ -198,6 +199,7 @@ export default function PendingReviewDetailPage() {
           }); break;
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestState]);
 
   return (
