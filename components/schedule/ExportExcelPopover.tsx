@@ -9,6 +9,7 @@ import { CalendarRange } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import DateRangeFilter from "../ui/DateRangeFilter";
 import { exportTasks } from "@/features/task/task.slice";
+import { useExportExcel } from "@/hooks/use-export-excel";
 import { useToastContext } from "@/context/ToastContext";
 import { exportSurveyToExcel } from "@/utils/export-survey-excel";
 import { Status } from "../ui/status-badge";
@@ -21,7 +22,8 @@ type DateRange = {
 
 export function ExportExcelPopover() {
   const dispatch = useAppDispatch();
-  const { error, success } = useToastContext();
+  const { success } = useToastContext();
+  const runExport = useExportExcel();
   const surveys = useAppSelector((state) => state.survey.surveys);
   const [open, setOpen] = useState(false);
   const [surveyId, setSurveyId] = useState<string>("");
@@ -37,49 +39,38 @@ export function ExportExcelPopover() {
       label: survey?.surveyData?.title,
     })) ?? [];
 
-  const handleExportClick = async () => {
+  const handleExportClick = () => {
     if (!surveyId || !range.from || !range.to) return;
-    try {
-      const startDate = range.from?.toISOString();
-      const endDate = range.to?.toISOString();
-      await dispatch(exportTasks({ status, surveyId, startDate, endDate }))
-        .unwrap()
-        .then((res) => {
-          const payload = res as any;
-          const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
-          const survey = data?.survey;
-          const tasks = data?.tasks?.items ?? data?.tasks;
-          if (!(Array.isArray(tasks) && tasks.length > 0) || !survey) {
-            error('Thất bại', 'Không có dữ liệu để xuất');
-            return;
+    const startDate = range.from.toISOString();
+    const endDate = range.to.toISOString();
+    const dateStr = `${startDate.slice(0, 10)}_${endDate.slice(0, 10)}`;
+    return runExport(async () => {
+      const res = await dispatch(exportTasks({ status, surveyId, startDate, endDate })).unwrap();
+      const payload = res as any;
+      const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+      const survey = data?.survey;
+      const tasks = data?.tasks?.items ?? data?.tasks;
+      if (!(Array.isArray(tasks) && tasks.length > 0) || !survey) {
+        return "Không có dữ liệu để xuất Excel.";
+      }
+      const surveyData = survey?.surveyData || survey;
+      const title = (surveyData?.title || survey?.title || "khảo_sát").replace(/[\\/:*?"<>|]/g, "_");
+      exportSurveyToExcel({
+        survey: surveyData?.questions ? { surveyData } : survey,
+        tasks,
+        filename: `${title}_${dateStr}.xlsx`,
+        getPerformByInfo: (task) => {
+          const p = task?.submission?.performedByInfo;
+          if (p) {
+            return [p.name, p.phone, p.email].filter(Boolean).join(" - ");
           }
-          const surveyData = survey?.surveyData || survey;
-          const title = (surveyData?.title || survey?.title || "khảo_sát").replace(/[\\/:*?"<>|]/g, "_");
-          const dateStr = range.from && range.to
-            ? `${range.from.toISOString().slice(0, 10)}_${range.to.toISOString().slice(0, 10)}`
-            : new Date().toISOString().slice(0, 10);
-          exportSurveyToExcel({
-            survey: surveyData?.questions ? { surveyData } : survey,
-            tasks,
-            filename: `${title}_${dateStr}.xlsx`,
-            getPerformByInfo: (task) => {
-              const p = task?.submission?.performedByInfo;
-              if (p) {
-                return [p.name, p.phone, p.email].filter(Boolean).join(" - ");
-              }
-              const a = task?.assignee;
-              return [a?.name, a?.phone, a?.email].filter(Boolean).join(" - ");
-            },
-          });
-          success("Thành công", `Đã xuất ${tasks.length} lịch trình ra file Excel.`);
-          setOpen(false);
-        }).catch((err: any) => {
-          throw err;
-        });
-    } catch (err) {
-      console.log('error: ', err)
-      error('Thất bại', 'Không thể xuất dữ liệu');
-    }
+          const a = task?.assignee;
+          return [a?.name, a?.phone, a?.email].filter(Boolean).join(" - ");
+        },
+      });
+      success("Thành công", `Đã xuất ${tasks.length} lịch trình ra file Excel.`);
+      setOpen(false);
+    }, "Không thể xuất dữ liệu lịch trình.");
   };
 
   return (
