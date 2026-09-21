@@ -37,7 +37,7 @@ export default function Page() {
       <div className="mx-2 lg:mx-3 flex flex-col gap-3">
         <div className="flex flex-row justify-between items-center">
           <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wide">Kiểm duyệt / QC</h2>
-          <ExportSubmissionButton filter={filter} />
+          <ExportSubmissionButton filter={filter} reviewedOnly filenamePrefix="ket-qua-kiem-duyet" />
         </div>
 
         <QCKPIs data={data} isLoading={isLoading} />
