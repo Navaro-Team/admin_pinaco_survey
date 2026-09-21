@@ -268,6 +268,9 @@ const QC_STATUS_LABEL: Record<string, string> = {
   FAILED: "Không đạt",
 };
 
+// Index of the last fixed info column (STT … Ngày khảo sát)
+const FIXED_COL_LAST = 11;
+
 export interface ExportSubmissionExcelParams {
   survey: any;
   submissions: any[];
@@ -280,6 +283,7 @@ export function exportSubmissionToExcel({ survey, submissions, filename = "ket_q
 
   const headerRow1 = [
     "STT",
+    "Mã điểm bán",
     "Tên điểm bán",
     "Địa chỉ",
     "SĐT điểm bán",
@@ -298,6 +302,7 @@ export function exportSubmissionToExcel({ survey, submissions, filename = "ket_q
 
   const headerRow2 = [
     "STT",
+    "Mã điểm bán",
     "Tên điểm bán",
     "Địa chỉ",
     "SĐT điểm bán",
@@ -317,13 +322,13 @@ export function exportSubmissionToExcel({ survey, submissions, filename = "ket_q
   const rows: (string | number)[][] = [headerRow1, headerRow2];
   const merges: XLSX.Range[] = [];
 
-  // Merge header rows for fixed info columns (0–10)
-  for (let c = 0; c <= 10; c++) {
+  // Merge header rows for fixed info columns (0–11)
+  for (let c = 0; c <= FIXED_COL_LAST; c++) {
     merges.push({ s: { r: 0, c }, e: { r: 1, c } });
   }
 
   // Merge header rows for question columns
-  let colIdx = 11;
+  let colIdx = FIXED_COL_LAST + 1;
   for (const col of questionCols) {
     if (!col.isDetail) {
       merges.push({ s: { r: 0, c: colIdx }, e: { r: 1, c: colIdx } });
@@ -372,6 +377,7 @@ export function exportSubmissionToExcel({ survey, submissions, filename = "ket_q
     for (let i = 0; i < maxDetailRows; i++) {
       const infoCells = [
         i === 0 ? stt : "",
+        i === 0 ? store?.code ?? "" : "",
         i === 0 ? store?.name ?? "" : "",
         i === 0 ? store?.location?.address ?? "" : "",
         i === 0 ? store?.phone ?? "" : "",
@@ -405,8 +411,8 @@ export function exportSubmissionToExcel({ survey, submissions, filename = "ket_q
 
     if (taskEndRow > taskStartRow) {
       const mergeColIndexes: number[] = [];
-      for (let c = 0; c <= 10; c++) mergeColIndexes.push(c);
-      let ci = 11;
+      for (let c = 0; c <= FIXED_COL_LAST; c++) mergeColIndexes.push(c);
+      let ci = FIXED_COL_LAST + 1;
       for (const col of questionCols) {
         if (!col.isDetail || col.detailField === "totalAmount") mergeColIndexes.push(ci);
         ci += 1;
@@ -421,6 +427,7 @@ export function exportSubmissionToExcel({ survey, submissions, filename = "ket_q
   const ws = XLSX.utils.aoa_to_sheet(rows);
   ws["!cols"] = [
     { wch: 5 },   // STT
+    { wch: 14 },  // Mã điểm bán
     { wch: 22 },  // Tên điểm bán
     { wch: 45 },  // Địa chỉ
     { wch: 14 },  // SĐT điểm bán

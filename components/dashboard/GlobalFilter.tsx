@@ -78,11 +78,12 @@ export function GlobalFilter({ value, onChange }: Props) {
       // reset staff nếu không còn trong danh sách khu vực mới
       onChange({ ...value, staff: "" });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value.region]);
 
   useEffect(() => {
     dispatch(getAreas({}))
-  }, [])
+  }, [dispatch])
 
   return (
     <div className="bg-white border rounded-xl px-3 py-2.5 mx-2 lg:mx-3">

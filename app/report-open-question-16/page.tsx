@@ -27,10 +27,11 @@ export default function Page() {
   useEffect(() => {
     dispatch(getCampaigns({}) as any)
     dispatch(getOpenQuestion16FilterOptions({}) as any)
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     dispatch(getOpenQuestion16Report(filter) as any)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter.campaignId, filter.startDate, filter.endDate, filter.province, filter.storeGroup])
 
   return (

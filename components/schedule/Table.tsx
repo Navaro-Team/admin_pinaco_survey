@@ -85,6 +85,7 @@ export function Table() {
       dispatch(resetPagination());
       fetchTasks(1);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, filter]);
 
   // Reload when tasks become empty after having data (e.g., after back from detail page)
@@ -95,6 +96,7 @@ export function Table() {
       fetchTasks(1);
     }
     prevTasksLengthRef.current = tasks.length;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, tasks.length, isLoading, requestState.status, filter.q, filter.assigneeId, filter.status]);
 
   const filteredTasks = tasks.filter((task) => {
@@ -170,6 +172,7 @@ export function Table() {
           break;
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestState]);
 
   return (

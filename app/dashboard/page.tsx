@@ -29,16 +29,17 @@ export default function Page() {
   useEffect(() => {
     dispatch(getBusinessOutcome({ ...filter, page: 1, limit: 20 }))
     dispatch(getInventoryHealth({ ...filter, page: 1, limit: 20 }))
-  }, [filter])
+  }, [dispatch, filter])
 
   useEffect(() => {
     dispatch(getDashboardOverview({ ...filter, brand: overviewBrand }))
-  }, [filter, overviewBrand])
+  }, [dispatch, filter, overviewBrand])
 
   useEffect(() => {
     if (errorDashboard) {
       error("Lỗi tổng hợp dữ liệu", errorDashboard)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorDashboard])
 
   return (
