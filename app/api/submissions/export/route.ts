@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     if (!accessToken) throw new Error('No access token');
     const urlParams = new URLSearchParams();
-    for (const key of ['region', 'staff', 'business_type', 'q', 'status', 'startDate', 'endDate']) {
+    for (const key of ['region', 'staff', 'business_type', 'q', 'status', 'startDate', 'endDate', 'reviewed']) {
       const value = params.get(key);
       if (value) urlParams.set(key, value);
     }

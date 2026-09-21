@@ -16,9 +16,13 @@ type Props = {
     startDate?: string;
     endDate?: string;
   };
+  /** Only export submissions that already have a supervisor review (QC). */
+  reviewedOnly?: boolean;
+  /** Overrides the default file name (survey title); the export date is appended. */
+  filenamePrefix?: string;
 };
 
-export function ExportSubmissionButton({ filter }: Props) {
+export function ExportSubmissionButton({ filter, reviewedOnly, filenamePrefix }: Props) {
   const dispatch = useAppDispatch();
   const runExport = useExportExcel();
 
@@ -32,6 +36,7 @@ export function ExportSubmissionButton({ filter }: Props) {
         status: filter?.status,
         startDate: filter?.startDate,
         endDate: filter?.endDate,
+        reviewed: reviewedOnly,
       })).unwrap();
       const payload = res as any;
       const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
@@ -40,12 +45,14 @@ export function ExportSubmissionButton({ filter }: Props) {
         return "Không có dữ liệu để xuất Excel.";
       }
       const surveyData = data?.surveyData;
-      const title = (surveyData?.title || "ket_qua_khao_sat").replace(/[\\/:*?"<>|]/g, "_");
       const dateStr = new Date().toISOString().slice(0, 10);
+      const filename = filenamePrefix
+        ? `${filenamePrefix}-${dateStr}.xlsx`
+        : `${(surveyData?.title || "ket_qua_khao_sat").replace(/[\\/:*?"<>|]/g, "_")}_${dateStr}.xlsx`;
       exportSubmissionToExcel({
         survey: surveyData,
         submissions,
-        filename: `${title}_${dateStr}.xlsx`,
+        filename,
       });
     }, "Không thể xuất dữ liệu khảo sát.");
 
