@@ -14,6 +14,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
 import { InputCalendar } from "../ui/InputCalendar";
+import { ProgressBar } from "../ui/progress-bar";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/hooks/use-dialog";
 import { surveyCleanupService } from "@/features/survey-cleanup/survey-cleanup.service";
@@ -32,6 +33,12 @@ type Props = {
   onCompleted?: () => void;
 };
 
+/** Stores per request — keeps each call well under the DB / HTTP timeouts. */
+const BATCH_SIZE = 50;
+
+type BatchTotals = { stores: number; submissions: number; tasks: number; skipped: number };
+const EMPTY_TOTALS: BatchTotals = { stores: 0, submissions: 0, tasks: 0, skipped: 0 };
+
 const TEXT: Record<CleanupAction, { title: string; description: string; confirm: string }> = {
   REMOVE: {
     title: "Xóa điểm bán bỏ khảo sát",
@@ -46,15 +53,18 @@ const TEXT: Record<CleanupAction, { title: string; description: string; confirm:
 };
 
 export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }: Props) {
-  const { showSuccess, showFailed } = useDialog();
+  const { showSuccess } = useDialog();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const stopRef = useRef(false);
   const [fileName, setFileName] = useState<string>("");
-  const [items, setItems] = useState<CleanupItem[]>([]);
   const [preview, setPreview] = useState<CleanupPreview | null>(null);
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [onlyIssues, setOnlyIssues] = useState(false);
   const [loading, setLoading] = useState<"preview" | "submit" | null>(null);
   const [error, setError] = useState<string>("");
+  // Batched execution: rows still to send, and running totals of processed batches
+  const [remaining, setRemaining] = useState<CleanupItem[] | null>(null);
+  const [totals, setTotals] = useState<BatchTotals>(EMPTY_TOTALS);
 
   const text = TEXT[action];
   const issues = preview ? preview.total - preview.valid : 0;
@@ -63,13 +73,24 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
     [preview, onlyIssues]
   );
 
+  const validItems = useMemo<CleanupItem[]>(
+    () =>
+      (preview?.items ?? [])
+        .filter((i) => i.status === "OK")
+        .map((i) => ({ storeCode: i.storeCode, ...(i.employeeCode && { employeeCode: i.employeeCode }) })),
+    [preview]
+  );
+  const processedCount = validItems.length - (remaining?.length ?? validItems.length);
+  const isResuming = remaining !== null && remaining.length > 0 && processedCount > 0;
+
   const reset = () => {
     setFileName("");
-    setItems([]);
     setPreview(null);
     setDueDate(null);
     setOnlyIssues(false);
     setError("");
+    setRemaining(null);
+    setTotals(EMPTY_TOTALS);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -86,7 +107,6 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
     try {
       const parsed = await parseCleanupExcel(file, action);
       if (parsed.length === 0) throw new Error(`Sheet "${namedSheetLabel(action)}" không có điểm bán nào.`);
-      setItems(parsed);
       setPreview(await surveyCleanupService.preview(action, parsed));
     } catch (err: any) {
       setError(err?.message || "Không thể đọc file.");
@@ -103,23 +123,62 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
     }
     setLoading("submit");
     setError("");
-    try {
-      let description: string;
-      if (action === "REMOVE") {
-        const res = await surveyCleanupService.remove(items);
-        description = `Đã xóa ${res.removedStores} điểm bán, ${res.deletedSubmissions} câu trả lời, ${res.deletedTasks} task. Bỏ qua ${res.skipped} dòng.`;
-      } else {
-        const res = await surveyCleanupService.resurvey(items, format(dueDate!, "yyyy-MM-dd"));
-        description = `Đã mở lại ${res.processedStores} điểm bán (${res.reopenedTasks} task), ẩn ${res.cancelledSubmissions} câu trả lời cũ. Bỏ qua ${res.skipped} dòng.`;
+    stopRef.current = false;
+
+    // Send only rows that passed preview, in small sequential batches so each request stays short
+    let queue = remaining && remaining.length > 0 ? remaining : validItems;
+    let acc = remaining && remaining.length > 0 ? totals : EMPTY_TOTALS;
+    setRemaining(queue);
+
+    while (queue.length > 0) {
+      if (stopRef.current) break;
+      const batch = queue.slice(0, BATCH_SIZE);
+      try {
+        if (action === "REMOVE") {
+          const res = await surveyCleanupService.remove(batch);
+          acc = {
+            stores: acc.stores + res.removedStores,
+            submissions: acc.submissions + res.deletedSubmissions,
+            tasks: acc.tasks + res.deletedTasks,
+            skipped: acc.skipped + res.skipped,
+          };
+        } else {
+          const res = await surveyCleanupService.resurvey(batch, format(dueDate!, "yyyy-MM-dd"));
+          acc = {
+            stores: acc.stores + res.processedStores,
+            submissions: acc.submissions + res.cancelledSubmissions,
+            tasks: acc.tasks + res.reopenedTasks,
+            skipped: acc.skipped + res.skipped,
+          };
+        }
+      } catch (err: any) {
+        setLoading(null);
+        setError(
+          `Lỗi khi xử lý lô ${batch[0].storeCode}…: ${err?.message || "không xác định"}. ` +
+          `Nhấn "Chạy tiếp" để xử lý ${queue.length} điểm còn lại.`
+        );
+        onCompleted?.();
+        return;
       }
-      setLoading(null);
-      handleOpenChange(false);
-      showSuccess({ title: "Thành công", description });
-      onCompleted?.();
-    } catch (err: any) {
-      setLoading(null);
-      showFailed({ title: "Thất bại", description: err?.message || "Không thể xử lý danh sách." });
+      queue = queue.slice(batch.length);
+      setTotals(acc);
+      setRemaining(queue);
     }
+
+    setLoading(null);
+    onCompleted?.();
+    if (queue.length > 0) {
+      setError(`Đã dừng. Còn ${queue.length} điểm chưa xử lý, nhấn "Chạy tiếp" để tiếp tục.`);
+      return;
+    }
+    handleOpenChange(false);
+    showSuccess({
+      title: "Thành công",
+      description:
+        action === "REMOVE"
+          ? `Đã xóa ${acc.stores} điểm bán, ${acc.submissions} câu trả lời, ${acc.tasks} task.`
+          : `Đã mở lại ${acc.stores} điểm bán (${acc.tasks} task), ẩn ${acc.submissions} câu trả lời cũ.`,
+    });
   };
 
   return (
@@ -139,7 +198,11 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
               className="hidden"
               onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
             />
-            <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={!!loading}>
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={!!loading || processedCount > 0}
+            >
               <Upload className="size-4" />
               Chọn file tổng kết
             </Button>
@@ -151,6 +214,15 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
             ) : null}
             {loading === "preview" ? <Loader2 className="size-4 animate-spin" /> : null}
           </div>
+
+          {remaining !== null ? (
+            <ProgressBar
+              label={loading === "submit" ? "Đang xử lý..." : "Tiến độ"}
+              subLabel={`${processedCount.toLocaleString("vi-VN")} / ${validItems.length.toLocaleString("vi-VN")} điểm · ${totals.submissions.toLocaleString("vi-VN")} câu trả lời · ${totals.tasks.toLocaleString("vi-VN")} task`}
+              current={processedCount}
+              total={validItems.length}
+            />
+          ) : null}
 
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
@@ -175,7 +247,12 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
                   <div className="flex items-center gap-2 text-sm">
                     <span className="whitespace-nowrap">Hạn hoàn thành</span>
                     <div className="w-44">
-                      <InputCalendar value={dueDate} onChange={setDueDate} placeholder="dd/MM/yyyy" />
+                      <InputCalendar
+                        value={dueDate}
+                        onChange={setDueDate}
+                        placeholder="dd/MM/yyyy"
+                        disabled={!!loading || processedCount > 0}
+                      />
                     </div>
                   </div>
                 ) : null}
@@ -229,16 +306,27 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={!!loading}>
-            Hủy
-          </Button>
+          {loading === "submit" ? (
+            <Button variant="outline" onClick={() => { stopRef.current = true; }}>
+              Dừng sau lô hiện tại
+            </Button>
+          ) : (
+            <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={!!loading}>
+              {processedCount > 0 ? "Đóng" : "Hủy"}
+            </Button>
+          )}
           <Button
             variant={action === "REMOVE" ? "destructive" : "default"}
             onClick={handleConfirm}
-            disabled={!preview || preview.valid === 0 || !!loading || (action === "RESURVEY" && !dueDate)}
+            disabled={
+              !preview || validItems.length === 0 || !!loading || (action === "RESURVEY" && !dueDate) ||
+              (remaining !== null && remaining.length === 0)
+            }
           >
             {loading === "submit" ? <Loader2 className="size-4 animate-spin" /> : null}
-            {text.confirm} {preview ? `(${preview.valid})` : ""}
+            {isResuming
+              ? `Chạy tiếp (${remaining!.length})`
+              : `${text.confirm} ${preview ? `(${validItems.length})` : ""}`}
           </Button>
         </DialogFooter>
       </DialogContent>
