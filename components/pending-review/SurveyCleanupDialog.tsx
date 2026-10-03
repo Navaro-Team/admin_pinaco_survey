@@ -15,6 +15,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Button } from "../ui/button";
 import { InputCalendar } from "../ui/InputCalendar";
 import { ProgressBar } from "../ui/progress-bar";
+import { Combobox } from "../ui/combobox";
+import { campaignsService } from "@/features/campaigns/campaigns.service";
+import { type Campaign, parseCampaigns } from "@/model/Campaign.model";
 import { cn } from "@/lib/utils";
 import { useDialog } from "@/hooks/use-dialog";
 import { surveyCleanupService } from "@/features/survey-cleanup/survey-cleanup.service";
@@ -33,6 +36,8 @@ type Props = {
   onCompleted?: () => void;
 };
 
+const KEEP_CAMPAIGN = "__keep__";
+
 /** Stores per request — keeps each call well under the DB / HTTP timeouts. */
 const BATCH_SIZE = 50;
 
@@ -47,7 +52,9 @@ const TEXT: Record<CleanupAction, { title: string; description: string; confirm:
   },
   RESURVEY: {
     title: "Import danh sách khảo sát lại",
-    description: "Câu trả lời cũ bị ẩn khỏi dashboard (vẫn giữ để tra cứu), task được mở lại và giao cho nhân viên chỉ định.",
+    description:
+      "Câu trả lời cũ bị ẩn khỏi dashboard (vẫn giữ để tra cứu). Task được mở lại và giao cho nhân viên chỉ định — " +
+      "nếu chọn chiến dịch, task được tạo trong chiến dịch đó và task ở chiến dịch cũ bị hủy.",
     confirm: "Xác nhận khảo sát lại",
   },
 };
@@ -65,6 +72,10 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
   // Batched execution: rows still to send, and running totals of processed batches
   const [remaining, setRemaining] = useState<CleanupItem[] | null>(null);
   const [totals, setTotals] = useState<BatchTotals>(EMPTY_TOTALS);
+  // RESURVEY only: rows read from the file (kept to re-run preview) and the optional target campaign
+  const [parsedItems, setParsedItems] = useState<CleanupItem[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaignId, setCampaignId] = useState<string>("");
 
   const text = TEXT[action];
   const issues = preview ? preview.total - preview.valid : 0;
@@ -91,8 +102,22 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [loading]);
 
+  // Campaigns for the resurvey target picker
+  useEffect(() => {
+    if (action !== "RESURVEY") return;
+    campaignsService
+      .getCampaigns({ page: 1, limit: 100 })
+      .then((res) => {
+        const payload = res as any;
+        const data = payload?.data?.data?.data || payload?.data?.data || payload?.data;
+        setCampaigns(parseCampaigns(data?.campaigns || []).filter((c) => !c.isDeleted && c.status !== "ARCHIVED"));
+      })
+      .catch(() => setCampaigns([]));
+  }, [action]);
+
   const reset = () => {
     setFileName("");
+    setParsedItems([]);
     setPreview(null);
     setDueDate(null);
     setOnlyIssues(false);
@@ -104,23 +129,48 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
 
   const handleOpenChange = (next: boolean) => {
     if (loading) return;
-    if (!next) reset();
+    if (!next) {
+      reset();
+      setCampaignId("");
+    }
     onOpenChange(next);
+  };
+
+  const runPreview = async (items: CleanupItem[], targetCampaignId: string) => {
+    setLoading("preview");
+    setError("");
+    try {
+      setPreview(await surveyCleanupService.preview(action, items, targetCampaignId || undefined));
+    } catch (err: any) {
+      setPreview(null);
+      setError(err?.message || "Không thể kiểm tra danh sách.");
+    } finally {
+      setLoading(null);
+    }
   };
 
   const handleFile = async (file: File) => {
     reset();
     setFileName(file.name);
-    setLoading("preview");
+    let parsed: CleanupItem[];
     try {
-      const parsed = await parseCleanupExcel(file, action);
+      parsed = await parseCleanupExcel(file, action);
       if (parsed.length === 0) throw new Error(`Sheet "${namedSheetLabel(action)}" không có điểm bán nào.`);
-      setPreview(await surveyCleanupService.preview(action, parsed));
     } catch (err: any) {
       setError(err?.message || "Không thể đọc file.");
-    } finally {
-      setLoading(null);
+      return;
     }
+    setParsedItems(parsed);
+    await runPreview(parsed, campaignId);
+  };
+
+  // A target campaign changes which rows are valid (stores without a task get a new one), so re-check
+  const handleCampaignChange = (value: string) => {
+    const next = value === KEEP_CAMPAIGN ? "" : value;
+    setCampaignId(next);
+    const campaign = campaigns.find((c) => c._id === next);
+    if (campaign?.endDate && !dueDate) setDueDate(new Date(campaign.endDate));
+    if (parsedItems.length > 0) runPreview(parsedItems, next);
   };
 
   const handleConfirm = async () => {
@@ -151,11 +201,15 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
             skipped: acc.skipped + res.skipped,
           };
         } else {
-          const res = await surveyCleanupService.resurvey(batch, format(dueDate!, "yyyy-MM-dd"));
+          const res = await surveyCleanupService.resurvey(
+            batch,
+            format(dueDate!, "yyyy-MM-dd"),
+            campaignId || undefined
+          );
           acc = {
             stores: acc.stores + res.processedStores,
             submissions: acc.submissions + res.cancelledSubmissions,
-            tasks: acc.tasks + res.reopenedTasks,
+            tasks: acc.tasks + res.reopenedTasks + (res.createdTasks ?? 0),
             skipped: acc.skipped + res.skipped,
           };
         }
@@ -251,13 +305,25 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
                 />
               </div>
 
-              <div className="flex flex-row items-center justify-between gap-3">
+              <div className="flex flex-row flex-wrap items-center justify-between gap-3">
                 <label className="flex items-center gap-2 text-sm">
                   <input type="checkbox" checked={onlyIssues} onChange={(e) => setOnlyIssues(e.target.checked)} />
                   Chỉ hiển thị dòng bị bỏ qua
                 </label>
                 {action === "RESURVEY" ? (
                   <div className="flex items-center gap-2 text-sm">
+                    <span className="whitespace-nowrap">Chiến dịch</span>
+                    <Combobox
+                      className="w-64"
+                      options={[
+                        { value: KEEP_CAMPAIGN, label: "Giữ chiến dịch hiện tại" },
+                        ...campaigns.map((c) => ({ value: c._id, label: c.campaignName })),
+                      ]}
+                      value={campaignId || KEEP_CAMPAIGN}
+                      onChange={handleCampaignChange}
+                      placeholder="Chọn chiến dịch"
+                      disabled={!!loading || processedCount > 0}
+                    />
                     <span className="whitespace-nowrap">Hạn hoàn thành</span>
                     <div className="w-44">
                       <InputCalendar
