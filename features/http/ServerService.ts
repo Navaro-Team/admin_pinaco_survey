@@ -26,8 +26,9 @@ export class ServerService extends BaseHttpService {
         const payload = {
           status: error.response?.status || 500,
           statusText: error.response?.statusText || 'Internal Server Error',
-          code: error.response?.data?.code,
-          message: error.response?.data?.message,
+          // BE uses both { code, message } and { error: { code, message } } envelopes
+          code: error.response?.data?.code ?? error.response?.data?.error?.code,
+          message: error.response?.data?.message ?? error.response?.data?.error?.message,
         };
         return Promise.reject(payload);
       }
