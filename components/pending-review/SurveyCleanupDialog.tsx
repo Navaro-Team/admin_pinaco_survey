@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import { AlertTriangle, CheckCircle2, FileSpreadsheet, Loader2, Upload } from "lucide-react";
 import {
@@ -82,6 +82,14 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
   );
   const processedCount = validItems.length - (remaining?.length ?? validItems.length);
   const isResuming = remaining !== null && remaining.length > 0 && processedCount > 0;
+
+  // Warn before reload / tab close while batches are being sent
+  useEffect(() => {
+    if (loading !== "submit") return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [loading]);
 
   const reset = () => {
     setFileName("");
@@ -183,7 +191,12 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-5xl max-h-[90vh] flex flex-col">
+      <DialogContent
+        className="sm:max-w-5xl max-h-[90vh] flex flex-col"
+        showCloseButton={!loading}
+        onEscapeKeyDown={(e) => loading && e.preventDefault()}
+        onInteractOutside={(e) => loading && e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>{text.title}</DialogTitle>
           <DialogDescription>{text.description}</DialogDescription>

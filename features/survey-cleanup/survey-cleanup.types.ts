@@ -1,6 +1,12 @@
 export type CleanupAction = "REMOVE" | "RESURVEY";
 
-export type PreviewItemStatus = "OK" | "STORE_NOT_FOUND" | "EMPLOYEE_NOT_FOUND" | "NO_TASK" | "DUPLICATE";
+export type PreviewItemStatus =
+  | "OK"
+  | "STORE_NOT_FOUND"
+  | "EMPLOYEE_NOT_FOUND"
+  | "NO_TASK"
+  | "ALREADY_PROCESSED"
+  | "DUPLICATE";
 
 export interface CleanupItem {
   storeCode: string;
@@ -50,5 +56,6 @@ export const PREVIEW_STATUS_LABEL: Record<PreviewItemStatus, string> = {
   STORE_NOT_FOUND: "Không tìm thấy điểm bán",
   EMPLOYEE_NOT_FOUND: "Không tìm thấy nhân viên",
   NO_TASK: "Điểm bán chưa có task",
+  ALREADY_PROCESSED: "Đã xử lý ở lần import trước",
   DUPLICATE: "Trùng mã trong file",
 };
