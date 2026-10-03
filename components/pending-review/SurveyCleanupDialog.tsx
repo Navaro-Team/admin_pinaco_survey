@@ -341,29 +341,18 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
                 <Table>
                   <TableHeader className="sticky top-0 bg-background">
                     <TableRow>
+                      <TableHead>Trạng thái</TableHead>
                       <TableHead>Mã điểm bán</TableHead>
                       <TableHead>Tên điểm bán</TableHead>
                       <TableHead>Khu vực</TableHead>
                       <TableHead className="text-right">Câu trả lời</TableHead>
                       <TableHead>Người khảo sát hiện tại</TableHead>
                       {action === "RESURVEY" ? <TableHead>Người khảo sát lại</TableHead> : null}
-                      <TableHead>Trạng thái</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {rows.map((item, idx) => (
                       <TableRow key={`${item.storeCode}-${idx}`}>
-                        <TableCell className="font-mono">{item.storeCode}</TableCell>
-                        <TableCell>{item.storeName ?? "-"}</TableCell>
-                        <TableCell>{item.area ?? "-"}</TableCell>
-                        <TableCell className="text-right">{item.activeSubmissions}</TableCell>
-                        <TableCell>{item.currentAssignee ?? "-"}</TableCell>
-                        {action === "RESURVEY" ? (
-                          <TableCell>
-                            {item.employeeName ?? "-"}
-                            <span className="text-muted-foreground"> ({item.employeeCode || "trống"})</span>
-                          </TableCell>
-                        ) : null}
                         <TableCell>
                           <span
                             className={cn(
@@ -375,6 +364,17 @@ export function SurveyCleanupDialog({ action, open, onOpenChange, onCompleted }:
                             {PREVIEW_STATUS_LABEL[item.status]}
                           </span>
                         </TableCell>
+                        <TableCell className="font-mono">{item.storeCode}</TableCell>
+                        <TableCell>{item.storeName ?? "-"}</TableCell>
+                        <TableCell>{item.area ?? "-"}</TableCell>
+                        <TableCell className="text-right">{item.activeSubmissions}</TableCell>
+                        <TableCell>{item.currentAssignee ?? "-"}</TableCell>
+                        {action === "RESURVEY" ? (
+                          <TableCell>
+                            {item.employeeName ?? "-"}
+                            <span className="text-muted-foreground"> ({item.employeeCode || "trống"})</span>
+                          </TableCell>
+                        ) : null}
                       </TableRow>
                     ))}
                   </TableBody>
