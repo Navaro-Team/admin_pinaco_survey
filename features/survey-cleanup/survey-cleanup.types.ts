@@ -48,6 +48,8 @@ export interface ResurveyResult {
   processedStores: number;
   cancelledSubmissions: number;
   reopenedTasks: number;
+  createdTasks?: number;
+  campaignId?: string;
   dueDate: string;
 }
 

@@ -15,8 +15,12 @@ const unwrap = <T>(result: ReturnType<typeof parseCommonHttpResult>): T => {
 };
 
 class SurveyCleanupService {
-  async preview(action: CleanupAction, items: CleanupItem[]) {
-    const response = await clientService.post("/survey-cleanup/preview", { action, items });
+  async preview(action: CleanupAction, items: CleanupItem[], campaignId?: string) {
+    const response = await clientService.post("/survey-cleanup/preview", {
+      action,
+      items,
+      ...(action === "RESURVEY" && campaignId && { campaignId }),
+    });
     return unwrap<CleanupPreview>(parseCommonHttpResult(response));
   }
 
@@ -25,8 +29,12 @@ class SurveyCleanupService {
     return unwrap<RemoveResult>(parseCommonHttpResult(response));
   }
 
-  async resurvey(items: CleanupItem[], dueDate: string) {
-    const response = await clientService.post("/survey-cleanup/resurvey", { items, dueDate });
+  async resurvey(items: CleanupItem[], dueDate: string, campaignId?: string) {
+    const response = await clientService.post("/survey-cleanup/resurvey", {
+      items,
+      dueDate,
+      ...(campaignId && { campaignId }),
+    });
     return unwrap<ResurveyResult>(parseCommonHttpResult(response));
   }
 }
