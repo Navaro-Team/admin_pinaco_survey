@@ -18,6 +18,14 @@ export interface Task {
   checkInAssets: any[],
   cancellationReason: string,
   cancelledBy: any,
+  reassignHistory: ReassignHistoryEntry[],
+}
+
+export interface ReassignHistoryEntry {
+  from: { id: string; name: string; code?: string };
+  to: { id: string; name: string; code?: string };
+  by: { id: string; name: string };
+  at: string;
 }
 
 export function parseTask(data: any): Task {
@@ -40,7 +48,8 @@ export function parseTask(data: any): Task {
     updatedAt: data.updatedAt,
     checkInAssets: data.checkInAssets,
     cancellationReason: data.cancellationReason,
-    cancelledBy: data.cancelledBy
+    cancelledBy: data.cancelledBy,
+    reassignHistory: data.reassignHistory ?? []
   };
 }
 
