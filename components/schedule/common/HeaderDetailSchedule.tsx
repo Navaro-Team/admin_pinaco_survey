@@ -14,10 +14,11 @@ import { useDialog } from "@/hooks/use-dialog";
 import { getStatusSupervisorReview } from "@/model/Submission.model";
 import { exportSurveyToPDF } from "@/utils/pdf-export";
 import { formatDate } from "date-fns";
-import { ArrowLeftIcon, CircleCheckBig, CircleX, Download } from "lucide-react";
+import { ArrowLeftIcon, CircleCheckBig, CircleX, Download, UserRoundCog } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ReassignTaskDialog } from "./ReassignTaskDialog";
 
 export function HeaderDetailSchedule() {
   const router = useRouter();
@@ -34,6 +35,9 @@ export function HeaderDetailSchedule() {
   const { error, success } = useToastContext();
   const { showSuccess, showFailed, showDialog, showLoading } = useDialog();
   const noteRef = useRef<string>("");
+  const user = useAppSelector((state) => state.app.user);
+  const isAdmin = !!user?.roles?.some((r: string) => r.toLowerCase() === "admin");
+  const [reassignOpen, setReassignOpen] = useState(false);
 
   const handleExportPDF = () => {
     if (!survey || !task) {
@@ -180,6 +184,12 @@ export function HeaderDetailSchedule() {
             {isLoading && isReject ? 'Đang từ chối yêu cầu...' : 'Từ chối yêu cầu'}
           </Button>
         </>}
+        {isAdmin && task && task.status !== Status.COMPLETED && <Button
+          variant="outline"
+          onClick={() => setReassignOpen(true)}>
+          <UserRoundCog className="size-4" />
+          Chuyển lịch trình
+        </Button>}
         <Button
           hidden={task?.status !== "IN_PROGRESS"}
           disabled={isLoading}
@@ -199,6 +209,7 @@ export function HeaderDetailSchedule() {
           </Button>
         </Link>
       </div>
+      {task && <ReassignTaskDialog task={task} open={reassignOpen} onOpenChange={setReassignOpen} />}
     </div>
   )
 }

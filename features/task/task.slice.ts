@@ -40,6 +40,7 @@ export const createMultipleTasks = commonCreateAsyncThunk({ type: "createMultipl
 export const exportTasks = commonCreateAsyncThunk({ type: "exportTasks", action: taskService.exportTasks });
 export const cancelTask = commonCreateAsyncThunk({ type: "cancelTask", action: taskService.cancelTask });
 export const reopenTask = commonCreateAsyncThunk({ type: "reopenTask", action: taskService.reopenTask });
+export const reassignTask = commonCreateAsyncThunk({ type: "reassignTask", action: taskService.reassignTask });
 export const getScheduleStats = commonCreateAsyncThunk({ type: "getScheduleStats", action: taskService.getScheduleStats });
 
 export const taskSlice = createSlice({
@@ -164,6 +165,16 @@ export const taskSlice = createSlice({
       })
       .addCase(reopenTask.rejected, (state) => {
         state.requestState = { status: "failed", type: "reopenTask" };
+      })
+      .addCase(reassignTask.pending, (state) => {
+        state.requestState = { status: "loading", type: "reassignTask" };
+      })
+      .addCase(reassignTask.fulfilled, (state) => {
+        state.requestState = { status: "completed", type: "reassignTask" };
+      })
+      .addCase(reassignTask.rejected, (state, action) => {
+        const payload = action.payload as any;
+        state.requestState = { status: "failed", type: "reassignTask", error: payload?.message };
       })
       .addCase(createTasks.pending, (state) => {
         state.requestState = { status: 'loading', type: 'createTasks' };
