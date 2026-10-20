@@ -77,6 +77,11 @@ class TaskService {
   }
 
 
+  async reassignTask(payload: { id: string, assigneeId: string }) {
+    const response = await clientService.patch(`/tasks/${payload.id}/reassign`, { assigneeId: payload.assigneeId });
+    return parseCommonHttpResult(response);
+  }
+
   async getScheduleStats() {
     const response = await clientService.get(`/tasks/schedule-stats`);
     return parseCommonHttpResult(response);
