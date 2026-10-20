@@ -3,6 +3,7 @@
 import { AssigneeInfo } from "@/components/schedule/common/AssigneeInfo"
 import { HeaderDetailSchedule } from "@/components/schedule/common/HeaderDetailSchedule"
 import { PhotoCheckIn } from "@/components/schedule/common/PhotoCheckIn"
+import { ReassignHistory } from "@/components/schedule/common/ReassignHistory"
 import { ResultSurvey } from "@/components/schedule/common/ResultSurvey"
 import { StoreInfo } from "@/components/schedule/common/StoreInfo"
 import { getTaskById } from "@/features/schedule/schedule.slice"
@@ -65,6 +66,7 @@ export default function Page() {
           checkinTime={submission?.checkinTime}
           checkoutTime={submission?.checkoutTime} />
       </div>
+      <ReassignHistory history={task?.reassignHistory} />
       <PhotoCheckIn />
       <ResultSurvey />
     </div>
