@@ -18,14 +18,19 @@ export function Header() {
   const { showSuccess, showFailed, showLoading } = useDialog();
   const taskState = useAppSelector((state) => state.task.requestState);
   const pagination = useAppSelector((state) => state.schedule.pagination);
+  const filter = useAppSelector((state) => state.schedule.filter);
 
   const [openScheduleSheet, setOpenScheduleSheet] = useState<boolean>(false);
   const [openAssignSheet, setOpenAssignSheet] = useState<boolean>(false);
 
   const handleRefresh = () => {
+    const hasActiveFilter = Boolean(filter.q || filter.assigneeId || filter.areaOrProvince || filter.campaignId || filter.status || filter.deadline);
     dispatch(clearFilter());
     dispatch(resetPagination());
-    dispatch(getTasks({ page: 1, limit: pagination.limit }));
+    // Clearing an active filter already triggers a refetch in Table
+    if (!hasActiveFilter) {
+      dispatch(getTasks({ page: 1, limit: pagination.limit }));
+    }
   }
 
   const clearState = () => {

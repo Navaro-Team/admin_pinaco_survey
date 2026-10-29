@@ -9,6 +9,8 @@ export interface GetTasksParams {
   campaignId?: string;
   q?: string;
   area?: string;
+  dueDateFrom?: string;
+  dueDateTo?: string;
 }
 
 class TaskService {
@@ -22,6 +24,8 @@ class TaskService {
     if (params?.assigneeId) queryParams.assigneeId = params.assigneeId;
     if (params?.area) queryParams.area = params.area;
     if (params?.campaignId) queryParams.campaignId = params.campaignId;
+    if (params?.dueDateFrom) queryParams.dueDateFrom = params.dueDateFrom;
+    if (params?.dueDateTo) queryParams.dueDateTo = params.dueDateTo;
 
     const response = await clientService.get('/tasks', queryParams);
     return parseCommonHttpResult(response);
@@ -60,8 +64,12 @@ class TaskService {
     return parseCommonHttpResult(response);
   }
 
-  async exportTasks(params: { status: string[], surveyId: string, startDate: string, endDate: string }) {
-    const response = await clientService.get('/tasks/export', params);
+  async exportTasks(params: Omit<GetTasksParams, 'page' | 'limit'> & { surveyId: string, startDate?: string, endDate?: string }) {
+    // Drop empty values so URLSearchParams does not send "undefined"
+    const queryParams = Object.fromEntries(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== '')
+    );
+    const response = await clientService.get('/tasks/export', queryParams);
     return parseCommonHttpResult(response);
   }
 
