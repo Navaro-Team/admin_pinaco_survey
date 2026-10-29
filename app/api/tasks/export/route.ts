@@ -11,15 +11,21 @@ export async function GET(request: NextRequest) {
     const urlParams = new URLSearchParams();
 
     if (!params.get('surveyId')) return missingRequiredFieldsResponse('surveyId');
-    if (!params.get('startDate')) return missingRequiredFieldsResponse('startDate');
-    if (!params.get('endDate')) return missingRequiredFieldsResponse('endDate');
 
-    urlParams.set('surveyId', params.get('surveyId') ?? '');
-    urlParams.set('startDate', params.get('startDate') ?? '');
-    urlParams.set('endDate', params.get('endDate') ?? '');
-
-    if (params.get('status')) {
-      urlParams.set('status', params.get('status') ?? '');
+    for (const key of [
+      'surveyId',
+      'startDate',
+      'endDate',
+      'status',
+      'campaignId',
+      'assigneeId',
+      'q',
+      'area',
+      'dueDateFrom',
+      'dueDateTo',
+    ]) {
+      const value = params.get(key);
+      if (value) urlParams.set(key, value);
     }
 
     const queryString = urlParams.toString();
