@@ -4,6 +4,15 @@ import { commonCreateAsyncThunk } from "@/store/thunk";
 import { taskService } from "../task/task.service";
 import { parseTask, parseTasks, Task } from "@/model/Task.model";
 
+export interface ScheduleFilter {
+  q: string;
+  assigneeId: string;
+  areaOrProvince: string;
+  campaignId: string;
+  deadline?: Date;
+  status: string;
+}
+
 interface ScheduleState {
   tasks: Task[];
   task: Task | null;
@@ -13,14 +22,7 @@ interface ScheduleState {
     hasMore: boolean;
     total: number;
   };
-  filter: {
-    q: string;
-    assigneeId: string;
-    areaOrProvince: string;
-    campaignId: string;
-    deadline?: Date;
-    status: string;
-  };
+  filter: ScheduleFilter;
   requestState: RequestState;
 }
 
@@ -70,11 +72,7 @@ export const scheduleSlice = createSlice({
       };
     },
     changeAssigneeId: (state, action) => {
-      if (action.payload === state.filter.assigneeId) {
-        state.filter.assigneeId = "";
-      } else {
-        state.filter.assigneeId = action.payload;
-      }
+      state.filter.assigneeId = action.payload;
     },
     changeSearch: (state, action) => {
       state.filter.q = action.payload;
@@ -86,18 +84,10 @@ export const scheduleSlice = createSlice({
       state.filter.deadline = action.payload;
     },
     changeStatus: (state, action) => {
-      if (action.payload === state.filter.status) {
-        state.filter.status = "";
-      } else {
-        state.filter.status = action.payload;
-      }
+      state.filter.status = action.payload;
     },
     changeCampaignId: (state, action) => {
-      if (action.payload === state.filter.campaignId) {
-        state.filter.campaignId = "";
-      } else {
-        state.filter.campaignId = action.payload;
-      }
+      state.filter.campaignId = action.payload;
     },
     clearScheduleState: (state) => {
       state.requestState = { status: 'idle', type: '' };

@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { changePage, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
 import { StatusBadge } from "../ui/status-badge";
 import { formatDate, isSameDay } from "date-fns";
+import { getTaskFilterParams } from "@/features/schedule/schedule.utils";
 import { TablePagination } from "../ui/table-pagination";
 import { Skeleton } from "../ui/skeleton";
 import { useDialog } from "@/hooks/use-dialog";
@@ -40,11 +41,7 @@ export function Table() {
   const getTasksParams = (page: number) => ({
     page,
     limit: 10,
-    q: filter.q?.trim() || undefined,
-    assigneeId: filter.assigneeId?.trim() || undefined,
-    area: filter.areaOrProvince?.trim() || undefined,
-    status: filter.status || undefined,
-    campaignId: filter.campaignId || undefined,
+    ...getTaskFilterParams(filter),
   });
 
   const fetchTasks = (page: number) => {
@@ -98,21 +95,6 @@ export function Table() {
     prevTasksLengthRef.current = tasks.length;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, tasks.length, isLoading, requestState.status, filter.q, filter.assigneeId, filter.status]);
-
-  const filteredTasks = tasks.filter((task) => {
-    if (filter.deadline && filter.deadline instanceof Date) {
-      if (task.dueDate) {
-        const taskDueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-        if (!isSameDay(taskDueDate, filter.deadline)) {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    }
-
-    return true;
-  });
 
   const itemsPerPage = 10;
 
@@ -221,14 +203,14 @@ export function Table() {
                         <Skeleton className="h-4 w-24" />
                       </TableCell>
                     </TableRow>
-                  ))) : (filteredTasks?.length === 0 ? (
+                  ))) : (tasks.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                         Không có dữ liệu hiển thị
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredTasks.map((task, index) => {
+                    tasks.map((task, index) => {
                       const actualIndex = (pagination.page - 1) * pagination.limit + index + 1;
                       return (
                         <TableRow key={task._id}>
