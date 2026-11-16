@@ -387,15 +387,47 @@ function buildAnswersMap(answers: any[]): Map<string, { answer: any; questionTyp
   return m;
 }
 
-export interface ExportSurveyExcelParams {
+export interface ExportSurveyExcelSheet {
   survey: any;
   tasks: any[];
+  sheetName?: string;
+}
+
+export interface ExportSurveyExcelParams {
+  /** One sheet per survey, since each survey has its own question columns */
+  sheets: ExportSurveyExcelSheet[];
   filename?: string;
   getPerformByInfo?: (task: any) => string;
 }
 
+/** Excel sheet names: max 31 chars, no []:*?/\ and unique within the workbook */
+function toSheetName(name: string, usedNames: Set<string>): string {
+  const base = (name || "Khảo sát").replace(/[\[\]:*?/\\]/g, "_").trim().slice(0, 31) || "Khảo sát";
+  let result = base;
+  for (let i = 2; usedNames.has(result.toLowerCase()); i++) {
+    const suffix = ` (${i})`;
+    result = base.slice(0, 31 - suffix.length) + suffix;
+  }
+  usedNames.add(result.toLowerCase());
+  return result;
+}
+
 export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
-  const { survey, tasks, filename = "khảo_sát.xlsx", getPerformByInfo } = params;
+  const { sheets, filename = "khảo_sát.xlsx", getPerformByInfo } = params;
+  const wb = XLSX.utils.book_new();
+  const usedNames = new Set<string>();
+  for (const sheet of sheets) {
+    const ws = buildSurveySheet(sheet.survey, sheet.tasks, getPerformByInfo);
+    XLSX.utils.book_append_sheet(wb, ws, toSheetName(sheet.sheetName ?? "", usedNames));
+  }
+  XLSX.writeFile(wb, filename);
+}
+
+function buildSurveySheet(
+  survey: any,
+  tasks: any[],
+  getPerformByInfo?: (task: any) => string
+): XLSX.WorkSheet {
   const questions = survey?.surveyData?.questions ?? survey?.questions ?? [];
   const questionCols = getQuestionColumns(questions);
 
@@ -574,7 +606,5 @@ export function exportSurveyToExcel(params: ExportSurveyExcelParams): void {
   if (merges.length) {
     ws["!merges"] = merges;
   }
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Khảo sát");
-  XLSX.writeFile(wb, filename);
+  return ws;
 }
