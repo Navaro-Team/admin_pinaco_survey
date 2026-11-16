@@ -64,7 +64,7 @@ class TaskService {
     return parseCommonHttpResult(response);
   }
 
-  async exportTasks(params: Omit<GetTasksParams, 'page' | 'limit'> & { surveyId: string, startDate?: string, endDate?: string }) {
+  async exportTasks(params: Omit<GetTasksParams, 'page' | 'limit'> & { surveyId?: string, startDate?: string, endDate?: string }) {
     // Drop empty values so URLSearchParams does not send "undefined"
     const queryParams = Object.fromEntries(
       Object.entries(params).filter(([, value]) => value !== undefined && value !== '')

@@ -9,7 +9,7 @@ import { clearCampaignsState, getCampaigns } from "@/features/campaigns/campaign
 import { AssignSheet } from "./AssignSheet";
 import { clearStaffsState, searchUsers } from "@/features/staffs/staffs.slice";
 import { clearStoreState, } from "@/features/store/store.slice";
-import { ExportExcelPopover } from "./ExportExcelPopover";
+import { ExportExcelButton } from "./ExportExcelButton";
 import { clearFilter, clearScheduleState, getTasks, resetPagination } from "@/features/schedule/schedule.slice";
 import { clearStores, clearTaskState } from "@/features/task/task.slice";
 
@@ -101,7 +101,7 @@ export function Header() {
         <p className="text-base text-muted-foreground">Xem, lọc và quản lý danh sách các lịch trình khảo sát tại điểm bán</p>
       </div>
       <div className="flex flex-col gap-4 items-center lg:flex-row">
-        <ExportExcelPopover />
+        <ExportExcelButton />
         <Button variant="outline" onClick={() => setOpenScheduleSheet(true)}>
           <CalendarPlus2 />
           Tạo lịch trình
