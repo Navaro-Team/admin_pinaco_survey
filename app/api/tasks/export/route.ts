@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { serverService } from "@/features/http/ServerService";
-import { missingRequiredFieldsResponse, responseFailed, responseSuccess } from "../../utils";
+import { responseFailed, responseSuccess } from "../../utils";
 
 export async function GET(request: NextRequest) {
   const accessToken = (await cookies()).get('access_token')?.value;
@@ -9,8 +9,6 @@ export async function GET(request: NextRequest) {
   try {
     if (!accessToken) throw new Error('No access token');
     const urlParams = new URLSearchParams();
-
-    if (!params.get('surveyId')) return missingRequiredFieldsResponse('surveyId');
 
     for (const key of [
       'surveyId',
