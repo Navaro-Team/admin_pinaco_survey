@@ -43,6 +43,12 @@ export async function GET(request: NextRequest) {
     if (params.get('area')) {
       urlParams.set('area', params.get('area') ?? '');
     }
+    if (params.get('dueDateFrom')) {
+      urlParams.set('dueDateFrom', params.get('dueDateFrom') ?? '');
+    }
+    if (params.get('dueDateTo')) {
+      urlParams.set('dueDateTo', params.get('dueDateTo') ?? '');
+    }
 
     const queryString = urlParams.toString();
     const url = queryString ? `/tasks?${queryString}` : '/tasks';
